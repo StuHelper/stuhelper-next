@@ -1,7 +1,7 @@
 ---
 type: spec
 status: InReview
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 原生客户端行为
@@ -12,11 +12,11 @@ updated: 2026-10-23
 
 ## 身份与会话
 
-移动端使用独立 public client、Authorization Code + S256 PKCE 与系统认证会话，客户端中不包含 secret。校验 state、nonce、redirect、issuer、audience 和令牌有效期；不同 client 的 token 不因同一 issuer 自动互通。取消、过期或进程恢复后必须重新核对授权意图，不能让回调绑定到另一用户。
+移动端分别注册公有客户端（public client），通过系统认证会话使用授权码与 S256 PKCE 登录，客户端不保存长期 secret。PKCE 用于防止他人用截获的授权码换取 token。校验 state、nonce、redirect、issuer、audience 和令牌有效期；不同 client 的 token 不因同一 issuer 自动互通。取消、过期或进程恢复后必须重新核对授权意图，不能让回调绑定到另一用户。
 
 微信登录只证明对应 appid 下的平台身份。绑定已有 SSO 账号必须有双方身份的有效证明与用户确认；缺失 unionid 时不推断跨应用身份。换绑/解绑需重新认证与审计。绑定凭证短时、一次性并关联发起端，不通过 URL、二维码或 postMessage 明文传递 access token。
 
-Web BFF 的 cookie 使用 HttpOnly/Secure 等适用属性并执行 CSRF 防护；移动端采用系统安全存储。服务端依然是权限、学生资格和可见性规则的执行者。
+Web BFF（供浏览器使用的后端）的 cookie 使用 HttpOnly/Secure 等适用属性并执行 CSRF 防护；移动端采用系统安全存储。服务端依然是权限、学生资格和可见性规则的执行者。
 
 ## 功能与离线
 

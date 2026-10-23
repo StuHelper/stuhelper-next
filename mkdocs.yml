@@ -82,6 +82,11 @@ nav:
       - QQ 入群与群管理: spec/qq-group-services.md
       - 第三方开放平台: spec/open-platform.md
       - 存储贡献: spec/storage-contribution.md
+      - 内容运营与审核: spec/content-management.md
+      - 课程维护与教务导入: spec/catalog-operations.md
+      - 内容发现与统计: spec/discovery-and-statistics.md
+      - 全站信息查询: spec/information-query.md
+      - 机器人娱乐功能: spec/bot-entertainment.md
       - 社交与内容治理: spec/social-content.md
       - SSO 兼容: spec/sso-compatibility.md
       - 原生客户端: spec/native-clients.md
@@ -91,8 +96,9 @@ nav:
       - 工作导航: development/README.md
       - 项目重写路线: development/rewrite-roadmap.md
       - SSO 迁移: development/sso-migration.md
-      - 文档架构落地: development/documentation-bootstrap.md
+      - 文档架构与检查工具: development/documentation-bootstrap.md
       - 旧业务整理与确认: development/business-design-extraction.md
+      - 待确认业务清单: development/business-decisions.md
       - 写作模板: development/TEMPLATE.md
   - 指南:
       - 操作导航: guide/README.md

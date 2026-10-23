@@ -1,14 +1,14 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # CI runner 分工
 
 ## 范围与确认依据
 
-适用于本仓库当前检查任务及未来镜像/客户端任务。owner 已确认[按任务分配 runner](../adr/0002-runner-placement.md)：Registry 位于 BJ1，Docker build 使用网络条件更好的 StuHelper 自建 runner。当前还没有镜像构建或发布工作流。
+适用于本仓库当前检查任务及未来镜像/客户端任务。项目负责人已确认[按任务分配 runner](../adr/0002-runner-placement.md)：Registry 位于 BJ1，Docker build 使用网络条件更好的 StuHelper 自建 runner。当前还没有镜像构建或发布工作流。
 
 ## 调度规则
 

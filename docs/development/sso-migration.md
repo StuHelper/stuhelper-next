@@ -1,7 +1,7 @@
 ---
 type: development
 status: InReview
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 官方 Casdoor 独立迁移
@@ -14,7 +14,7 @@ updated: 2026-10-23
 
 ## 调研问题与已知依据
 
-2026-10-23 初始调查确认官方稳定候选为 [v4.23.0](https://github.com/casdoor/casdoor/releases/tag/v4.23.0)，发布于 2026-10-21，tag commit 为 `1b91d9d319a127e9b1af88fa7a20bb35c052b9d8`。完整 digest 记录在[候选锁](https://github.com/StuHelper/stuhelper-next/blob/develop/ops/sso/candidate.json)，状态为 `candidate-not-deployed`；之后实施需重新确认目标版本，不把历史核查日期当作当前 latest 保证。
+2026-10-23 初始调查确认官方稳定候选为 [v4.23.0](https://github.com/casdoor/casdoor/releases/tag/v4.23.0)，发布于 2026-10-21，tag commit 为 `1b91d9d319a127e9b1af88fa7a20bb35c052b9d8`。完整 digest 记录在[候选记录](https://github.com/StuHelper/stuhelper-next/blob/develop/ops/sso/candidate.json)，状态为 `candidate-not-deployed`；之后实施需重新确认目标版本，不把历史核查日期当作当前 latest 保证。
 
 公开 discovery 当时返回 issuer `https://sso.stuhelper.com`，authorize/token/userinfo/JWKS 同源，声明 S256；版本接口要求认证，因此未据此推断生产版本。没有读取生产凭据或原始用户数据。
 
@@ -31,15 +31,15 @@ AI 工作副本检查基线为 `5c6064b120f69b38c4af63a92030499881cde133`，Stor
 | Payment / 机器人 / 其他应用 | 待清点，不因用户举例 AI/Store 而漏掉现有应用 | 全量已注册 application 与实际消费清单的对应关系 |
 | Next 原生客户端 | 新 client 独立注册，Authorization Code + S256 PKCE | 每端 redirect、设备存储、取消/恢复、退出和 refresh 策略 |
 
-以上代码检查针对工作副本，不等于生产配置或当前生产镜像事实。尤其 AI 的自定义 claim selector 不可根据字段名猜值；应在受控进程内比对旧/新结果和原绑定。
+以上代码检查针对工作副本，实际生产配置与镜像版本仍待核实。尤其 AI 的自定义 claim selector 不可根据字段名猜值；应在限制访问且不输出敏感值的进程中比对旧/新结果和原绑定。
 
 ## 决策与确认
 
-owner 已确认[官方镜像](../adr/0001-official-casdoor-image.md)，并说明 Registry 在 BJ1，镜像相关任务使用自建 runner。尚无本次正式切换时间、生产实际拓扑或完整消费者验收结果。
+项目负责人已确认[官方镜像](../adr/0001-official-casdoor-image.md)，并说明 Registry 在 BJ1，镜像相关任务使用自建 runner。尚无本次正式切换时间、生产实际拓扑或完整消费者验收结果。
 
 ## 验收准备与实施任务
 
-- [x] 固定初始官方 release、commit 与镜像 index/platform digest；依据候选锁。
+- [x] 固定初始官方 release、commit 与镜像 index/platform digest；依据候选记录。
 - [x] 区分数据保留、会话连续性和真实消费者验收；定义兼容规格。
 - [ ] 确认实际运行镜像、数据库、持久化资源、全部写入者及已登记消费应用，不公开敏感参数。
 - [ ] 逐项核实 AI selector、Store get-account 策略和其他消费者配置，准备旧/新环境下同一组验收场景。
@@ -55,8 +55,8 @@ owner 已确认[官方镜像](../adr/0001-official-casdoor-image.md)，并说明
 
 1. **只读清点**：确认实际运行 image digest、版本、数据库类型/版本、持久化路径、writer 清单、issuer、应用清单、认证方法、反代/CDN 静态路径。既有文档不能代替当前容器和配置事实。
 2. **消费者先适配**：按 [兼容规格](../spec/sso-compatibility.md) 检查旧站、AI、Store；原始绑定保持不变。当前业务依赖的官方 API、claims 类型与 token policy 都须明确，不从通用“支持 OIDC”推断通过。
-3. **隔离演练**：生产快照仅在受控主机的隔离网络恢复；禁止候选访问真实短信、邮件、支付、webhook、syncer 和外部身份提供方。用可控测试账号/合成 provider 完成 old → candidate、数据核对与 restore → old 演练。其他真实 provider 另做获授权的验收。
-4. **准备维护窗口**：镜像和全部恢复材料提前落地；确认受影响登录、注册、refresh 和实时身份校验的短时中断，确定上线负责人和恢复步骤。当前提案不自行安排停机。
+3. **隔离演练**：生产快照仅在限制访问的主机和隔离网络中恢复；禁止候选访问真实短信、邮件、支付、webhook、syncer 和外部身份提供方。用可控测试账号/合成 provider 完成 old → candidate、数据核对与 restore → old 演练。其他真实 provider 另做获授权的验收。
+4. **准备维护窗口**：提前准备好镜像和全部恢复材料；确认受影响登录、注册、refresh 和实时身份校验的短时中断，确定上线负责人和恢复步骤。当前提案不自行安排停机。
 5. **停所有 SSO 写入者**：包含旧进程、后台任务、syncer、管理员修改和旧站账号写 API。冻结身份写入，不能只关闭登录页面。取得最终一致备份，在隔离库实际恢复、启动并重复关键验证。
 6. **提交边界**：候选首次连接生产库前持久化迁移事务记录（旧/新 digest、备份摘要、状态、操作者、时间）。仅一个部署协调器持有锁；候选从锁定制品启动，不能临时解析 latest。
 7. **验证与放行**：检查实际运行 digest、健康、discovery/JWKS、登录 UI、数据不变量，再完成 AI/Store 等真实消费者的登录、刷新、退出、账号归属和权限验收。
@@ -64,7 +64,7 @@ owner 已确认[官方镜像](../adr/0001-official-casdoor-image.md)，并说明
 
 ## 实际验证与限制
 
-初始候选解析器已真实查询官方 GitHub 与 Docker Hub 元数据，固定 tag/commit/digest，非法 `latest` 参数与 v5 参数被拒绝。解析器不会拉镜像层、构建镜像或部署。哈希一致性不能单独证明同名镜像由对应 commit 构建，来源交叉验证仍在资格工具范围。
+初始候选解析器已真实查询官方 GitHub 与 Docker Hub 元数据，固定 tag/commit/digest，非法 `latest` 参数与 v5 参数被拒绝。解析器不会拉镜像层、构建镜像或部署。哈希一致性不能单独证明同名镜像由对应 commit 构建，镜像与源码之间的来源核验仍待实现。
 
 尚未执行生产快照备份/恢复、实际部署、AI/Store 真实账号登录、外部 provider 和旧会话验收。后续每个结果必须绑定精确候选、消费方版本、测试项和匿名结果；pending/skipped 保持未完成。
 

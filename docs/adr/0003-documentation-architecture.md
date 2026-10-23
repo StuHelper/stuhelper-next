@@ -1,7 +1,7 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 0003：采用 project-docs-starter 文档架构
@@ -12,7 +12,7 @@ updated: 2026-10-23
 
 ## 决策与确认依据
 
-采用 owner 于 2026-10-23 指定的 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0) 架构，基线 commit 为 `1c4c6bb1bd401b803ea986b404932926cfc95eb0`。
+采用项目负责人于 2026-10-23 指定的 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0) 架构，基线 commit 为 `1c4c6bb1bd401b803ea986b404932926cfc95eb0`。
 
 文档分为 design、spec、development、guide 和 adr；各类提供入口和模板，使用 `type/status/updated` 元信息，区分确认状态、工作进度和验证结果。每条完整规则只维护一处，通过链接组织设计、场景、任务与操作。
 

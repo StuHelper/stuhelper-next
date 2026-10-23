@@ -1,7 +1,7 @@
 ---
 type: spec
 status: InReview
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 模块生命周期
@@ -11,6 +11,8 @@ updated: 2026-10-23
 定义 Next 内置模块和外部扩展的目标行为，供服务端、客户端和运维使用。当前仅有[设计依赖清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)，没有运行时模块加载器。
 
 ## 模块与依赖
+
+capability 表示服务提供的功能或允许执行的操作，schema 表示数据库结构，outbox 保存等待发送的业务事件。事件的 revision 是业务对象修订号，用来判断事件的新旧顺序。
 
 模块声明自身版本、必需/可选依赖、提供的 API、capability 和事件、schema 支持范围、健康与关闭方式。必需依赖必须存在且版本兼容，整体不能成环；可选依赖通过公开接口或事件适配，不导入对方私有实现。
 

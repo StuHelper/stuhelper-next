@@ -1,12 +1,12 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 功能与模块规格
 
-本分类定义目标行为与验收条件。尚未实现的功能在正文标明范围，执行结果由开发记录维护。
+本分类定义目标行为与验收条件。当前业务仍处于设计阶段，实际实现和验证结果记录在 development 分类。待决定的问题集中在[业务清单](../development/business-decisions.md)。
 
 | 主题 | 内容 |
 | --- | --- |
@@ -21,6 +21,11 @@ updated: 2026-10-23
 | [QQ 绑定、入群与群管理](qq-group-services.md) | 入群、名片、黑名单、资格宽限期与管理员豁免 |
 | [第三方开放平台](open-platform.md) | 应用接入、用户授权和业务信息查询 |
 | [存储贡献](storage-contribution.md) | 容量、期限、占用、续期、退出和贡献榜 |
+| [内容运营与审核](content-management.md) | 审核、举报、隐藏/恢复、修改/删除申请和反馈 |
+| [课程、教师维护与教务导入](catalog-operations.md) | 目录更正、导入来源、任务和处理结果 |
+| [内容发现、排行与趋势](discovery-and-statistics.md) | 热门课程/教师、评价趋势和我的投票 |
+| [全站信息关联查询](information-query.md) | 学号/姓名/QQ 关联查询，以及管理员可见范围 |
+| [机器人娱乐功能](bot-entertainment.md) | 骰子、自助禁言及管理配置 |
 | [社交与内容治理](social-content.md) | 动态、互动、匿名、举报、审核和通知 |
 | [SSO 兼容](sso-compatibility.md) | 数据保留、身份不变量、消费者验收矩阵 |
 | [原生客户端行为](native-clients.md) | 跨端登录、绑定、离线与升级行为 |

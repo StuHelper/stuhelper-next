@@ -1,14 +1,14 @@
 ---
 type: development
 status: InReview
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 旧业务整理与确认
 
 ## 目标、范围与进度
 
-进度：进行中。已将 owner 确认保留的业务提取到五类文档架构，补充本轮确认的实名、作品授权、资料权益和货币规则，并完成本地文档检查。未决问题继续由 owner 确认；本文不代表业务实现、数据库连接或生产验收。
+进度：进行中。已整理项目负责人确认保留的业务，补充实名、作品授权、资料权益、货币、后台运营和机器人功能。待决定的问题集中在[业务清单](business-decisions.md)，实际检查结果见文末。
 
 Next 是现有 StuHelper 的重构版本，未来改名与旧仓库退役的方向见[业务范围](../design/business-scope.md)。本次在现有独立文档工作树继续更新 [PR #1](https://github.com/StuHelper/stuhelper-next/pull/1)，不修改旧工作树内容或生产系统。
 
@@ -18,14 +18,15 @@ Next 是现有 StuHelper 的重构版本，未来改名与旧仓库退役的方�
 
 | 旧资料 | 提取后的维护位置 |
 | --- | --- |
-| [课程与评课](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/course-review.md) | [课程与评价](../spec/academic-content.md)：查询、预览、互动和五级展示 |
+| [课程与评课](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/course-review.md) | [课程与评价](../spec/academic-content.md)、[内容运营](../spec/content-management.md)、[排行与趋势](../spec/discovery-and-statistics.md) |
 | [学生认证与入群](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/student-verification-and-group-admission.md) | [认证](../spec/student-verification.md)及[QQ 群服务](../spec/qq-group-services.md) |
 | [用户系统](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/user-system.md) | [个人中心](../spec/personal-center.md) |
 | [资源共享](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/resource-sharing.md) | [资料共享](../spec/resource-sharing.md)，版权和删除采用本轮新决定 |
 | [通知](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/notification.md) | [通知中心](../spec/notifications.md) |
-| [教务数据集成](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/academics-data-integration.md) | [我的课程与课表](../spec/my-courses.md) |
+| [教务数据集成](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/academics-data-integration.md) | [我的课程与课表](../spec/my-courses.md)及[目录维护与导入](../spec/catalog-operations.md) |
 | [群名片治理](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/koishi-group-card-governance.md) | QQ 群服务中的名片检查与提醒 |
 | [黑名单统一](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/member-blacklist-unification.md) | QQ 群服务中的黑名单与管理员处理 |
+| [机器人业务说明](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/bots/koishi/README.md) | 群消息管理、[信息查询](../spec/information-query.md)与[娱乐功能](../spec/bot-entertainment.md)，查询范围采用本次确认的新规则 |
 | [开放平台](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/open-platform-v1.md) | [第三方开放平台](../spec/open-platform.md) |
 | [存储贡献](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/storage-contribution.md) | [存储贡献](../spec/storage-contribution.md) |
 
@@ -35,10 +36,10 @@ Next 是现有 StuHelper 的重构版本，未来改名与旧仓库退役的方�
 
 ## 已确认的变更
 
-2026-10-23 owner 明确同意写入已确认内容，并先后确认以下规则：
+2026-10-23 项目负责人明确同意写入已确认内容，并先后确认以下规则：
 
 - 评课沿用游客和未认证用户看预览、学生看全文并发布的限制，继续五级文字与表情展示。
-- 课程和教师评价默认匿名、允许主动署名；发布后修改或删除都由管理员处理。教师评价沿用评课的发布门槛，不要求系统提供对应选课证明。
+- 课程和教师评价默认匿名，也允许使用平台昵称和头像署名。发布后修改或删除都由管理员处理。教师评价沿用评课的发布条件，不要求系统提供对应选课证明。
 - 发布前绑定手机号；学生认证本身不强制绑手机；发布不额外要求独立实名，但用户可以完成实名。
 - 北航实名信息校验沿用学籍比对，通过后同时完成学生认证和实名；单独实名也优先学籍比对，未覆盖用户的云实人认证以后接入。
 - 学生认证只允许用户申请撤销或删除，由管理员处理。
@@ -48,6 +49,15 @@ Next 是现有 StuHelper 的重构版本，未来改名与旧仓库退役的方�
 - 本轮同时讨论积分与余额两套账户、余额购买积分、平台收取消费、贡献奖励、长期和限时积分及原路或人工退款，规则集中在[货币规格](../spec/wallet-and-points.md)。
 - 余额采用 Ivory 计价，CNY 充值按 1 CNY = 1 Ivory；支持 USDT 充值的方向已确认，汇率和接入规则留待后续讨论。
 - 积分先扣最早到期的限时积分，再扣长期积分；退款保留原类型与有效期，按实际到账时判断，已过期部分不恢复为可用积分，不续期或增加宽限期。
+- 纳入内容运营、课程和教师维护、教务导入、热门课程与教师、评价趋势和我的投票。资料支持整目录和多包下载，存储贡献增加透明度页面。
+- 机器人按群聊管理、信息查询和娱乐功能组织。群聊管理包含警告、禁言、关键词、防复读、防撤回和 AI 举报分析。信息查询覆盖身份、认证、内容、群记录、会员权益、积分、Ivory、消费及退款。
+- 平台管理员可查全站，其他管理员按负责学校、群和业务模块授权。管理后台提供完整查询入口，机器人查询能力另行按权限配置。
+
+## 沟通与写作规范
+
+已按项目负责人提供的原文更新仓库根目录 [AGENTS.md](https://github.com/StuHelper/stuhelper-next/blob/docs/adopt-project-docs-starter/AGENTS.md#沟通与回复)，并把相同原文加入本机主工作区的 AGENTS.md。规范直接存放在 AGENTS.md 中。
+
+本轮审阅现有 Markdown，简化重复的状态声明和含糊表述，并解释 OIDC、Outbox、schema、PKCE、HMAC 等必要概念。修正路线图中已过时的署名待确认项，保留已确认业务规则、SSO 数据保留要求和失败恢复条件。
 
 ## 未继承的旧约束
 
@@ -66,14 +76,14 @@ Next 是现有 StuHelper 的重构版本，未来改名与旧仓库退役的方�
 | 检查 | 本次结果 |
 | --- | --- |
 | `python3 scripts/check.py` | 通过，覆盖仓库语法、13 个原有模块声明和候选元数据 |
-| `npm run check:docs` | 通过，50 份 Markdown 的格式、元信息、本地链接和锚点 |
+| `npm run check:docs` | 通过，56 份 Markdown 的格式、元信息、本地链接和锚点 |
 | `npm run test:docs` | 7 项检查器回归通过 |
 | `python3 scripts/lint_workflows.py` | actionlint 1.7.12 通过 |
 | `uv run --locked mkdocs build --strict` | 通过，新增页面与分类导航纳入严格构建 |
-| 固定旧来源检查 | 13 个引用路径均存在于记录的旧提交中 |
+| 固定旧来源检查 | 14 个引用路径均存在于记录的旧提交中 |
 
-交付与精确提交的远端结果以 [PR #1 checks](https://github.com/StuHelper/stuhelper-next/pull/1/checks) 为准，不用上一个文档提交的 CI 代替本次结果。此轮未修改图表结构，不重复使用浏览器图表结果作为新增业务已验收的证明。
+当前提交的远端结果见 [PR #1 checks](https://github.com/StuHelper/stuhelper-next/pull/1/checks)。本轮图表结构保持不变，检查范围为文档、链接、工具和静态站点构建。
 
-学校方法清单、评分与匿名细节、会员套餐和其他未决问题保留在对应规格，不以默认值代替决定。
+学校方法清单、评分维度、发布后切换匿名状态、会员套餐等问题保留在对应规格，并汇总到业务清单。
 
-本次不访问学校 Oracle，不读取真实学生数据，不实施支付、授权、群移出或其他生产操作。所有验收表均为未来实现的判断标准，不是已经执行的测试结果。
+本次修改范围为文档。规格中的验收表用于指导未来实现，业务测试和生产验收的结果在实施后记录。

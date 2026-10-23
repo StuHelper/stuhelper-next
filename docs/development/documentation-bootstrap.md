@@ -1,20 +1,20 @@
 ---
 type: development
 status: InReview
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
-# 文档架构落地
+# 文档架构与检查工具
 
 ## 目标、范围与进度
 
-进度：已完成。文档重写与本地验证已完成，通过 [PR #1](https://github.com/StuHelper/stuhelper-next/pull/1) 交付，合并状态以 PR 为准。按 owner 指定的 project-docs-starter 重写首版方案，并记录官方 Casdoor 镜像与 BJ1 镜像任务的 runner 分工。本次只变更文档和文档检查基础，不实施 SSO 生产迁移或镜像构建。
+进度：已完成。首版文档架构和检查工具已完成本地与远端验证，通过 [PR #1](https://github.com/StuHelper/stuhelper-next/pull/1) 交付，合并状态以 PR 为准。按项目负责人指定的 project-docs-starter 重写首版方案，并记录官方 Casdoor 镜像与 BJ1 镜像任务的 runner 分工。本记录保存文档工具首次交付的结果。后续业务补充见[业务整理记录](business-design-extraction.md)。
 
 ## 来源与确认依据
 
 已读取[模板基线](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0)的 README、AGENTS、authoring、五类模板/索引、检查器说明及 MkDocs 配置。项目采用其分类与生命周期，内容和检查器按本仓库实际需要实现；不引入上游演示业务或浮动工具版本。
 
-2026-10-23 owner 明确要求使用官方 Casdoor 镜像，Docker build 因 Registry 位于 BJ1 而使用自建 runner，并指定本套文档架构。三项决定分别记录在[ADR 索引](../adr/README.md)。产品细节仍保留 InReview。
+2026-10-23 项目负责人明确要求使用官方 Casdoor 镜像，Docker build 因 Registry 位于 BJ1 而使用自建 runner，并指定本套文档架构。三项决定分别记录在[ADR 索引](../adr/README.md)。产品细节仍保留 InReview。
 
 ## 原内容的归属
 
@@ -60,4 +60,4 @@ updated: 2026-10-23
 
 本表保留首个已验证实现提交的回执；后续仅补充交付记录时仍运行 CI，最终 HEAD 的结果由 [PR checks](https://github.com/StuHelper/stuhelper-next/pull/1/checks) 展示。首次建仓的旧 CI 结果不能替代此次验证。
 
-不执行生产 SSO 切换、真实账号登录、Docker build、BJ1 Registry 读写或移动端构建；这些工作仍在对应开发计划中，不因文档状态或检查通过而视为完成。
+SSO 生产切换、真实账号登录、镜像与移动端构建的进度由对应开发记录维护。

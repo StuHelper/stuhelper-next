@@ -1,8 +1,8 @@
 # StuHelper Next
 
-现有 StuHelper 的重构版本，Next 是过渡名称，未来以 StuHelper 的名称继续维护。重新实现已确认保留的校园业务，采用独立官方 Casdoor SSO、模块化业务契约，以及 Web、微信小程序、Android、iOS、HarmonyOS 原生客户端。
+现有 StuHelper 的重构版本。Next 是过渡名称，未来以 StuHelper 的名称继续维护。项目采用独立官方 Casdoor SSO，各业务模块通过公开接口协作，并分别开发 Web、微信小程序、Android、iOS 和 HarmonyOS 原生客户端。
 
-**当前阶段：架构提案与工程初始化。** 本仓库尚无业务 API 或客户端产品；SSO 部署、数据迁移和真实账号验收尚未执行。CI 通过只证明仓库检查通过。
+**当前阶段：业务与架构设计。** 仓库已提供文档、检查工具和 SSO 候选版本解析器。业务 API、客户端、SSO 部署和数据迁移仍待实施。
 
 ## 已确定的方向
 
@@ -11,7 +11,7 @@
 - 保留现有 SSO 数据、issuer、用户标识和消费方绑定；AI、Store 等已有应用独立接入同一身份提供方。
 - 先实现有明确边界的模块化后端，模块通过公开接口和事件协作；有实际隔离需求时再拆服务。
 - 客户端共享 API、领域术语、设计规范和验收用例，原生 UI 与平台生命周期分别实现。
-- 保留课程与评课、学生认证与可选实名、资料共享、个人中心、通知、课表、QQ 入群与群管理、开放平台及存储贡献；积分、余额和资料权益采用本轮确认的业务规则，见[业务范围](docs/design/business-scope.md)。
+- 已确认课程与评课、认证、资料共享、课表、内容运营、开放平台和存储贡献等业务。机器人功能分为群聊管理、信息查询和娱乐功能。完整范围见[业务设计](docs/design/business-scope.md)，剩余选择见[待确认业务清单](docs/development/business-decisions.md)。
 
 ## 文档入口
 
@@ -39,12 +39,12 @@ uv run --locked mkdocs build --strict
 
 完整命令、预览与限制见[检查指南](docs/guide/repository-checks.md)。CI 还运行固定版本的 actionlint。普通检查默认 GitHub 托管 runner；Docker/OCI 构建与 BJ1 Registry 拉取、推送、缓存固定使用 StuHelper 自建 runner。Casdoor 直接消费官方原件，不在本项目构建。
 
-普通开发从最新 `origin/develop` 建短期分支并通过 PR squash 合入。正式发行经 `develop -> main` merge commit，owner 授权后才创建不可变 CalVer tag。
+普通开发从最新 `origin/develop` 建短期分支并通过 PR squash 合入。正式发行经 `develop -> main` merge commit，项目负责人授权后才创建不可变 CalVer tag。
 
 ## 目录
 
 ```text
-architecture/modules.json   模块依赖的设计清单（不是运行时插件加载器）
+architecture/modules.json   模块依赖的设计清单
 docs/                      design / spec / development / guide / adr
 ops/sso/                   无业务依赖的官方镜像候选解析工具
 scripts/                   仓库检查与 CI 工具
@@ -53,6 +53,6 @@ scripts/                   仓库检查与 CI 工具
 mkdocs.yml                 本地文档站与严格构建配置
 ```
 
-未来业务代码目录见架构文档；不以空项目、假 API 或通过的占位测试表示功能已完成。
+业务代码的目录提案见架构文档，实际实现与验证进度记录在 development 分类中。沟通和技术文档写作遵循 [AGENTS.md](AGENTS.md)。
 
 代码与文档延续 StuHelper 的 [AGPL-3.0-only](LICENSE) 许可；Casdoor 是单独部署的第三方软件，保留其自己的官方许可证。

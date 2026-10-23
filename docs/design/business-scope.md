@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 重构定位与业务范围
@@ -26,8 +26,15 @@ StuHelper Next 是现有 StuHelper 的重构版本。Next 是过渡名称，目�
 | 群管理 | 管理群名片、提醒、黑名单与资格失效后的群成员处理 | [QQ 与群管理](../spec/qq-group-services.md) |
 | 第三方开放平台 | 开发者申请接入，用户决定向应用授权哪些业务信息 | [开放平台](../spec/open-platform.md) |
 | 存储贡献 | 自愿贡献网盘容量，查看占用、续期、退出和贡献榜 | [存储贡献](../spec/storage-contribution.md) |
+| 内容运营 | 审核内容、处理举报和作者申请，隐藏或恢复内容并反馈结果 | [内容管理](../spec/content-management.md) |
+| 目录与教务维护 | 维护课程和教师资料，查看教务导入来源、任务与结果 | [目录维护](../spec/catalog-operations.md) |
+| 内容发现 | 查看热门课程、热门教师、评价趋势和我的投票 | [发现与统计](../spec/discovery-and-statistics.md) |
+| 信息查询 | 从学号、姓名或 QQ 关联查看用户的全站业务记录 | [信息查询](../spec/information-query.md) |
+| 娱乐功能 | 使用和管理骰子、自助禁言等机器人命令 | [娱乐功能](../spec/bot-entertainment.md) |
 
 社交能力与 Web、小程序、Android、iOS、HarmonyOS 原生客户端仍在重写范围内，见[社交提案](../spec/social-content.md)和[原生多端](native-clients.md)。独立官方 Casdoor SSO 继续负责登录，并保持 AI、Store 等已有消费方的账号连续性，见[独立 SSO](independent-sso.md)。
+
+机器人相关菜单统一分为群聊管理、信息查询和娱乐功能。群聊管理包含关键词、防复读、防撤回与 AI 举报分析。信息查询由管理后台提供完整入口，机器人能力按权限配置。
 
 ## 贯穿业务的概念
 
@@ -39,6 +46,6 @@ StuHelper Next 是现有 StuHelper 的重构版本。Next 是过渡名称，目�
 
 ## 确认边界
 
-2026-10-23 owner 同意提取并写入上述业务，明确仅继承确认的产品规则。旧工程中的权限投影、加密实现、事务协调、审计保留期、部署流程和底层存储调度不属于这批业务提取的内容。
+2026-10-23 项目负责人同意提取并写入上述业务，明确仅继承确认的产品规则。旧工程中的权限投影、加密实现、事务协调、审计保留期、部署流程和底层存储调度不属于这批业务提取的内容。
 
-各规格把已确认行为与待确认问题分开。未知评分维度、学校方法清单、奖励数值、资格期限和上线顺序不能因旧文档存在某个默认值就成为 Next 的决定。来源与实际文档验证见[业务整理记录](../development/business-design-extraction.md)。
+各规格记录已确认行为，剩余选择汇总在[待确认业务清单](../development/business-decisions.md)。评分维度、学校方法、奖励数值、资格期限和上线顺序由项目负责人决定。来源与验证记录见[业务整理记录](../development/business-design-extraction.md)。

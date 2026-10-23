@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 仓库检查与文档预览
@@ -33,7 +33,7 @@ uv run --locked mkdocs build --strict
 uv run --locked mkdocs serve --dev-addr 127.0.0.1:8000
 ```
 
-打开终端给出的本地地址。导航按五类目录组织，Mermaid 支持图表与缩放；图表脚本来自配置中固定版本的 jsDelivr 资源，浏览器需可访问该 CDN。严格构建不证明浏览器已加载外部脚本。
+打开终端给出的本地地址。导航按五类目录组织，Mermaid 支持图表与缩放；图表脚本来自配置中固定版本的 jsDelivr 资源，浏览器需要访问该 CDN。修改图表或相关配置后，在浏览器中确认实际显示结果。
 
 ## 结果检查
 
@@ -49,6 +49,6 @@ uv run --locked mkdocs serve --dev-addr 127.0.0.1:8000
 | 文件或锚点缺失 | 核对移动后的主题、标题和入站引用 | 重跑链接检查和严格构建 |
 | lockfile 不一致 | 明确升级范围并重新生成 lockfile，不跳过锁定 | 重新安装后完整检查 |
 | 下载失败 | 区分网络和内容校验错误，不关闭 checksum 或换未知来源 | 重跑原失败步骤 |
-| 图表未显示 | 查看浏览器 CDN 加载和 Mermaid 语法 | 在预览页核实图表，保留构建结果边界 |
+| 图表未显示 | 查看浏览器 CDN 加载和 Mermaid 语法 | 在预览页核实图表，确认图表实际显示 |
 
 预览使用 Ctrl+C 停止。`site/`、`node_modules/` 和 `.venv/` 是本地构建/依赖目录，已忽略；不删除源码、lockfile、工作树或其他项目的数据。
