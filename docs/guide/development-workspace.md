@@ -8,10 +8,10 @@ updated: 2026-10-24
 
 ## 准备
 
-需要 Git、Go 1.27.2、Node.js 24、Corepack、uv，以及 GitHub 仓库访问权限。公开框架不需要私有仓库权限。先检出架构仓库的框架分支；本阶段仍处于跨仓库 PR 开发，合并后清单会改为 develop，正式发行组合单独固定版本 tag。
+需要 Git、Go 1.27.2、Node.js 24、Corepack、uv，以及 GitHub 仓库访问权限。公开框架不需要私有仓库权限。架构与模块仓库的开发工作区统一检出 develop，正式发行组合单独固定版本 tag。
 
 ```bash
-git clone --branch feat/framework-bootstrap https://github.com/StuHelper/stuhelper-next.git
+git clone --branch develop https://github.com/StuHelper/stuhelper-next.git
 cd stuhelper-next
 make tools
 make setup

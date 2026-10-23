@@ -11,7 +11,7 @@ for (const config of [publicConfig, privateConfig]) {
   for (const [name, project] of Object.entries(config.projects)) {
     assert.equal(project.url, `https://github.com/StuHelper/stuhelper-${name}.git`);
     assert.equal(project.path, `workspace/${name}`);
-    assert.equal(typeof project.branch, 'string');
+    assert.equal(project.branch, 'develop', 'Development checkout must use the maintained branch');
     assert(!project.worktrees, 'Task worktrees must not be globally created or pruned by sync');
   }
 }

@@ -1,4 +1,4 @@
-# Development workspace. These bootstrap branches are not release versions.
+# Development workspace. Formal deployment combinations use fixed version tags.
 shell: bash
 sync_gitignore: false
 sync_remotes: false
@@ -8,17 +8,17 @@ projects:
   platform:
     path: workspace/platform
     url: https://github.com/StuHelper/stuhelper-platform.git
-    branch: feat/framework-bootstrap
+    branch: develop
     tags: [public, backend, code]
   web:
     path: workspace/web
     url: https://github.com/StuHelper/stuhelper-web.git
-    branch: feat/framework-bootstrap
+    branch: develop
     tags: [public, frontend, code]
   admin:
     path: workspace/admin
     url: https://github.com/StuHelper/stuhelper-admin.git
-    branch: feat/framework-bootstrap
+    branch: develop
     tags: [public, frontend, code]
 
 specs:
