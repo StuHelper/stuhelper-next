@@ -32,3 +32,5 @@ Next 是原 StuHelper 的重构版本和过渡名称。重写目标是保留需�
 | [原生多端](native-clients.md) | 技术路线、共享边界、登录和平台限制 |
 
 新增主题使用[设计模板](TEMPLATE.md)，遵循[维护约定](../authoring.md)。
+
+- [框架运行与应用入口](framework-runtime.md)

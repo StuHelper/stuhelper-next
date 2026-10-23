@@ -1,0 +1,53 @@
+# Development workspace. These bootstrap branches are not release versions.
+shell: bash
+sync_gitignore: false
+sync_remotes: false
+remove_orphaned_worktrees: false
+
+projects:
+  platform:
+    path: workspace/platform
+    url: https://github.com/StuHelper/stuhelper-platform.git
+    branch: feat/framework-bootstrap
+    tags: [public, backend, code]
+  web:
+    path: workspace/web
+    url: https://github.com/StuHelper/stuhelper-web.git
+    branch: feat/framework-bootstrap
+    tags: [public, frontend, code]
+  admin:
+    path: workspace/admin
+    url: https://github.com/StuHelper/stuhelper-admin.git
+    branch: feat/framework-bootstrap
+    tags: [public, frontend, code]
+
+specs:
+  default:
+    parallel: false
+    forks: 3
+    ignore_errors: false
+    ignore_non_existing: false
+
+tasks:
+  status:
+    desc: Show each repository's branch and working tree
+    cmd: git status --short --branch
+  fetch:
+    desc: Fetch remote refs without switching branches or changing files
+    cmd: git fetch origin --tags
+  setup:
+    desc: Install each code repository's locked tools
+    cmd: make setup
+    target:
+      tags: [code]
+  check:
+    desc: Run each code repository's own checks
+    cmd: make check
+    target:
+      tags: [code]
+  build:
+    desc: Build each code repository independently
+    cmd: make build
+    target:
+      tags: [code]
+

@@ -69,4 +69,4 @@ updated: 2026-10-24
 
 私有模块的详细规格分别放在对应仓库，公共规格仅保留必要的使用与对接说明。公共仓库继续保持 public，历史提交按项目负责人决定保留，不重写已有公开历史。
 
-本轮完成的是文档及仓库结构迁移。运行时加载器、业务服务、SDK、跨仓库发布和生产部署仍待实现。[模块清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)只记录设计状态，不能用清单存在证明模块已经可运行。
+文档与私有仓库结构已迁移，platform、Web 和 Admin 的框架代码已完成。业务服务、跨仓库正式发布和生产部署继续单独推进。[模块清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)分别记录设计、框架和业务实现状态；实际验证以[框架工作记录](../development/framework-bootstrap.md)为准。

@@ -17,3 +17,5 @@ updated: 2026-10-23
 新增主题使用[决策模板](TEMPLATE.md)，遵循[维护约定](../authoring.md)。
 
 - [ADR-0004：按模块采用多仓库](0004-modular-multi-repository.md)
+
+- [开发工作区使用 Mani](0005-mani-workspace.md)

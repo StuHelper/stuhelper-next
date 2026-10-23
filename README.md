@@ -2,7 +2,7 @@
 
 现有 StuHelper 的重构版本。Next 是过渡名称，未来以 StuHelper 的名称继续维护。项目采用独立官方 Casdoor SSO，各业务模块通过公开接口协作，当前开发 Web 与 Admin，微信小程序、Android、iOS 和 HarmonyOS 暂时搁置。
 
-**当前阶段：业务与架构设计。** 仓库已提供公共文档、模块清单与检查工具，私有模块文档迁往对应仓库。业务 API、客户端、SSO 部署和数据迁移仍待实施。
+**当前阶段：工程框架。** 公共文档与私有模块文档已整理，正在搭建 Go 平台运行时、Web 和 Vben Admin 应用。业务 API、真实身份接入、SSO 部署和数据迁移尚未实施。详见[框架工作记录](docs/development/framework-bootstrap.md)。
 
 ## 已确定的方向
 
@@ -24,6 +24,10 @@
 | [development](docs/development/README.md) | 调研、实施任务、实际进度与验证证据 |
 | [guide](docs/guide/README.md) | 本地检查、文档预览、CI 操作与候选解析 |
 | [adr](docs/adr/README.md) | 官方镜像、runner 分工和文档架构的已确认决策 |
+
+## 开发工作区
+
+使用 Mani 管理公开与可选私有检出。各代码仓库有独立的构建和检查入口，完整操作见[开发工作区](docs/guide/development-workspace.md)。Admin 固定 Vben Admin v5.7.0 官方默认 web-antd 应用。
 
 ## 本地检查
 

@@ -1,6 +1,6 @@
 ---
 type: spec
-status: InReview
+status: Accepted
 updated: 2026-10-24
 ---
 
@@ -8,7 +8,7 @@ updated: 2026-10-24
 
 ## 范围与适用情况
 
-定义多仓库模块与外部扩展的目标行为，供服务端、客户端和运维使用。当前仅有[设计依赖清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)，没有运行时模块加载器。
+定义多仓库模块与外部扩展的目标行为，供服务端、客户端和运维使用。[模块清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)记录模块归属。首期框架通过配置与重启启停模块，当前没有在线管理开关；运行机制见[框架实现设计](../design/framework-runtime.md)。
 
 ## 模块与依赖
 

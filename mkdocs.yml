@@ -65,6 +65,7 @@ nav:
       - 学生资格与实名身份: design/student-identity.md
       - 积分与 Ivory 设计: design/wallet-and-points.md
       - 平台架构: design/platform-architecture.md
+      - 框架运行: design/framework-runtime.md
       - 按模块划分仓库: design/module-repositories.md
       - 课程与内容关系: design/academic-content.md
       - 独立 SSO: design/independent-sso.md
@@ -98,6 +99,7 @@ nav:
   - 开发:
       - 工作导航: development/README.md
       - 项目重写路线: development/rewrite-roadmap.md
+      - 框架搭建: development/framework-bootstrap.md
       - SSO 迁移: development/sso-migration.md
       - 文档架构与检查工具: development/documentation-bootstrap.md
       - 旧业务整理与确认: development/business-design-extraction.md
@@ -106,6 +108,7 @@ nav:
       - 写作模板: development/TEMPLATE.md
   - 指南:
       - 操作导航: guide/README.md
+      - 开发工作区: guide/development-workspace.md
       - 检查与预览: guide/repository-checks.md
       - CI 操作: guide/ci-runners.md
       - SSO 候选解析: guide/sso-candidate.md
@@ -116,4 +119,5 @@ nav:
       - Runner 分工: adr/0002-runner-placement.md
       - 文档架构: adr/0003-documentation-architecture.md
       - 模块多仓库: adr/0004-modular-multi-repository.md
+      - Mani 工作区: adr/0005-mani-workspace.md
       - 写作模板: adr/TEMPLATE.md

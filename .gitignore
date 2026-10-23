@@ -20,3 +20,10 @@ secrets/
 backups/
 private/
 ops/sso/runtime/
+
+workspace/
+.tools/
+go.work.sum
+
+test-results/
+playwright-report/

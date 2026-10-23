@@ -1,0 +1,34 @@
+# Optional private source checkout. Repository access still requires GitHub permission.
+import:
+  - ./mani.yaml
+shell: bash
+sync_gitignore: false
+sync_remotes: false
+remove_orphaned_worktrees: false
+
+projects:
+  sso:
+    path: workspace/sso
+    url: https://github.com/StuHelper/stuhelper-sso.git
+    branch: docs/import-module-design
+    tags: [private, docs]
+  verification:
+    path: workspace/verification
+    url: https://github.com/StuHelper/stuhelper-verification.git
+    branch: docs/import-module-design
+    tags: [private, docs]
+  campus-adapters:
+    path: workspace/campus-adapters
+    url: https://github.com/StuHelper/stuhelper-campus-adapters.git
+    branch: docs/import-module-design
+    tags: [private, docs]
+  billing:
+    path: workspace/billing
+    url: https://github.com/StuHelper/stuhelper-billing.git
+    branch: docs/import-module-design
+    tags: [private, docs]
+  ops:
+    path: workspace/ops
+    url: https://github.com/StuHelper/stuhelper-ops.git
+    branch: docs/import-module-design
+    tags: [private, docs]

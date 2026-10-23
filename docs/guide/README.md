@@ -15,3 +15,5 @@ updated: 2026-10-23
 | [解析 SSO 候选](sso-candidate.md) | 获得官方 release、commit、镜像 digest；不进行部署 |
 
 新增主题使用[指南模板](TEMPLATE.md)，遵循[维护约定](../authoring.md)。
+
+- [开发工作区](development-workspace.md)

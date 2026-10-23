@@ -1,17 +1,17 @@
 {
   "schema_version": 2,
-  "status": "design-only",
+  "status": "framework",
   "repository_model": "modular-multi-repo",
   "modules": [
     {
       "id": "platform",
       "repository": "StuHelper/stuhelper-platform",
       "visibility": "public",
-      "implementation": "not-implemented",
+      "implementation": "framework",
       "required": [],
       "optional": [],
       "interface_owner": "platform",
-      "contract_status": "design-only"
+      "contract_status": "framework"
     },
     {
       "id": "identity",
@@ -258,6 +258,20 @@
       ],
       "interface_owner": "notifications",
       "contract_status": "design-only"
+    }
+  ],
+  "applications": [
+    {
+      "id": "web",
+      "repository": "StuHelper/stuhelper-web",
+      "visibility": "public",
+      "implementation": "framework"
+    },
+    {
+      "id": "admin",
+      "repository": "StuHelper/stuhelper-admin",
+      "visibility": "public",
+      "implementation": "framework"
     }
   ]
 }
