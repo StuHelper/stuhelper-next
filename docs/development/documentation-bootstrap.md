@@ -8,7 +8,7 @@ updated: 2026-10-23
 
 ## 目标、范围与进度
 
-进度：进行中。文档重写与本地验证已完成，正在通过 PR 交付。按 owner 指定的 project-docs-starter 重写首版方案，并记录官方 Casdoor 镜像与 BJ1 镜像任务的 runner 分工。本次只变更文档和文档检查基础，不实施 SSO 生产迁移或镜像构建。
+进度：已完成。文档重写与本地验证已完成，通过 [PR #1](https://github.com/StuHelper/stuhelper-next/pull/1) 交付，合并状态以 PR 为准。按 owner 指定的 project-docs-starter 重写首版方案，并记录官方 Casdoor 镜像与 BJ1 镜像任务的 runner 分工。本次只变更文档和文档检查基础，不实施 SSO 生产迁移或镜像构建。
 
 ## 来源与确认依据
 
@@ -38,8 +38,8 @@ updated: 2026-10-23
 - [x] 明确普通检查与镜像任务的 runner 分工，官方 Casdoor 不增加构建任务。
 - [x] 完成五类模板/索引、文档检查与严格构建，核对全部旧链接已修复。
 - [x] 执行检查器回归与完整本地检查。
-- [ ] 核对精确提交的远端 CI。
-- [ ] 按仓库规则通过 PR 交付，并记录实际结果与剩余限制。
+- [x] 核对精确提交的远端 CI，首个验证提交与 run 见下表。
+- [x] 按仓库规则通过 PR 交付，并记录实际结果与剩余限制。
 
 ## 验证与交付
 
@@ -54,9 +54,10 @@ updated: 2026-10-23
 | `uv run --locked mkdocs build --strict` | 通过：五类导航、全部页面和链接的静态构建 |
 | 本地浏览器 | 平台架构、课程关系、SSO 状态图均实际生成 SVG；主题导航正常 |
 | Node 依赖审计 | 锁定依赖安装后的 npm audit 为 0 vulnerabilities |
+| GitHub 托管 CI | 提交 `4eb8f5ff27dbb4d9506de02859522d08ba40836b` 的 [run 39963320509](https://github.com/StuHelper/stuhelper-next/actions/runs/39963320509) 成功，执行全部新增检查 |
 
 格式检查直接调用 markdownlint library，避免引入当前 CLI2 的未修复 braces/glob 依赖链；picomatch 使用 4.0.7，间接 KaTeX 固定为修复版 0.18.2。固定依赖和检查器一起通过回归，不通过关闭规则消除错误。
 
-远端 CI 尚待本次 PR 的精确提交运行；首次建仓的旧 CI 结果不能替代此次验证。
+本表保留首个已验证实现提交的回执；后续仅补充交付记录时仍运行 CI，最终 HEAD 的结果由 [PR checks](https://github.com/StuHelper/stuhelper-next/pull/1/checks) 展示。首次建仓的旧 CI 结果不能替代此次验证。
 
 不执行生产 SSO 切换、真实账号登录、Docker build、BJ1 Registry 读写或移动端构建；这些工作仍在对应开发计划中，不因文档状态或检查通过而视为完成。
