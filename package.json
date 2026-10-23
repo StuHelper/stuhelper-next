@@ -1,0 +1,20 @@
+{
+  "name": "stuhelper-next-docs",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "check:docs": "node .github/check-docs/lint-markdown.mjs && node .github/check-docs/check-docs.mjs",
+    "test:docs": "node --test .github/check-docs/check-docs.test.mjs"
+  },
+  "devDependencies": {
+    "github-slugger": "2.0.0",
+    "markdown-it": "15.0.3",
+    "markdownlint": "0.42.0",
+    "picomatch": "4.0.7",
+    "yaml": "2.9.1"
+  },
+  "overrides": {
+    "katex": "0.18.2"
+  }
+}

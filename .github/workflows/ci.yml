@@ -25,18 +25,19 @@ jobs:
   repository:
     name: Repository checks
     # PRs always use GitHub-hosted compute in this maintained workflow.
-    # See docs/ci.md for the separate organization-level runner access boundary.
+    # Ordinary checks only. Image builds and BJ1 Registry jobs must use ARC.
+    # See docs/spec/ci-runners.md for the organization-level access boundary.
     runs-on: >-
       ${{ fromJSON(
         (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') &&
         ((github.event_name == 'workflow_dispatch' && inputs.runner == 'stuhelper') ||
          (github.event_name == 'push' && vars.CI_RUNNER == 'stuhelper')) &&
         '{"group":"stuhelper-arc","labels":"stuhelper-arc-sh-k8s"}' ||
-        '"ubuntu-24.04"') }}
+        '"ubuntu-26.04"') }}
     timeout-minutes: 10
     steps:
       - name: Check out source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -52,7 +53,32 @@ jobs:
           python3 --version
 
       - name: Validate repository
-        run: python3 scripts/check.py
+        run: |
+          python3 scripts/check.py
+          python3 -m unittest discover -s scripts -p "test_*.py"
+
+      - name: Set up Node.js for documentation
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - name: Install locked documentation tools
+        run: npm ci --ignore-scripts
+
+      - name: Check documentation and checker regressions
+        run: |
+          npm run check:docs
+          npm run test:docs
+
+      - name: Set up uv for documentation build
+        uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: '0.12.18'
+          enable-cache: false
+
+      - name: Build documentation strictly
+        run: uv run --locked mkdocs build --strict
 
       - name: Validate GitHub Actions workflows
         run: python3 scripts/lint_workflows.py
