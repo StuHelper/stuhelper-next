@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "design-only",
+  "modules": [
+    {"id": "identity", "required": [], "optional": []},
+    {"id": "access", "required": ["identity"], "optional": []},
+    {"id": "profiles", "required": ["identity"], "optional": ["media"]},
+    {"id": "campus", "required": ["identity", "access"], "optional": []},
+    {"id": "catalog", "required": ["campus"], "optional": []},
+    {"id": "moderation", "required": ["access"], "optional": []},
+    {"id": "media", "required": ["access"], "optional": []},
+    {"id": "reviews", "required": ["catalog", "profiles", "access", "moderation"], "optional": ["social"]},
+    {"id": "resources", "required": ["catalog", "media", "access", "moderation"], "optional": ["social"]},
+    {"id": "social", "required": ["profiles", "access", "moderation"], "optional": ["catalog", "reviews", "resources", "media"]},
+    {"id": "search", "required": ["access"], "optional": ["catalog", "reviews", "resources", "social"]},
+    {"id": "notifications", "required": ["identity"], "optional": ["reviews", "resources", "social", "moderation"]},
+    {"id": "integrations", "required": ["identity", "access"], "optional": ["campus", "catalog", "notifications"]}
+  ]
+}

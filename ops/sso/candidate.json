@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "status": "candidate-not-deployed",
+  "repository": "https://github.com/casdoor/casdoor",
+  "version": "v4.23.0",
+  "commit": "1b91d9d319a127e9b1af88fa7a20bb35c052b9d8",
+  "release_url": "https://github.com/casdoor/casdoor/releases/tag/v4.23.0",
+  "published_at": "2026-10-21T08:17:56Z",
+  "resolved_at": "2026-10-23T13:10:28.718082+00:00",
+  "image_tag": "docker.io/casbin/casdoor:4.23.0",
+  "image": "docker.io/casbin/casdoor@sha256:e13c9aada231f7338a03ab0ae7054d0a9480e77283338ab9fc319d88fe2b3ce0",
+  "platforms": [
+    {
+      "platform": "linux/amd64",
+      "digest": "sha256:b332a55c819276fc1a1a51c6e5126fd571458a00631cf8a109b64c3858e6241b"
+    },
+    {
+      "platform": "linux/arm64",
+      "digest": "sha256:4fe2ab9a8cfcdc1ec501fdcb3332246242e9e6e92b39ebbe49ece68a5917d1bf"
+    }
+  ]
+}
