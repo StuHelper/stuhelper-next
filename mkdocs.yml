@@ -63,7 +63,7 @@ nav:
       - 项目概览: design/README.md
       - 重构定位与业务范围: design/business-scope.md
       - 学生资格与实名身份: design/student-identity.md
-      - 积分与余额设计: design/wallet-and-points.md
+      - 积分与 Ivory 设计: design/wallet-and-points.md
       - 平台架构: design/platform-architecture.md
       - 课程与内容关系: design/academic-content.md
       - 独立 SSO: design/independent-sso.md
@@ -75,7 +75,7 @@ nav:
       - 课程与评价: spec/academic-content.md
       - 学生认证与实名: spec/student-verification.md
       - 资料与访问权益: spec/resource-sharing.md
-      - 积分与充值余额: spec/wallet-and-points.md
+      - 积分与 Ivory 余额: spec/wallet-and-points.md
       - 个人中心: spec/personal-center.md
       - 通知中心: spec/notifications.md
       - 我的课程与课表: spec/my-courses.md

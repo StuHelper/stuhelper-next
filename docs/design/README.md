@@ -24,7 +24,7 @@ Next 是原 StuHelper 的重构版本和过渡名称。重写目标是保留需�
 | --- | --- |
 | [重构定位与业务范围](business-scope.md) | 十组已确认旧业务、相关新方向与提取边界 |
 | [学生资格与实名身份](student-identity.md) | 发布门槛、北航学籍比对与可选实名之间的关系 |
-| [积分、余额与资料解锁](wallet-and-points.md) | 两套账户、获取奖励、购买权益与退款的业务关系 |
+| [积分、Ivory 与资料解锁](wallet-and-points.md) | 两套账户、获取奖励、购买权益与退款的业务关系 |
 | [平台架构](platform-architecture.md) | 模块职责、数据所有权、协作与部署单元 |
 | [课程、教师与内容关系](academic-content.md) | 课程、开课、教师、评价、资料和社交引用 |
 | [独立 SSO](independent-sso.md) | 官方镜像、独立运维、迁移和恢复机制 |
