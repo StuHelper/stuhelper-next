@@ -98,6 +98,7 @@ nav:
       - SSO 迁移: development/sso-migration.md
       - 文档架构与检查工具: development/documentation-bootstrap.md
       - 旧业务整理与确认: development/business-design-extraction.md
+      - 旧业务迁移覆盖: development/business-migration-coverage.md
       - 待确认业务清单: development/business-decisions.md
       - 写作模板: development/TEMPLATE.md
   - 指南:

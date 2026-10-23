@@ -48,4 +48,4 @@ StuHelper Next 是现有 StuHelper 的重构版本。Next 是过渡名称，目�
 
 2026-10-23 项目负责人同意提取并写入上述业务，明确仅继承确认的产品规则。旧工程中的权限投影、加密实现、事务协调、审计保留期、部署流程和底层存储调度不属于这批业务提取的内容。
 
-各规格记录已确认行为，剩余选择汇总在[待确认业务清单](../development/business-decisions.md)。评分维度、学校方法、奖励数值、资格期限和上线顺序由项目负责人决定。来源与验证记录见[业务整理记录](../development/business-design-extraction.md)。
+各规格记录已确认行为，剩余选择汇总在[待确认业务清单](../development/business-decisions.md)。学校方法、奖励数值、资格期限和上线顺序等剩余选择由项目负责人决定。来源与验证记录见[业务整理记录](../development/business-design-extraction.md)。

@@ -11,7 +11,7 @@ updated: 2026-10-24
 | 主题 | 内容 |
 | --- | --- |
 | [模块生命周期](module-lifecycle.md) | 依赖、启停、扩展、能力协商与数据保留 |
-| [课程、教师与评价](academic-content.md) | 查询、预览、发布门槛、五级评分与互动 |
+| [课程、教师与评价](academic-content.md) | 查询、课程五维评分、导师评论模板、匿名回复与短时撤回 |
 | [学生认证与实名认证](student-verification.md) | 北航比对、可选实名、管理员撤销与后续云实人认证 |
 | [资料共享与访问权益](resource-sharing.md) | 原创/转载、长期授权、下架申请、逐用户与群体授权 |
 | [积分与 Ivory 余额](wallet-and-points.md) | 获取、期限、CNY/USDT 充值方向、购买积分、解锁与退款 |

@@ -23,8 +23,10 @@ erDiagram
   Term ||--o{ CourseOffering : schedules
   CourseOffering ||--o{ TeachingAssignment : has
   Teacher ||--o{ TeachingAssignment : teaches
-  CourseOffering ||--o{ CourseReview : receives
-  TeachingAssignment ||--o{ TeacherReview : receives
+  Course ||--o{ CourseReview : receives
+  CourseOffering |o--o{ CourseReview : contextualizes
+  Teacher ||--o{ TeacherReview : receives
+  TeachingAssignment |o--o{ TeacherReview : contextualizes
   Course ||--o{ Resource : has
   Resource ||--o{ ResourceVersion : versions
   User ||--o{ CourseReview : writes
@@ -42,7 +44,7 @@ erDiagram
 
 用户按学校、院系、学期和教师查找课程，从课程进入开课、评价和资料，也能从教师查看其开课列表。缺失的课程信息保持未提供，避免用户把未知学分或年份理解为真实数值。
 
-评课提供预览和全文两种阅读体验，学生认证与手机号决定已确认的发布门槛；具体规则集中在课程规格。评价继续用五级文字和表情表达，回复、投票、课程收藏和草稿帮助用户参与讨论和持续编辑。
+评课提供预览和全文两种阅读体验，学生认证与手机号决定已确认的发布门槛；具体规则集中在课程规格。课程评价使用五个维度的文字和表情评分，导师评论提供可自由编辑的推荐模板。回复、投票、课程收藏和草稿帮助用户参与讨论。
 
 资料上传只要求用户判断原创或转载，转载填写自由文本来源或选择来源未知。作品授权、资料是否公开、用户是否有下载权是不同问题：拥有平台作品许可，不等于每个用户都可下载；用户购买下载权，也不意味着取得对外商业使用权。
 
@@ -52,6 +54,6 @@ erDiagram
 
 ## 取舍与待确认事项
 
-教师档案独立于登录账号，因此可以先录入教师及开课信息。课程评价与教师评价分别记录和统计，两者默认匿名，也允许作者用平台昵称和头像署名。发布后的修改和删除由管理员处理。评价数量和具体评分维度仍待确认。
+教师档案独立于登录账号，因此可以先录入教师及开课信息。课程评价与教师评价分别记录和统计，两者默认匿名，也允许作者用平台昵称和头像署名。用户可单独评价课程，也可针对不同教师分别发表，不设置每人每课或每教师的评价条数上限。课程评价、导师评论和回复支持发布后短时间内撤回重编，初始为 5 分钟且后台可配置。超时修改和删除由管理员处理。课程采用五个评分维度，导师评论使用六段可选正文模板。
 
 社交首期建议仍待审阅，不能因已保留 QQ 群管理就推定 Next 同时实现站内群聊。全部业务范围及其确认边界见[重构定位](business-scope.md)。
