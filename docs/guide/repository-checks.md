@@ -19,6 +19,7 @@ Node 工具由 `package-lock.json` 固定，MkDocs 工具由 `uv.lock` 固定。
 ```bash
 npm ci
 python3 scripts/check.py
+python3 -m unittest discover -s scripts -p "test_*.py"
 npm run check:docs
 npm run test:docs
 python3 scripts/lint_workflows.py
@@ -26,6 +27,8 @@ uv run --locked mkdocs build --strict
 ```
 
 `check:docs` 包含 Markdown 格式、元信息、本地链接、标题锚点和占位符检查；`test:docs` 验证检查器的重要错误处理。文档变更后重跑相关检查，检查器或依赖更新后执行回归测试。实际结果见[工作记录](../development/documentation-bootstrap.md)。
+
+actionlint 1.7.12 的内置 runner 名单尚未包含 GitHub 已提供的 `ubuntu-26.04`，因此 `.github/actionlint.yaml` 只补充这个精确标签。该配置仅影响静态检查，不改变工作流的调度方式，也不忽略其他 runner 标签错误。后续 actionlint 原生支持后移除这项兼容配置。
 
 本地预览：
 
@@ -50,5 +53,7 @@ uv run --locked mkdocs serve --dev-addr 127.0.0.1:8000
 | lockfile 不一致 | 明确升级范围并重新生成 lockfile，不跳过锁定 | 重新安装后完整检查 |
 | 下载失败 | 区分网络和内容校验错误，不关闭 checksum 或换未知来源 | 重跑原失败步骤 |
 | 图表未显示 | 查看浏览器 CDN 加载和 Mermaid 语法 | 在预览页核实图表，确认图表实际显示 |
+
+开发中另行运行 Docker 测试时，先用任务专属容器名、镜像 tag、Compose project 或 builder 标记资源，并在失败与中断路径安排清理。运行结束后停止并销毁测试容器，测试完成后删除本次创建且不再使用的本地镜像；确认本任务的构建缓存无用后自动清理。不要清理共享 builder、其他任务的镜像、持久卷、生产或回退资源，也不要执行全局 `docker system prune`。
 
 预览使用 Ctrl+C 停止。`site/`、`node_modules/` 和 `.venv/` 是本地构建/依赖目录，已忽略；不删除源码、lockfile、工作树或其他项目的数据。

@@ -61,3 +61,15 @@ updated: 2026-10-24
 本表保留首个已验证实现提交的回执；后续仅补充交付记录时仍运行 CI，最终 HEAD 的结果由 [PR checks](https://github.com/StuHelper/stuhelper-next/pull/1/checks) 展示。首次建仓的旧 CI 结果不能替代此次验证。
 
 SSO 生产切换、真实账号登录、镜像与移动端构建的进度由对应开发记录维护。
+
+## 2026-10-24 工程约定调整
+
+项目负责人要求普通托管检查使用 Ubuntu 26.04，版本引用使用明确 tag，并补充 Docker 测试清理与免费组织账号的 Actions 存储规则。三个 Actions tag 已核对，均指向改动前固定的同一提交。自建 runner 保留现有组和标签，其操作系统升级由项目负责人手动完成。
+
+当前文档检查显式关闭 npm 和 uv 的 Actions 缓存，不上传文档构建 artifact。通过 GitHub API 只读查询，本仓库当时缓存数量和大小均为 0，artifact 数量也为 0。未调整缓存额度、付费设置或其他仓库的缓存。
+
+课程模型改为 `TermCourse = Course + Term`，同一课程和学期只有一个对象，教学班由 `TeachingClass` 单独表示。新增了同学期多班、跨学期和历史班级未知三个验收场景。课程与教师评分等其他已确认规则沿用原有文档。
+
+本轮本地检查通过：Python/JSON 与模块声明检查、Markdown 格式与元信息/链接检查、7 项文档检查器回归、MkDocs 严格构建及 actionlint。浏览器实际生成包含 TermCourse 和 TeachingClass 的关系图 SVG。actionlint 1.7.12 尚未收录 Ubuntu 26.04，配置只补充官方已提供的精确标签；错误标签仍会被拒绝。
+
+已迁入私有 SSO 仓库的候选工具同步采用 `gh api`，镜像拉取地址改用版本 tag，摘要单独保存。公开仓库保持工具迁出的状态，相关解析器测试与元数据实查结果见[SSO 迁移记录](sso-migration.md)。上述工程调整核验时尚未提交或发起远端 CI，最终提交结果以本轮文档迁移 PR 为准。没有构建、拉取或运行 Docker 镜像，也没有升级自建 runner 或执行生产部署。

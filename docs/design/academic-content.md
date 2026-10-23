@@ -12,33 +12,34 @@ updated: 2026-10-24
 
 ## 核心概念与关联
 
-`Course` 是学校内可长期识别的课程；`CourseOffering` 是某学期某个教学班的实际开课。教师与开课通过 `TeachingAssignment` 多对多关联，从而支持合授、多个教学班和同一教师跨学期授课。
+`Course` 是学校内可长期识别的课程。`TermCourse` 是这门课程在某学期的开课，即 `Course + Term`，同一课程与学期组合只对应一个对象。`TeachingClass` 表示该学期开课下的教学班，各班通过 `TeachingAssignment` 关联教师，支持合授和同一教师跨学期授课。
 
 ```mermaid
 erDiagram
   School ||--o{ Department : contains
   School ||--o{ Course : owns
   School ||--o{ Term : defines
-  Course ||--o{ CourseOffering : offered_as
-  Term ||--o{ CourseOffering : schedules
-  CourseOffering ||--o{ TeachingAssignment : has
+  Course ||--o{ TermCourse : offered_as
+  Term ||--o{ TermCourse : schedules
+  TermCourse ||--o{ TeachingClass : contains
+  TeachingClass ||--o{ TeachingAssignment : has
   Teacher ||--o{ TeachingAssignment : teaches
   Course ||--o{ CourseReview : receives
-  CourseOffering |o--o{ CourseReview : contextualizes
-  Teacher ||--o{ TeacherReview : receives
-  TeachingAssignment |o--o{ TeacherReview : contextualizes
+  TermCourse |o--o{ CourseReview : contextualizes
+  TeachingClass |o--o{ CourseReview : contextualizes
+  Teacher ||--o{ MentorReview : receives
   Course ||--o{ Resource : has
   Resource ||--o{ ResourceVersion : versions
   User ||--o{ CourseReview : writes
-  User ||--o{ TeacherReview : writes
+  User ||--o{ MentorReview : writes
   User ||--o{ Resource : contributes
   User ||--o{ Post : publishes
   Post ||--o{ ContentReference : references
 ```
 
-这张图表达业务概念之间的关联，不代表已经建立数据库或实现跨模块调用。课程评价、教师评价、资料及社交引用保留各自的用途。
+这张图表达业务概念之间的关联，不代表已经建立数据库或实现跨模块调用。课程评价、导师评价、资料及社交引用保留各自的用途。图中的 Post 和 ContentReference 为已延期社交模块的参考，本轮不实现。
 
-例如同一门课程在秋季开设两个教学班，分别由不同教师授课：课程页聚合两个班的评价，开课页保留各自上下文，教师页按授课关系展示自己的班级。合授增加授课关系，不复制课程；跨学期新建开课对象，历史评价仍关联原开课。
+例如同一门课程在秋季开设两个教学班，分别由不同教师授课：只建立一个 `TermCourse` 和两个 `TeachingClass`。课程页聚合两个班的评价，学期开课页列出两个班，教学班各自保留授课上下文，教师页按授课关系展示自己的班级、课程评价汇总得出的教师评分，以及使用推荐模板发表的导师评价。合授为同一教学班增加授课关系。下一学期新建 `TermCourse`，历史评价仍关联原学期开课及已知教学班。仅有课程和学期的历史数据可以关联 `TermCourse`，班级未知时保持未知。
 
 ## 内容发现与发布流程
 
@@ -54,6 +55,6 @@ erDiagram
 
 ## 取舍与待确认事项
 
-教师档案独立于登录账号，因此可以先录入教师及开课信息。课程评价与教师评价分别记录和统计，两者默认匿名，也允许作者用平台昵称和头像署名。用户可单独评价课程，也可针对不同教师分别发表，不设置每人每课或每教师的评价条数上限。课程评价、导师评论和回复支持发布后短时间内撤回重编，初始为 5 分钟且后台可配置。超时修改和删除由管理员处理。课程采用五个评分维度，导师评论使用六段可选正文模板。
+教师档案独立于登录账号，因此可以先录入教师及开课信息。课程评价与导师评价分别保存，教师评分由所授课程的课程评价汇总，导师评论不产生评分，两者默认匿名，也允许作者用平台昵称和头像署名。用户可单独评价课程，也可针对不同教师分别发表，不设置每人每课或每教师的评价条数上限。课程评价、导师评论和回复支持发布后短时间内撤回重编，初始为 5 分钟且后台可配置。超时修改和删除由管理员处理。课程采用五个评分维度，导师评论使用六段可选正文模板。
 
-社交首期建议仍待审阅，不能因已保留 QQ 群管理就推定 Next 同时实现站内群聊。全部业务范围及其确认边界见[重构定位](business-scope.md)。
+社交模块已经明确延期，QQ 群管理继续保留，站内群聊不进入当前交付。全部业务范围及其确认边界见[重构定位](business-scope.md)。

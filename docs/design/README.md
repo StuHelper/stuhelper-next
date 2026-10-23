@@ -10,7 +10,7 @@ updated: 2026-10-24
 
 学生需要把课程、教师、历次开课、评价和学习资料放在一起查询，并围绕这些内容开展交流。StuHelper Next 负责这套业务体验；独立 SSO 提供统一登录，使现有 AI、Store 等系统继续识别原账号。
 
-Next 是原 StuHelper 的重构版本和过渡名称。重写目标是保留需要的业务及身份连续性，明确模块边界，支持原生多端；已确认业务见[范围总览](business-scope.md)。首批功能与各模块的实现顺序仍待确认，进度见[重写计划](../development/rewrite-roadmap.md)。
+Next 是原 StuHelper 的重构版本和过渡名称。重写目标是保留需要的业务及身份连续性，明确模块边界，支持原生多端；已确认业务见[范围总览](business-scope.md)。当前仅推进 Web 与 Admin，其他端及独立社交模块搁置，进度见[重写计划](../development/rewrite-roadmap.md)。
 
 ## 方案概览
 
@@ -23,8 +23,9 @@ Next 是原 StuHelper 的重构版本和过渡名称。重写目标是保留需�
 | 主题 | 内容 |
 | --- | --- |
 | [重构定位与业务范围](business-scope.md) | 已确认业务、后台管理与机器人菜单分类 |
-| [学生资格与实名身份](student-identity.md) | 发布门槛、北航学籍比对与可选实名之间的关系 |
+| [学生资格与实名身份](student-identity.md) | 公共资格接口与私有认证边界 |
 | [积分、Ivory 与资料解锁](wallet-and-points.md) | 两套账户、获取奖励、购买权益与退款的业务关系 |
+| [按模块划分仓库](module-repositories.md) | 模块职责、公开与私有范围、数据与接口归属 |
 | [平台架构](platform-architecture.md) | 模块职责、数据所有权、协作与部署单元 |
 | [课程、教师与内容关系](academic-content.md) | 课程、开课、教师、评价、资料和社交引用 |
 | [独立 SSO](independent-sso.md) | 官方镜像、独立运维、迁移和恢复机制 |

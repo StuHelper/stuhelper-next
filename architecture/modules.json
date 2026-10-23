@@ -1,19 +1,263 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "design-only",
+  "repository_model": "modular-multi-repo",
   "modules": [
-    {"id": "identity", "required": [], "optional": []},
-    {"id": "access", "required": ["identity"], "optional": []},
-    {"id": "profiles", "required": ["identity"], "optional": ["media"]},
-    {"id": "campus", "required": ["identity", "access"], "optional": []},
-    {"id": "catalog", "required": ["campus"], "optional": []},
-    {"id": "moderation", "required": ["access"], "optional": []},
-    {"id": "media", "required": ["access"], "optional": []},
-    {"id": "reviews", "required": ["catalog", "profiles", "access", "moderation"], "optional": ["social"]},
-    {"id": "resources", "required": ["catalog", "media", "access", "moderation"], "optional": ["social"]},
-    {"id": "social", "required": ["profiles", "access", "moderation"], "optional": ["catalog", "reviews", "resources", "media"]},
-    {"id": "search", "required": ["access"], "optional": ["catalog", "reviews", "resources", "social"]},
-    {"id": "notifications", "required": ["identity"], "optional": ["reviews", "resources", "social", "moderation"]},
-    {"id": "integrations", "required": ["identity", "access"], "optional": ["campus", "catalog", "notifications"]}
+    {
+      "id": "platform",
+      "repository": "StuHelper/stuhelper-platform",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [],
+      "optional": [],
+      "interface_owner": "platform",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "identity",
+      "repository": "StuHelper/stuhelper-sso",
+      "visibility": "private",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [],
+      "interface_owner": "identity",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "profiles",
+      "repository": "StuHelper/stuhelper-profiles",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "identity",
+        "media"
+      ],
+      "interface_owner": "profiles",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "campus-adapters",
+      "repository": "StuHelper/stuhelper-campus-adapters",
+      "visibility": "private",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [],
+      "interface_owner": "campus-adapters",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "verification",
+      "repository": "StuHelper/stuhelper-verification",
+      "visibility": "private",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "identity",
+        "campus-adapters"
+      ],
+      "interface_owner": "verification",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "catalog",
+      "repository": "StuHelper/stuhelper-catalog",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "campus-adapters"
+      ],
+      "interface_owner": "catalog",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "moderation",
+      "repository": "StuHelper/stuhelper-moderation",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [],
+      "interface_owner": "moderation",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "media",
+      "repository": "StuHelper/stuhelper-media",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "billing"
+      ],
+      "interface_owner": "media",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "reviews",
+      "repository": "StuHelper/stuhelper-reviews",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform",
+        "catalog",
+        "moderation"
+      ],
+      "optional": [
+        "profiles",
+        "verification"
+      ],
+      "interface_owner": "reviews",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "resources",
+      "repository": "StuHelper/stuhelper-resources",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform",
+        "catalog",
+        "media",
+        "moderation"
+      ],
+      "optional": [
+        "verification",
+        "billing"
+      ],
+      "interface_owner": "resources",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "billing",
+      "repository": "StuHelper/stuhelper-billing",
+      "visibility": "private",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "identity"
+      ],
+      "interface_owner": "billing",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "community",
+      "repository": "StuHelper/stuhelper-community",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform",
+        "moderation"
+      ],
+      "optional": [
+        "profiles",
+        "catalog",
+        "reviews",
+        "resources",
+        "media"
+      ],
+      "interface_owner": "community",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "groups",
+      "repository": "StuHelper/stuhelper-groups",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "profiles",
+        "verification",
+        "moderation"
+      ],
+      "interface_owner": "groups",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "information-query",
+      "repository": "StuHelper/stuhelper-information-query",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "profiles",
+        "verification",
+        "catalog",
+        "reviews",
+        "resources",
+        "billing",
+        "groups"
+      ],
+      "interface_owner": "information-query",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "open-platform",
+      "repository": "StuHelper/stuhelper-open-platform",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "identity",
+        "verification",
+        "profiles",
+        "groups"
+      ],
+      "interface_owner": "open-platform",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "search",
+      "repository": "StuHelper/stuhelper-search",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "catalog",
+        "reviews",
+        "resources",
+        "community"
+      ],
+      "interface_owner": "search",
+      "contract_status": "design-only"
+    },
+    {
+      "id": "notifications",
+      "repository": "StuHelper/stuhelper-notifications",
+      "visibility": "public",
+      "implementation": "not-implemented",
+      "required": [
+        "platform"
+      ],
+      "optional": [
+        "profiles"
+      ],
+      "interface_owner": "notifications",
+      "contract_status": "design-only"
+    }
   ]
 }

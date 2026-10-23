@@ -1,17 +1,17 @@
 # StuHelper Next
 
-现有 StuHelper 的重构版本。Next 是过渡名称，未来以 StuHelper 的名称继续维护。项目采用独立官方 Casdoor SSO，各业务模块通过公开接口协作，并分别开发 Web、微信小程序、Android、iOS 和 HarmonyOS 原生客户端。
+现有 StuHelper 的重构版本。Next 是过渡名称，未来以 StuHelper 的名称继续维护。项目采用独立官方 Casdoor SSO，各业务模块通过公开接口协作，当前开发 Web 与 Admin，微信小程序、Android、iOS 和 HarmonyOS 暂时搁置。
 
-**当前阶段：业务与架构设计。** 仓库已提供文档、检查工具和 SSO 候选版本解析器。业务 API、客户端、SSO 部署和数据迁移仍待实施。
+**当前阶段：业务与架构设计。** 仓库已提供公共文档、模块清单与检查工具，私有模块文档迁往对应仓库。业务 API、客户端、SSO 部署和数据迁移仍待实施。
 
 ## 已确定的方向
 
 - `StuHelper/stuhelper-next` 是公共仓库；默认使用 GitHub 标准托管 runner，可手动选用 StuHelper ARC。
 - Casdoor 直接使用官方未经修改的发行镜像，独立数据库、运行环境与更新生命周期；不得依赖主站后台、主站数据库或主站发布。
 - 保留现有 SSO 数据、issuer、用户标识和消费方绑定；AI、Store 等已有应用独立接入同一身份提供方。
-- 先实现有明确边界的模块化后端，模块通过公开接口和事件协作；有实际隔离需求时再拆服务。
-- 客户端共享 API、领域术语、设计规范和验收用例，原生 UI 与平台生命周期分别实现。
-- 已确认课程与评课、认证、资料共享、课表、内容运营、开放平台和存储贡献等业务。机器人功能分为群聊管理、信息查询和娱乐功能。完整范围见[业务设计](docs/design/business-scope.md)，剩余选择见[待确认业务清单](docs/development/business-decisions.md)。
+- 采用按业务模块划分的多仓库，各模块拥有自己的接口、数据、版本与生命周期，详见[仓库划分](docs/design/module-repositories.md)。
+- Web 与 Admin 共享 API 和领域术语，原生端参考设计保留，恢复实施时再安排各端工作。
+- 已确认课程与评课、认证、资料共享、课表、内容运营、开放平台和存储贡献等业务。机器人功能分为群聊管理、信息查询和娱乐功能。完整范围见[业务设计](docs/design/business-scope.md)，确认结果见[业务确认结果与延期事项](docs/development/business-decisions.md)。
 
 ## 文档入口
 
@@ -32,6 +32,7 @@
 ```bash
 npm ci
 python3 scripts/check.py
+python3 -m unittest discover -s scripts -p "test_*.py"
 npm run check:docs
 npm run test:docs
 uv run --locked mkdocs build --strict
@@ -44,9 +45,8 @@ uv run --locked mkdocs build --strict
 ## 目录
 
 ```text
-architecture/modules.json   模块依赖的设计清单
+architecture/modules.json   模块仓库与依赖设计清单
 docs/                      design / spec / development / guide / adr
-ops/sso/                   无业务依赖的官方镜像候选解析工具
 scripts/                   仓库检查与 CI 工具
 .github/workflows/         默认托管、可选 ARC 的基础 CI
 .github/check-docs/        文档元信息、链接与锚点检查

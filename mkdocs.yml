@@ -65,6 +65,7 @@ nav:
       - 学生资格与实名身份: design/student-identity.md
       - 积分与 Ivory 设计: design/wallet-and-points.md
       - 平台架构: design/platform-architecture.md
+      - 按模块划分仓库: design/module-repositories.md
       - 课程与内容关系: design/academic-content.md
       - 独立 SSO: design/independent-sso.md
       - 原生多端: design/native-clients.md
@@ -72,6 +73,7 @@ nav:
   - 规格:
       - 规格导航: spec/README.md
       - 模块生命周期: spec/module-lifecycle.md
+      - 动作资格配置: spec/action-eligibility.md
       - 课程与评价: spec/academic-content.md
       - 学生认证与实名: spec/student-verification.md
       - 资料与访问权益: spec/resource-sharing.md
@@ -83,6 +85,7 @@ nav:
       - 第三方开放平台: spec/open-platform.md
       - 存储贡献: spec/storage-contribution.md
       - 内容运营与审核: spec/content-management.md
+      - 管理角色与配置: spec/admin-operations.md
       - 课程维护与教务导入: spec/catalog-operations.md
       - 内容发现与统计: spec/discovery-and-statistics.md
       - 全站信息查询: spec/information-query.md
@@ -99,7 +102,7 @@ nav:
       - 文档架构与检查工具: development/documentation-bootstrap.md
       - 旧业务整理与确认: development/business-design-extraction.md
       - 旧业务迁移覆盖: development/business-migration-coverage.md
-      - 待确认业务清单: development/business-decisions.md
+      - 确认结果与延期事项: development/business-decisions.md
       - 写作模板: development/TEMPLATE.md
   - 指南:
       - 操作导航: guide/README.md
@@ -112,4 +115,5 @@ nav:
       - 官方 Casdoor 镜像: adr/0001-official-casdoor-image.md
       - Runner 分工: adr/0002-runner-placement.md
       - 文档架构: adr/0003-documentation-architecture.md
+      - 模块多仓库: adr/0004-modular-multi-repository.md
       - 写作模板: adr/TEMPLATE.md

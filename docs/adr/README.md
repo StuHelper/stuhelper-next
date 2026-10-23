@@ -15,3 +15,5 @@ updated: 2026-10-23
 | [0003：采用五类文档架构](0003-documentation-architecture.md) | Accepted | 分类、导航、状态、模板与检查方式 |
 
 新增主题使用[决策模板](TEMPLATE.md)，遵循[维护约定](../authoring.md)。
+
+- [ADR-0004：按模块采用多仓库](0004-modular-multi-repository.md)

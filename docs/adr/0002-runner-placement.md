@@ -12,11 +12,13 @@ updated: 2026-10-24
 
 ## 决策与确认依据
 
-普通文档、静态检查和不依赖私有 Registry 的测试默认使用 GitHub 标准托管 runner，并保留受信分支手动切换到 StuHelper ARC 的能力。
+普通文档、静态检查和不依赖私有 Registry 的测试默认使用 GitHub 标准托管 `ubuntu-26.04` runner，并保留受信分支手动切换到 StuHelper ARC 的能力。
 
 Docker/OCI 镜像构建，以及 BJ1 Registry 的拉取、推送和镜像缓存任务固定使用 StuHelper 自建 runner；不受普通检查的 `CI_RUNNER` 变量覆盖。原生 iOS 编译仍需要 macOS，其他平台按实际 SDK 支持安排。
 
 确认依据：项目负责人于 2026-10-23 指定 Docker build 使用自建 runner，因为 Registry 在 BJ1、自建网络更好。Registry 地址、凭据和实际传输性能没有在本次文档工作中探测或公开。
+
+2026-10-24，项目负责人要求托管检查改用 Ubuntu 26.04，并计划自行升级 StuHelper runner。普通检查关闭 Actions 依赖缓存，Docker 缓存使用自建环境或 BJ1 Registry，避免占用 GitHub 免费存储额度。版本引用使用明确 tag，摘要继续用于完整性核验。
 
 ## 备选与取舍
 

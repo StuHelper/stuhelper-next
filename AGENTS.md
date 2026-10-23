@@ -6,7 +6,10 @@
 * 新仓库只有首次引导可创建 `develop` / `main`；后续先刷新 `origin/develop`，短期分支 PR squash 到 develop。正式发布 develop → main 使用 merge commit。tag、镜像发行、生产晋级需 owner 授权。
 * 大功能使用专用分支和独立 worktree，一个主要写入者；保留其他工作树的未提交内容。
 * Casdoor 使用官方原件，不维护源码 fork，不把 StuHelper 补丁、页面或业务逻辑注入镜像。
-* 普通检查默认 GitHub 标准托管 runner。Docker/OCI build 与 BJ1 Registry 拉取、推送、缓存固定使用 StuHelper 自建 runner；普通检查的 CI_RUNNER 变量不能覆盖镜像任务。Casdoor 不设本项目构建 job。完整规则见 [runner 规格](docs/spec/ci-runners.md)。
+* 普通检查默认 GitHub 标准托管 `ubuntu-26.04` runner。Docker/OCI build 与 BJ1 Registry 拉取、推送、缓存固定使用 StuHelper 自建 runner；普通检查的 CI_RUNNER 变量不能覆盖镜像任务。自建 runner 的 Ubuntu 26.04 升级由 owner 手动完成，不能把目标版本写成已升级。Casdoor 不设本项目构建 job。完整规则见 [runner 规格](docs/spec/ci-runners.md)。
+* GitHub Actions 和部署镜像使用明确的版本 tag，镜像按 tag 拉取以保留本地名称。digest、checksum 和源码提交用于完整性核验与追溯，不作为日常维护的版本引用；保留 lockfile 完整性字段，不使用 `latest` 作为部署版本。
+* 当前普通检查关闭 GitHub Actions 依赖缓存，不上传构建产物。Docker/BuildKit 缓存只使用任务专属的自建环境或 BJ1 Registry，禁止 `type=gha`，不得自动提高 GitHub 缓存额度或启用付费存储。新增缓存或 artifact 先在 PR 写明用途、大小上限、保留期和清理方式。
+* 开发测试需要构建或运行 Docker 时，使用任务专属名称、标签或 Compose project，记录本次创建的资源。运行结束后停止并销毁测试容器，测试完成后删除本次创建且不再使用的本地镜像；确认构建缓存无用时自动清理。失败与中断路径也执行清理。只清理本任务拥有的资源，保留其他任务正在使用的镜像、缓存、卷和运行数据，不执行全局 `docker system prune`。
 * SSO 只通过 OIDC/官方 API 集成；业务模块不得访问 Casdoor 数据库。保留 issuer、subject 和外部绑定；不按邮箱或手机号猜测合并身份。
 * 不把生产数据、配置、DSN、token、证书私钥、备份或原始身份信息提交到公共仓库、日志和 Actions artifacts。
 * 原生客户端不嵌入 client secret；私钥、服务管理凭据仅留在服务端。

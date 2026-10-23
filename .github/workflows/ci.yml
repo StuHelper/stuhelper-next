@@ -33,11 +33,11 @@ jobs:
         ((github.event_name == 'workflow_dispatch' && inputs.runner == 'stuhelper') ||
          (github.event_name == 'push' && vars.CI_RUNNER == 'stuhelper')) &&
         '{"group":"stuhelper-arc","labels":"stuhelper-arc-sh-k8s"}' ||
-        '"ubuntu-24.04"') }}
+        '"ubuntu-26.04"') }}
     timeout-minutes: 10
     steps:
       - name: Check out source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -53,12 +53,15 @@ jobs:
           python3 --version
 
       - name: Validate repository
-        run: python3 scripts/check.py
+        run: |
+          python3 scripts/check.py
+          python3 -m unittest discover -s scripts -p "test_*.py"
 
       - name: Set up Node.js for documentation
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: '24'
+          package-manager-cache: false
 
       - name: Install locked documentation tools
         run: npm ci --ignore-scripts
@@ -69,7 +72,7 @@ jobs:
           npm run test:docs
 
       - name: Set up uv for documentation build
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        uses: astral-sh/setup-uv@v10.3.2
         with:
           version: '0.12.18'
           enable-cache: false
