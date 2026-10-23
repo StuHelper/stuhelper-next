@@ -2,6 +2,9 @@ globs:
   - '**/*.md'
   - '**/*.markdown'
 ignores:
+  # Independently maintained repositories checked through their own workflows.
+  - 'workspace/**'
+  - '.tools/**'
   - '**/.git/**'
   - '**/node_modules/**'
   - '**/.venv/**'

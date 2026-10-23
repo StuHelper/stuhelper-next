@@ -1,6 +1,6 @@
 ---
 type: design
-status: InReview
+status: Accepted
 updated: 2026-10-24
 ---
 
@@ -73,6 +73,6 @@ platform 管理模块能力、动作资格配置与授权范围。Casdoor 目标
 
 ## 实施状态与后续设计
 
-当前为设计与文档迁移，尚无运行时注册器或业务服务。跨模块原子流程、接口兼容测试、服务发现与容量目标随实现补齐。OpenFGA 是否需要在首期引入，由具体授权用例决定。
+公共运行时与 Web/Admin 框架按[框架实现设计](framework-runtime.md)搭建，当前进度见[框架工作记录](../development/framework-bootstrap.md)。业务服务、跨模块事务和容量目标随业务实现补齐。OpenFGA 是否需要在首期引入，由具体授权用例决定。
 
 本设计遵循[多仓库决策](../adr/0004-modular-multi-repository.md)。现有已确认的业务规则继续迁移，不因仓库划分而删减功能。

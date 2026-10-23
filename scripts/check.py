@@ -11,7 +11,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def validate_modules(config):
-    assert config["schema_version"] == 2 and config["status"] == "design-only"
+    assert config["schema_version"] == 2
+    assert config["status"] in {"design-only", "framework-in-progress", "framework"}
     assert config["repository_model"] == "modular-multi-repo"
     modules = config["modules"]
     by_id = {module["id"]: module for module in modules}
@@ -20,9 +21,12 @@ def validate_modules(config):
         assert re.fullmatch(r"[a-z][a-z0-9-]*", module["id"])
         assert re.fullmatch(r"StuHelper/stuhelper-[a-z0-9-]+", module["repository"])
         assert module["visibility"] in {"public", "private"}
-        assert module["implementation"] == "not-implemented"
+        assert module["implementation"] in {"not-implemented", "framework"}
         assert module["interface_owner"] == module["id"]
-        assert module["contract_status"] == "design-only"
+        assert module["contract_status"] in {"design-only", "framework"}
+        if module["implementation"] == "framework":
+            assert module["id"] == "platform", "Business implementation is out of scope"
+            assert module["contract_status"] == "framework"
         for kind in ("required", "optional"):
             deps = module[kind]
             assert len(deps) == len(set(deps)), "Duplicate dependency"
@@ -32,6 +36,12 @@ def validate_modules(config):
     assert len({module["repository"] for module in modules}) == len(modules), "Duplicate repository owner"
     for private_id in ("identity", "verification", "campus-adapters", "billing"):
         assert by_id[private_id]["visibility"] == "private", "Private module exposed"
+    applications = config.get("applications", [])
+    assert len({app["id"] for app in applications}) == len(applications), "Duplicate application"
+    for app in applications:
+        assert app["id"] in {"web", "admin"}, "Deferred application introduced"
+        assert app["repository"] == f"StuHelper/stuhelper-{app['id']}"
+        assert app["visibility"] == "public" and app["implementation"] == "framework"
     visited, active = set(), set()
 
     def visit(name):

@@ -70,6 +70,7 @@ jobs:
         run: |
           npm run check:docs
           npm run test:docs
+          node scripts/check-workspace.mjs
 
       - name: Set up uv for documentation build
         uses: astral-sh/setup-uv@v10.3.2
@@ -82,3 +83,37 @@ jobs:
 
       - name: Validate GitHub Actions workflows
         run: python3 scripts/lint_workflows.py
+
+  integration:
+    name: Framework integration
+    runs-on: ubuntu-26.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7.0.0
+        with:
+          go-version: '1.27.2'
+          cache: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Install workspace tools
+        run: |
+          npm install --global corepack@0.34.5
+          npm ci --ignore-scripts
+          make tools
+      - name: Check out public framework repositories with Mani
+        run: |
+          make workspace
+          .tools/bin/mani --user-config scripts/mani-user.yaml run setup --all
+      - name: Check independent repositories and shared contracts
+        run: make workspace-check
+      - name: Install browser
+        run: npx playwright install --with-deps chromium
+      - name: Exercise built clients against the real framework server
+        run: npm run test:e2e
+      - name: Record the tested public source combination
+        run: python3 scripts/workspace.py snapshot

@@ -18,3 +18,5 @@ updated: 2026-10-24
 | [项目重写路线](rewrite-roadmap.md) | 已有工程基础、业务阶段、原生端和旧数据迁移 |
 
 新增主题使用[开发模板](TEMPLATE.md)，遵循[维护约定](../authoring.md)。
+
+- [框架搭建记录](framework-bootstrap.md)
