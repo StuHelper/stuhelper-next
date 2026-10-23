@@ -61,7 +61,7 @@ updated: 2026-10-24
 
 资料页面展示当前可用的访问方式和账务服务返回的价格。已有有效访问权的用户不重复收费，资格暂时不满足时保留既有权益，恢复后重新检查下载条件。
 
-单独授权撤回或到期只影响该来源，其他有效权益保留。会员、购买、续费和退款的完整业务规则迁至[私有账务规格](https://github.com/StuHelper/stuhelper-billing/blob/docs/import-module-design/docs/spec/resource-entitlements.md)。公开资源模块只使用所需的交易状态和权益结论。
+单独授权撤回或到期只影响该来源，其他有效权益保留。会员、购买、续费和退款的完整业务规则迁至[私有账务规格](https://github.com/StuHelper/stuhelper-billing/blob/develop/docs/spec/resource-entitlements.md)。公开资源模块只使用所需的交易状态和权益结论。
 
 ## 下架与投诉
 

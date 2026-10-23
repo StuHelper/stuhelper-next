@@ -14,7 +14,10 @@ export async function lintMarkdown(root) {
     let config = { ...settings.config };
     for (const override of settings.overrides ?? []) {
       if (override.combine !== 'merge') throw new Error('Only merged markdownlint overrides are supported');
-      if (picomatch(override.filter, { dot: true })(relative)) config = { ...config, ...override.config };
+      if (picomatch(override.filter, { dot: true })(relative)) {
+        config = { ...config, ...override.config };
+        break;
+      }
     }
     const result = await lint({ files: [file], config });
     for (const violation of result[file] ?? []) {

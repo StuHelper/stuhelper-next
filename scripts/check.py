@@ -50,6 +50,16 @@ def validate_modules(config):
     return modules
 
 
+def private_material_errors(path):
+    name, suffix = path.name.lower(), path.suffix.lower()
+    errors = []
+    if (name.startswith(".env") or suffix == ".env") and not name.endswith(".example"):
+        errors.append(f"Runtime environment file: {path}")
+    if suffix in {".pem", ".key", ".p12", ".pfx", ".dump", ".backup"}:
+        errors.append(f"Private material extension: {path}")
+    return errors
+
+
 def main():
     files = [ROOT / p for p in subprocess.check_output(
         ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
@@ -58,10 +68,7 @@ def main():
     failures = []
     for path in files:
         relative = path.relative_to(ROOT)
-        if path.name.startswith(".env") and path.name != ".env.example":
-            failures.append(f"Runtime environment file: {relative}")
-        if path.suffix in {".pem", ".key", ".p12", ".pfx", ".dump", ".backup"}:
-            failures.append(f"Private material extension: {relative}")
+        failures.extend(private_material_errors(relative))
         if not path.exists():
             continue  # A tracked file intentionally moved out of this checkout.
         if path.suffix == ".py":

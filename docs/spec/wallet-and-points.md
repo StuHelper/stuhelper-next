@@ -16,4 +16,4 @@ updated: 2026-10-24
 
 余额、交易与收款资料仅按本人或获授权管理员的权限返回。公开模块不读取私有账务数据库，不把交易载荷写入通用事件或日志。服务不可用时保留既有事实，明确返回当前不可执行。
 
-具体货币、计价、奖励、购买与退款规则维护在 [私有账务规格](https://github.com/StuHelper/stuhelper-billing/blob/docs/import-module-design/docs/spec/wallet-and-points.md)，资料交易关系见 [私有权益规格](https://github.com/StuHelper/stuhelper-billing/blob/docs/import-module-design/docs/spec/resource-entitlements.md)。
+具体货币、计价、奖励、购买与退款规则维护在 [私有账务规格](https://github.com/StuHelper/stuhelper-billing/blob/develop/docs/spec/wallet-and-points.md)，资料交易关系见 [私有权益规格](https://github.com/StuHelper/stuhelper-billing/blob/develop/docs/spec/resource-entitlements.md)。

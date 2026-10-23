@@ -7,6 +7,7 @@ import picomatch from 'picomatch';
 import { parse as parseYaml } from 'yaml';
 
 const markdown = new MarkdownIt();
+const categories = new Set(['design', 'spec', 'development', 'guide', 'adr']);
 const statuses = new Set(['Draft', 'InReview', 'Accepted', 'Rejected', 'Deprecated', 'Superseded', 'Archived']);
 const placeholder = /YYYY-MM-DD|\{\{[^{}\n]+\}\}|<待填写>|\bTODO\s*[:：]/u;
 const posix = (value) => value.split(path.sep).join('/');
@@ -35,7 +36,17 @@ export function filesIn(root) {
   return walk(root).sort();
 }
 
-function parsedFile(file) {
+// Match Python-Markdown toc.slugify_unicode and its unique-ID suffixes.
+export function siteSlug(text, anchors) {
+  let value = text.replace(/[^\p{L}\p{N}_\s-]/gu, '').trim().toLowerCase().replace(/[-\s]+/gu, '-');
+  while (!value || anchors.has(value)) {
+    const suffix = value.match(/^(.*)_([0-9]+)$/u);
+    value = suffix ? `${suffix[1]}_${Number(suffix[2]) + 1}` : `${value}_1`;
+  }
+  return value;
+}
+
+function parsedFile(file, siteDocument) {
   const source = fs.readFileSync(file, 'utf8');
   const frontmatter = source.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   const body = frontmatter ? source.slice(frontmatter[0].length) : source;
@@ -49,7 +60,7 @@ function parsedFile(file) {
       const text = (tokens[index + 1]?.children ?? [])
         .filter((child) => ['text', 'code_inline', 'image'].includes(child.type))
         .map((child) => child.content).join('');
-      anchors.add(slugger.slug(text));
+      anchors.add(siteDocument ? siteSlug(text, anchors) : slugger.slug(text));
     }
     for (const child of token.children ?? []) {
       if (child.type === 'link_open') links.push(child.attrGet('href'));
@@ -65,7 +76,7 @@ export function checkDocs(directory) {
   const errors = [];
   const cache = new Map();
   const read = (file) => {
-    if (!cache.has(file)) cache.set(file, parsedFile(file));
+    if (!cache.has(file)) cache.set(file, parsedFile(file, posix(path.relative(root, file)).startsWith('docs/')));
     return cache.get(file);
   };
   const files = filesIn(root);
@@ -81,7 +92,7 @@ export function checkDocs(directory) {
         try {
           const data = parseYaml(parsed.frontmatter[1]);
           const parts = relative.split('/');
-          const allowedTypes = parts.length === 2 ? ['index'] : [parts[1], parts.at(-2)];
+          const allowedTypes = parts.length === 2 ? ['index'] : categories.has(parts[1]) ? [parts[1]] : [];
           if (!data || typeof data.type !== 'string' || !allowedTypes.includes(data.type)) report('type does not match document location');
           if (!statuses.has(data?.status)) report('invalid document status');
           const date = data?.updated;

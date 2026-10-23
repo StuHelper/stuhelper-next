@@ -69,4 +69,4 @@ updated: 2026-10-24
 
 私有模块的详细规格分别放在对应仓库，公共规格仅保留必要的使用与对接说明。公共仓库继续保持 public，历史提交按项目负责人决定保留，不重写已有公开历史。
 
-本轮完成的是文档及仓库结构迁移。运行时加载器、业务服务、SDK、跨仓库发布和生产部署仍待实现。[模块清单](https://github.com/StuHelper/stuhelper-next/blob/docs/adopt-project-docs-starter/architecture/modules.json)只记录设计状态，不能用清单存在证明模块已经可运行。
+本轮完成的是文档及仓库结构迁移。运行时加载器、业务服务、SDK、跨仓库发布和生产部署仍待实现。[模块清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)只记录设计状态，不能用清单存在证明模块已经可运行。

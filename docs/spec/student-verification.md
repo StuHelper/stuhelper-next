@@ -20,4 +20,4 @@ updated: 2026-10-24
 
 ## 私有规格
 
-完整认证方法、材料处理、身份归属与核验规则维护在 [私有学生认证规格](https://github.com/StuHelper/stuhelper-verification/blob/docs/import-module-design/docs/spec/student-verification.md)。本页保留公共业务所需说明，不重复保存具体认证方案。
+完整认证方法、材料处理、身份归属与核验规则维护在 [私有学生认证规格](https://github.com/StuHelper/stuhelper-verification/blob/develop/docs/spec/student-verification.md)。本页保留公共业务所需说明，不重复保存具体认证方案。

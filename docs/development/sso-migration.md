@@ -6,7 +6,7 @@ updated: 2026-10-24
 
 # SSO 迁移进度与私有文档
 
-进度：尚未实施生产迁移。原有候选调查、兼容矩阵、备份恢复及切换任务已迁至 [私有 SSO 迁移记录](https://github.com/StuHelper/stuhelper-sso/blob/docs/import-module-design/docs/development/sso-migration.md)。
+进度：尚未实施生产迁移。原有候选调查、兼容矩阵、备份恢复及切换任务已迁至 [私有 SSO 迁移记录](https://github.com/StuHelper/stuhelper-sso/blob/develop/docs/development/sso-migration.md)。
 
 本次只迁移文档、候选解析工具和相应检查，没有更新运行中的 SSO、读取生产数据或执行账号迁移。候选检查保留在 SSO 仓库，不因移出公开仓库而取消。
 
