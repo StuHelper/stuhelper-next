@@ -25,7 +25,8 @@ jobs:
   repository:
     name: Repository checks
     # PRs always use GitHub-hosted compute in this maintained workflow.
-    # See docs/ci.md for the separate organization-level runner access boundary.
+    # Ordinary checks only. Image builds and BJ1 Registry jobs must use ARC.
+    # See docs/spec/ci-runners.md for the organization-level access boundary.
     runs-on: >-
       ${{ fromJSON(
         (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main') &&
@@ -53,6 +54,28 @@ jobs:
 
       - name: Validate repository
         run: python3 scripts/check.py
+
+      - name: Set up Node.js for documentation
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+
+      - name: Install locked documentation tools
+        run: npm ci --ignore-scripts
+
+      - name: Check documentation and checker regressions
+        run: |
+          npm run check:docs
+          npm run test:docs
+
+      - name: Set up uv for documentation build
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: '0.12.18'
+          enable-cache: false
+
+      - name: Build documentation strictly
+        run: uv run --locked mkdocs build --strict
 
       - name: Validate GitHub Actions workflows
         run: python3 scripts/lint_workflows.py

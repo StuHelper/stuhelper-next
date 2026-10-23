@@ -6,7 +6,6 @@ import json
 import re
 import subprocess
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -27,16 +26,6 @@ def main():
             ast.parse(path.read_text(), filename=str(relative))
         if path.suffix == ".json":
             json.loads(path.read_text())
-        if path.suffix != ".md":
-            continue
-        text = re.sub(r"```.*?```", "", path.read_text(), flags=re.S)
-        for target in re.findall(r"\[[^\]]*\]\(([^\s)]+)\)", text):
-            parsed = urlsplit(target.strip("<>"))
-            if parsed.scheme or parsed.netloc or not parsed.path:
-                continue
-            resolved = (path.parent / unquote(parsed.path)).resolve()
-            if not resolved.is_relative_to(ROOT) or not resolved.exists():
-                failures.append(f"Broken local link in {relative}: {target}")
 
     config = json.loads((ROOT / "architecture/modules.json").read_text())
     assert config["schema_version"] == 1 and config["status"] == "design-only"
@@ -80,7 +69,7 @@ def main():
 
     if failures:
         raise SystemExit("\n".join(failures))
-    print(f"PASS: {len(files)} files; local links, Python/JSON syntax, "
+    print(f"PASS: {len(files)} files; Python/JSON syntax, "
           f"{len(modules)} module declarations, candidate metadata")
     print("Scope: repository checks only; no application, SSO migration or login acceptance.")
 

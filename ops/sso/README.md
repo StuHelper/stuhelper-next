@@ -12,4 +12,6 @@ python3 ops/sso/resolve_candidate.py --version v4.23.0
 
 不在公共仓库保存 app.conf、初始化真实数据、数据库/Redis 连接信息或密钥。后续完整独立部署包从受控主机配置/secret backend 获得这些信息，不从 StuHelper 主站 API 获取。
 
-首次切换与一键更新的状态机、数据边界和验收详见 [SSO 迁移设计](../../docs/sso-migration.md)。
+操作方法见[候选解析指南](../../docs/guide/sso-candidate.md)。首次切换与一键更新的机制见[独立 SSO 设计](../../docs/design/independent-sso.md)，数据与验收要求见[兼容规格](../../docs/spec/sso-compatibility.md)，进度见[迁移工作](../../docs/development/sso-migration.md)。
+
+官方镜像路线已确认。本项目不构建或重新打包 Casdoor；需要向 BJ1 Registry 原样复制镜像时使用 StuHelper 自建 runner，保持 digest 一致。

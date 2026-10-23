@@ -12,37 +12,44 @@
 - 先实现有明确边界的模块化后端，模块通过公开接口和事件协作；有实际隔离需求时再拆服务。
 - 客户端共享 API、领域术语、设计规范和验收用例，原生 UI 与平台生命周期分别实现。
 
-## 设计入口
+## 文档入口
 
-| 文档 | 内容 |
+采用 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0) 的五类文档架构，从[文档导航](docs/README.md)进入。
+
+| 分类 | 内容 |
 | --- | --- |
-| [系统架构](docs/architecture.md) | 业务模块、数据所有权、扩展方式与运行拓扑 |
-| [内容模型](docs/domain-model.md) | 课程、开课、教师、评价、资料和社交关联 |
-| [SSO 独立化与迁移](docs/sso-migration.md) | 官方 v4、数据保留、一键更新、切换与恢复 |
-| [登录兼容验收](docs/sso-compatibility.md) | AI、Store、旧站及新客户端的验收矩阵 |
-| [原生多端](docs/native-clients.md) | 各端技术路线、登录和渐进交付 |
-| [CI 与 runners](docs/ci.md) | 免费托管 runner、自建 runner、信任边界 |
-| [实施路线](docs/roadmap.md) | 分阶段成果和完成条件 |
-| [事实与来源](docs/research.md) | 2026-10-23 核查范围及官方资料 |
+| [design](docs/design/README.md) | 项目目标、系统架构、课程内容、独立 SSO 与原生端机制 |
+| [spec](docs/spec/README.md) | 行为规则、身份兼容、模块生命周期与验收场景 |
+| [development](docs/development/README.md) | 调研、实施任务、实际进度与验证证据 |
+| [guide](docs/guide/README.md) | 本地检查、文档预览、CI 操作与候选解析 |
+| [adr](docs/adr/README.md) | 官方镜像、runner 分工和文档架构的已确认决策 |
 
 ## 本地检查
 
-需要 Python 3.11+、Git。基础检查不需要数据库或生产凭据：
+需要 Git、Python 3.11+、Node.js 24 和 uv 0.12.18。依赖通过 lockfile 固定，检查不需要数据库或生产凭据：
 
 ```bash
+npm ci
 python3 scripts/check.py
+npm run check:docs
+npm run test:docs
+uv run --locked mkdocs build --strict
 ```
 
-CI 还通过固定版本的 actionlint 校验工作流。首次引导提交建立空仓库的 `develop` 和 `main`；此后普通开发从最新 `origin/develop` 建短期分支并通过 PR squash 合入。正式发行经 `develop -> main` merge commit，owner 授权后才创建不可变 CalVer tag。
+完整命令、预览与限制见[检查指南](docs/guide/repository-checks.md)。CI 还运行固定版本的 actionlint。普通检查默认 GitHub 托管 runner；Docker/OCI 构建与 BJ1 Registry 拉取、推送、缓存固定使用 StuHelper 自建 runner。Casdoor 直接消费官方原件，不在本项目构建。
+
+普通开发从最新 `origin/develop` 建短期分支并通过 PR squash 合入。正式发行经 `develop -> main` merge commit，owner 授权后才创建不可变 CalVer tag。
 
 ## 目录
 
 ```text
 architecture/modules.json   模块依赖的设计清单（不是运行时插件加载器）
-docs/                      架构、契约、迁移与验收设计
+docs/                      design / spec / development / guide / adr
 ops/sso/                   无业务依赖的官方镜像候选解析工具
 scripts/                   仓库检查与 CI 工具
 .github/workflows/         默认托管、可选 ARC 的基础 CI
+.github/check-docs/        文档元信息、链接与锚点检查
+mkdocs.yml                 本地文档站与严格构建配置
 ```
 
 未来业务代码目录见架构文档；不以空项目、假 API 或通过的占位测试表示功能已完成。

@@ -1,0 +1,12 @@
+[project]
+name = "stuhelper-next-docs"
+version = "0.0.0"
+requires-python = ">=3.11"
+dependencies = [
+  "mkdocs==1.6.1",
+  "mkdocs-material==9.7.7",
+  "mkdocs-mermaid-zoom==0.1.0",
+]
+
+[tool.uv]
+package = false

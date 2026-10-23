@@ -1,0 +1,95 @@
+site_name: StuHelper Next
+site_description: StuHelper Next 的设计、规格、开发、指南与决策
+repo_url: https://github.com/StuHelper/stuhelper-next
+repo_name: StuHelper/stuhelper-next
+edit_uri: edit/develop/docs/
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+
+plugins:
+  - search
+  - mermaid-zoom
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js
+
+markdown_extensions:
+  - tables
+  - admonition
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+      slugify: !!python/name:markdown.extensions.toc.slugify_unicode
+
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    anchors: warn
+
+nav:
+  - 文档:
+      - 总览: README.md
+      - 写作与维护: authoring.md
+  - 设计:
+      - 项目概览: design/README.md
+      - 平台架构: design/platform-architecture.md
+      - 课程与社交模型: design/academic-content.md
+      - 独立 SSO: design/independent-sso.md
+      - 原生多端: design/native-clients.md
+      - 写作模板: design/TEMPLATE.md
+  - 规格:
+      - 规格导航: spec/README.md
+      - 模块生命周期: spec/module-lifecycle.md
+      - 课程与资料: spec/academic-content.md
+      - 社交与内容治理: spec/social-content.md
+      - SSO 兼容: spec/sso-compatibility.md
+      - 原生客户端: spec/native-clients.md
+      - CI runner 分工: spec/ci-runners.md
+      - 写作模板: spec/TEMPLATE.md
+  - 开发:
+      - 工作导航: development/README.md
+      - 项目重写路线: development/rewrite-roadmap.md
+      - SSO 迁移: development/sso-migration.md
+      - 文档架构落地: development/documentation-bootstrap.md
+      - 写作模板: development/TEMPLATE.md
+  - 指南:
+      - 操作导航: guide/README.md
+      - 检查与预览: guide/repository-checks.md
+      - CI 操作: guide/ci-runners.md
+      - SSO 候选解析: guide/sso-candidate.md
+      - 写作模板: guide/TEMPLATE.md
+  - 决策:
+      - 决策导航: adr/README.md
+      - 官方 Casdoor 镜像: adr/0001-official-casdoor-image.md
+      - Runner 分工: adr/0002-runner-placement.md
+      - 文档架构: adr/0003-documentation-architecture.md
+      - 写作模板: adr/TEMPLATE.md
