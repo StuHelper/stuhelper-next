@@ -61,15 +61,27 @@ nav:
       - 写作与维护: authoring.md
   - 设计:
       - 项目概览: design/README.md
+      - 重构定位与业务范围: design/business-scope.md
+      - 学生资格与实名身份: design/student-identity.md
+      - 积分与余额设计: design/wallet-and-points.md
       - 平台架构: design/platform-architecture.md
-      - 课程与社交模型: design/academic-content.md
+      - 课程与内容关系: design/academic-content.md
       - 独立 SSO: design/independent-sso.md
       - 原生多端: design/native-clients.md
       - 写作模板: design/TEMPLATE.md
   - 规格:
       - 规格导航: spec/README.md
       - 模块生命周期: spec/module-lifecycle.md
-      - 课程与资料: spec/academic-content.md
+      - 课程与评价: spec/academic-content.md
+      - 学生认证与实名: spec/student-verification.md
+      - 资料与访问权益: spec/resource-sharing.md
+      - 积分与充值余额: spec/wallet-and-points.md
+      - 个人中心: spec/personal-center.md
+      - 通知中心: spec/notifications.md
+      - 我的课程与课表: spec/my-courses.md
+      - QQ 入群与群管理: spec/qq-group-services.md
+      - 第三方开放平台: spec/open-platform.md
+      - 存储贡献: spec/storage-contribution.md
       - 社交与内容治理: spec/social-content.md
       - SSO 兼容: spec/sso-compatibility.md
       - 原生客户端: spec/native-clients.md
@@ -80,6 +92,7 @@ nav:
       - 项目重写路线: development/rewrite-roadmap.md
       - SSO 迁移: development/sso-migration.md
       - 文档架构落地: development/documentation-bootstrap.md
+      - 旧业务整理与确认: development/business-design-extraction.md
       - 写作模板: development/TEMPLATE.md
   - 指南:
       - 操作导航: guide/README.md

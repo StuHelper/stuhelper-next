@@ -11,6 +11,7 @@ updated: 2026-10-23
 | 主题 | 当前范围 |
 | --- | --- |
 | [文档架构落地](documentation-bootstrap.md) | 本次结构重写、已确认规则、检查与交付 |
+| [旧业务整理与确认](business-design-extraction.md) | 固定旧来源、owner 已确认规则、业务文档与本轮验证 |
 | [独立 SSO 迁移](sso-migration.md) | 候选与消费者调查、演练准备、后续切换任务 |
 | [项目重写路线](rewrite-roadmap.md) | 已有工程基础、业务阶段、原生端和旧数据迁移 |
 

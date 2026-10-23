@@ -1,6 +1,6 @@
 # StuHelper Next
 
-面向校园的模块化内容与社交平台。独立官方 Casdoor SSO，共享业务契约，Web、微信小程序、Android、iOS、HarmonyOS 各自原生实现。
+现有 StuHelper 的重构版本，Next 是过渡名称，未来以 StuHelper 的名称继续维护。重新实现已确认保留的校园业务，采用独立官方 Casdoor SSO、模块化业务契约，以及 Web、微信小程序、Android、iOS、HarmonyOS 原生客户端。
 
 **当前阶段：架构提案与工程初始化。** 本仓库尚无业务 API 或客户端产品；SSO 部署、数据迁移和真实账号验收尚未执行。CI 通过只证明仓库检查通过。
 
@@ -11,6 +11,7 @@
 - 保留现有 SSO 数据、issuer、用户标识和消费方绑定；AI、Store 等已有应用独立接入同一身份提供方。
 - 先实现有明确边界的模块化后端，模块通过公开接口和事件协作；有实际隔离需求时再拆服务。
 - 客户端共享 API、领域术语、设计规范和验收用例，原生 UI 与平台生命周期分别实现。
+- 保留课程与评课、学生认证与可选实名、资料共享、个人中心、通知、课表、QQ 入群与群管理、开放平台及存储贡献；积分、余额和资料权益采用本轮确认的业务规则，见[业务范围](docs/design/business-scope.md)。
 
 ## 文档入口
 
@@ -18,8 +19,8 @@
 
 | 分类 | 内容 |
 | --- | --- |
-| [design](docs/design/README.md) | 项目目标、系统架构、课程内容、独立 SSO 与原生端机制 |
-| [spec](docs/spec/README.md) | 行为规则、身份兼容、模块生命周期与验收场景 |
+| [design](docs/design/README.md) | 重构业务范围、身份与货币概念、系统架构、独立 SSO 与原生端机制 |
+| [spec](docs/spec/README.md) | 各业务行为、资料权益、积分与余额、身份兼容和验收场景 |
 | [development](docs/development/README.md) | 调研、实施任务、实际进度与验证证据 |
 | [guide](docs/guide/README.md) | 本地检查、文档预览、CI 操作与候选解析 |
 | [adr](docs/adr/README.md) | 官方镜像、runner 分工和文档架构的已确认决策 |
