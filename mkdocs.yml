@@ -95,13 +95,17 @@ nav:
       - SSO 兼容: spec/sso-compatibility.md
       - 原生客户端: spec/native-clients.md
       - CI runner 分工: spec/ci-runners.md
+      - 数据保留与删除: spec/data-retention.md
+      - 国际化与本地化: spec/internationalization.md
+      - 文件与媒体模块: spec/media.md
+      - 模块通信与一致性: spec/module-protocol.md
+      - 统一业务术语: spec/terminology.md
       - 写作模板: spec/TEMPLATE.md
   - 开发:
       - 工作导航: development/README.md
       - 项目重写路线: development/rewrite-roadmap.md
-      - 框架搭建: development/framework-bootstrap.md
+      - 框架状态: development/framework-bootstrap.md
       - SSO 迁移: development/sso-migration.md
-      - 文档架构与检查工具: development/documentation-bootstrap.md
       - 旧业务整理与确认: development/business-design-extraction.md
       - 旧业务迁移覆盖: development/business-migration-coverage.md
       - 确认结果与延期事项: development/business-decisions.md
@@ -112,6 +116,7 @@ nav:
       - 检查与预览: guide/repository-checks.md
       - CI 操作: guide/ci-runners.md
       - SSO 候选解析: guide/sso-candidate.md
+      - 工具链与依赖维护: guide/dependency-maintenance.md
       - 写作模板: guide/TEMPLATE.md
   - 决策:
       - 决策导航: adr/README.md

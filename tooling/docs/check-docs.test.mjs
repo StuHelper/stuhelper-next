@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { execFileSync } from 'node:child_process';
 import { checkDocs, siteSlug } from './check-docs.mjs';
 import { lintMarkdown } from './lint-markdown.mjs';
 
@@ -118,4 +119,71 @@ test('only the first matching Markdown override is applied', async (t) => {
   fs.appendFileSync(path.join(root, '.markdownlint-cli2.yaml'),
     "overrides:\n  - filter: ['README.md']\n    config: {MD041: false}\n    combine: merge\n  - filter: ['**/*.md']\n    config: {MD041: true}\n    combine: merge\n");
   assert.doesNotMatch((await lintMarkdown(root)).join('\n'), /MD041/);
+});
+
+
+test('standard terminology rejects old aliases but accepts code identifiers', (t) => {
+  const root = fixture(t, { 'docs/spec/a.md': doc('# 资格\n\n有效学生资格与 `学生认证通过`') });
+  const errors = checkDocs(root).errors;
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /use standard term/);
+});
+
+test('repository GitHub links validate files and GitHub anchors locally', (t) => {
+  const root = fixture(t, {
+    'mkdocs.yml': 'repo_url: https://github.com/StuHelper/example\nnav:\n  - Topic: spec/a.md\n',
+    'docs/spec/a.md': doc('# 行为\n\n## 行为\n\n[有效](https://github.com/StuHelper/example/blob/develop/docs/spec/a.md#行为-1) [错误](https://github.com/StuHelper/example/blob/develop/gone.md)'),
+  });
+  const errors = checkDocs(root).errors;
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /missing or external local target/);
+});
+
+test('new topics must appear in both category index and site navigation', (t) => {
+  const root = fixture(t, {
+    'mkdocs.yml': 'nav:\n  - Index: spec/README.md\n',
+    'docs/spec/README.md': doc('# 索引'),
+    'docs/spec/a.md': doc('# 新主题'),
+  });
+  const errors = checkDocs(root).errors.join('\n');
+  assert.match(errors, /missing topic a.md/);
+  assert.match(errors, /missing navigation spec\/a.md/);
+});
+
+
+test('paragraph limits count rendered text, not URL bytes, and report source lines', t => {
+  const root = fixture(t, { 'README.md': '# Title\n\n[Short label](https://example.org/' + 'a'.repeat(400) + ')\n\n' + '文'.repeat(201) + '\n' });
+  const errors = checkDocs(root).errors;
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /第 5 行段落有 201 个可见字符/);
+});
+
+test('ADR numbers, scenario IDs and index descriptions reject copy errors', t => {
+  const root = fixture(t, {
+    'docs/adr/README.md': doc('# 索引\n\n| 主题 | 内容 |\n| --- | --- |\n| [0001：A](0001-a.md) | 0001：A |\n| [0001：B](0001-b.md) | Different |', 'adr'),
+    'docs/adr/0001-a.md': doc('# 0002：A', 'adr'),
+    'docs/adr/0001-b.md': doc('# 0001：B', 'adr'),
+    'docs/spec/a.md': doc('# A\n\n| 场景 | 结果 |\n| --- | --- |\n| AE-01 | A |'),
+    'docs/spec/b.md': doc('# B\n\n| 场景 | 结果 |\n| --- | --- |\n| AE-01 | B |'),
+  });
+  const errors = checkDocs(root).errors.join('\n');
+  assert.match(errors, /四位编号一致/);
+  assert.match(errors, /ADR 编号 0001.*重复/);
+  assert.match(errors, /场景编号 AE-01.*重复/);
+  assert.match(errors, /不能重复标题/);
+});
+
+test('modified document dates follow the content commit in Shanghai and remain stable on later CI runs', t => {
+  const root = fixture(t, { 'docs/spec/a.md': doc('# A', 'spec', '2026-10-23') });
+  const git = (...args) => execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', env: { ...process.env, GIT_AUTHOR_NAME: 'Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.test', GIT_COMMITTER_NAME: 'Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.test', GIT_AUTHOR_DATE: '2026-10-23T17:00:00Z', GIT_COMMITTER_DATE: '2026-10-23T17:00:00Z' }, stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  git('init', '-q'); git('add', '.'); git('commit', '-qm', 'base');
+  const base = git('rev-parse', 'HEAD');
+  fs.writeFileSync(path.join(root, 'docs/spec/a.md'), doc('# A\n\nNew content.', 'spec', '2026-10-23'));
+  git('add', '.'); git('commit', '-qm', 'content');
+  assert.match(checkDocs(root, { base, now: Date.parse('2026-10-25T12:00:00Z') }).errors.join('\n'), /修改日期 2026-10-24/);
+  fs.writeFileSync(path.join(root, 'docs/spec/a.md'), doc('# A\n\nNew content.', 'spec', '2026-10-24'));
+  assert.deepEqual(checkDocs(root, { base, now: Date.parse('2026-10-25T12:00:00Z') }).errors, []);
+  git('add', '.');
+  execFileSync('git', ['-C', root, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'metadata only'], { env: { ...process.env, GIT_AUTHOR_DATE: '2026-10-25T12:00:00Z', GIT_COMMITTER_DATE: '2026-10-25T12:00:00Z' } });
+  assert.deepEqual(checkDocs(root, { base, now: Date.parse('2026-10-26T12:00:00Z') }).errors, []);
 });

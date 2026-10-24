@@ -10,7 +10,9 @@ updated: 2026-10-24
 
 进度：业务来源整理与规则确认已完成。将旧仓库中仍需要的业务整理到 Next，逐项确认有实际产品取舍的规则，并为每组来源记录维护位置。迁移完成需要同时满足来源覆盖、业务决定和文档检查三项条件。
 
-旧仓库基线为 `a0a998688a623da7811d04037efe0829c0783267`，于 2026-10-24 刷新 `origin/develop` 后核对。已盘点 `docs/` 和机器人目录中的 167 份 Markdown：9 份产品规格、32 份设计、26 份指南、18 份 ADR、3 份参考、75 份内部记录、2 份机器人说明，以及 2 份文档根入口。全部文件已纳入来源清单，按业务、设计、工程操作与历史记录分类。产品行为按下面的主题核对，技术实现和旧运行证据保留原仓库。逐文件路径、哈希和处理分类保存在私有运维仓库的 source-inventory.json。
+旧仓库来源基线为 `a0a998688a623da7811d04037efe0829c0783267`。来源清单记录文档路径、哈希和处理分类，保存在私有 ops 仓库的 `source-inventory.json`。
+
+盘点范围包括 `docs/` 和机器人目录中的 167 份 Markdown，涵盖产品规格、设计、指南、ADR、参考材料、内部记录和入口。下表核对已保留的产品行为，旧实现和旧运行证据保留在原仓库。
 
 本轮沿用已确认的业务迁移范围。旧部署、权限框架、数据库锁、后台任务和数据清理实现作为技术参考保留在原仓库，具体实现由新架构决定。旧历史文档中的批准状态不直接成为 Next 的业务决定。
 
@@ -53,7 +55,9 @@ updated: 2026-10-24
 
 工程原则、前后端分层、错误处理、部署、备份、发布和 CI 文档分别由 Next 已有工程文档承接，后续按选定实现补充。旧系统的实际运行结果和故障记录保留在旧仓库，不改写成 Next 的验证结果。品牌沿用 StuHelper 与已确认的纸飞机资产，客户端实现时从核对过的源文件接入。
 
-补查还覆盖机器人后台聊天工作台、事件订阅、动态口令、广告与链接检测、频率限制、观察名单和规则预览，以及上传取消的用户可见结果。这些功能已写入群服务或资料规格。来源包括[机器人后台完成记录](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/internal/koishi-webui-refactor-completion-2026-08-23.md)和[上传取消记录](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/internal/exec-plans/completed/2026-09-11-web02-upload-cancellation.md)。旧运行结果只作行为来源，不作为 Next 实现证据。
+补查覆盖机器人后台聊天工作台、事件订阅、动态口令、广告与链接检测、频率限制、观察名单、规则预览，以及上传取消的用户可见结果。这些功能由群服务或资料规格维护。
+
+行为来源包括[机器人后台完成记录](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/internal/koishi-webui-refactor-completion-2026-08-23.md)和[上传取消记录](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/internal/exec-plans/completed/2026-09-11-web02-upload-cancellation.md)。Next 的实现结果在对应实施任务中验证。
 
 ## 完成条件
 

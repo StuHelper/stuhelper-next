@@ -11,7 +11,36 @@
       "required": [],
       "optional": [],
       "interface_owner": "platform",
-      "contract_status": "framework"
+      "contract_status": "framework",
+      "specifications": [
+        "docs/spec/module-lifecycle.md",
+        "docs/spec/module-protocol.md",
+        "docs/spec/action-eligibility.md",
+        "docs/spec/data-retention.md"
+      ],
+      "scenario_tests": {
+        "MOD-06": [
+          "module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness"
+        ],
+        "MOD-07": [
+          "module/remote_test.go#TestRemoteDegradedStartupRecoveryAndBoundedProbes",
+          "module/remote_test.go#TestRemoteSlowStartupBudget"
+        ],
+        "MOD-08": [
+          "module/remote_test.go#TestRemoteCredentialRotationAndMissingConfiguration",
+          "module/remote_test.go#TestRemoteDegradedStartupRecoveryAndBoundedProbes"
+        ],
+        "MOD-09": [
+          "module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness"
+        ]
+      },
+      "api": 1,
+      "capabilities": [
+        "platform.status",
+        "platform.modules"
+      ],
+      "capability_requires": {},
+      "critical": true
     },
     {
       "id": "identity",
@@ -23,7 +52,10 @@
       ],
       "optional": [],
       "interface_owner": "identity",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/sso-compatibility.md"
+      ]
     },
     {
       "id": "profiles",
@@ -38,7 +70,10 @@
         "media"
       ],
       "interface_owner": "profiles",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/personal-center.md"
+      ]
     },
     {
       "id": "campus-adapters",
@@ -50,7 +85,10 @@
       ],
       "optional": [],
       "interface_owner": "campus-adapters",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/catalog-operations.md"
+      ]
     },
     {
       "id": "verification",
@@ -65,7 +103,10 @@
         "campus-adapters"
       ],
       "interface_owner": "verification",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/student-verification.md"
+      ]
     },
     {
       "id": "catalog",
@@ -79,7 +120,12 @@
         "campus-adapters"
       ],
       "interface_owner": "catalog",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/catalog-operations.md",
+        "docs/spec/my-courses.md",
+        "docs/spec/academic-content.md"
+      ]
     },
     {
       "id": "moderation",
@@ -91,7 +137,10 @@
       ],
       "optional": [],
       "interface_owner": "moderation",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/content-management.md"
+      ]
     },
     {
       "id": "media",
@@ -105,7 +154,11 @@
         "billing"
       ],
       "interface_owner": "media",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/media.md",
+        "docs/spec/storage-contribution.md"
+      ]
     },
     {
       "id": "reviews",
@@ -119,10 +172,20 @@
       ],
       "optional": [
         "profiles",
-        "verification"
+        "verification",
+        "identity"
       ],
       "interface_owner": "reviews",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/academic-content.md"
+      ],
+      "eligibility_facts": {
+        "campus_eligibility": "verification",
+        "phone_bound": "identity",
+        "identity_verified": "verification",
+        "course_enrollment": "catalog"
+      }
     },
     {
       "id": "resources",
@@ -137,10 +200,19 @@
       ],
       "optional": [
         "verification",
-        "billing"
+        "billing",
+        "identity"
       ],
       "interface_owner": "resources",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/resource-sharing.md"
+      ],
+      "eligibility_facts": {
+        "campus_eligibility": "verification",
+        "phone_bound": "identity",
+        "identity_verified": "verification"
+      }
     },
     {
       "id": "billing",
@@ -154,7 +226,10 @@
         "identity"
       ],
       "interface_owner": "billing",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/wallet-and-points.md"
+      ]
     },
     {
       "id": "community",
@@ -173,7 +248,10 @@
         "media"
       ],
       "interface_owner": "community",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/social-content.md"
+      ]
     },
     {
       "id": "groups",
@@ -189,7 +267,11 @@
         "moderation"
       ],
       "interface_owner": "groups",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/qq-group-services.md",
+        "docs/spec/bot-entertainment.md"
+      ]
     },
     {
       "id": "information-query",
@@ -209,7 +291,10 @@
         "groups"
       ],
       "interface_owner": "information-query",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/information-query.md"
+      ]
     },
     {
       "id": "open-platform",
@@ -226,7 +311,10 @@
         "groups"
       ],
       "interface_owner": "open-platform",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/open-platform.md"
+      ]
     },
     {
       "id": "search",
@@ -243,7 +331,10 @@
         "community"
       ],
       "interface_owner": "search",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/discovery-and-statistics.md"
+      ]
     },
     {
       "id": "notifications",
@@ -257,7 +348,10 @@
         "profiles"
       ],
       "interface_owner": "notifications",
-      "contract_status": "design-only"
+      "contract_status": "design-only",
+      "specifications": [
+        "docs/spec/notifications.md"
+      ]
     }
   ],
   "applications": [
@@ -265,13 +359,35 @@
       "id": "web",
       "repository": "StuHelper/stuhelper-web",
       "visibility": "public",
-      "implementation": "framework"
+      "implementation": "framework",
+      "specifications": [
+        "docs/spec/internationalization.md"
+      ]
     },
     {
       "id": "admin",
       "repository": "StuHelper/stuhelper-admin",
       "visibility": "public",
-      "implementation": "framework"
+      "implementation": "framework",
+      "specifications": [
+        "docs/spec/internationalization.md"
+      ]
     }
+  ],
+  "operations": [
+    {
+      "id": "ops",
+      "repository": "StuHelper/stuhelper-ops",
+      "visibility": "private",
+      "kind": "operations",
+      "specifications": [
+        "docs/spec/ci-runners.md",
+        "docs/spec/admin-operations.md"
+      ]
+    }
+  ],
+  "shared_specifications": [
+    "docs/spec/terminology.md",
+    "docs/spec/native-clients.md"
   ]
 }

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
 
@@ -14,10 +15,10 @@ export default defineConfig({
   retries: 0,
   reporter: 'list',
   use: { trace: 'off', screenshot: 'only-on-failure' },
-  projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
-  ],
+  projects: Object.keys(JSON.parse(fs.readFileSync(path.join(root, 'architecture/locales.json'), 'utf8')).languages).flatMap(locale => [
+    { name: `desktop-${locale}`, metadata: { locale }, use: { ...devices['Desktop Chrome'] } },
+    { name: `mobile-${locale}`, metadata: { locale }, use: { ...devices['Pixel 7'] } },
+  ]),
   webServer: [
     {
       command: './bin/stuhelper-platform', cwd: platform,
@@ -26,7 +27,7 @@ export default defineConfig({
       gracefulShutdown: { signal: 'SIGTERM', timeout: 5000 },
     },
     {
-      command: 'npm run preview -- --port 18781', cwd: web,
+      command: 'pnpm run preview --port 18781', cwd: web,
       env: { STUHELPER_API_TARGET: 'http://127.0.0.1:18780' },
       url: 'http://127.0.0.1:18781', reuseExistingServer: false,
       gracefulShutdown: { signal: 'SIGTERM', timeout: 5000 },

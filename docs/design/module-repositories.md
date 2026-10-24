@@ -14,6 +14,8 @@ updated: 2026-10-24
 
 本仓库保留跨模块架构、公共业务规格、接口目录和迁移进度。模块开始实现时，其详细设计、实现、模块内验收与迁移由自己的仓库维护。私有模块的具体设计本轮直接迁入私有仓库，公开页面只说明用户入口及必要对接范围。
 
+完整开发工作区由一份 Mani 清单登记。仓库可见性表达代码和文档的保密范围，GitHub 管理仓库访问权限。业务管理员、学校范围和普通用户权限由运行中的服务管理。各仓库按自身接口依赖独立构建，组合服务通过公开模块接口或私有服务 API 协作。
+
 ## 仓库与数据归属
 
 以下名称确定模块归属。没有实现内容的公开模块先登记，开始实现时建立仓库，避免把空仓库当成交付。
@@ -37,11 +39,15 @@ updated: 2026-10-24
 | open-platform | stuhelper-open-platform | public | 开发者应用审批、业务授权与撤回 |
 | search | stuhelper-search | public | 可重建搜索索引、热度与发现查询 |
 | notifications | stuhelper-notifications | public | 站内通知、发送意图、渠道投递与偏好 |
-| production | stuhelper-ops | private | 部署组合、版本固定、备份恢复与生产迁移文档 |
+| 运维仓库 | stuhelper-ops | private | 部署组合、版本固定、备份恢复与生产迁移文档 |
 
 现有私有 `stuhelper-payment` 保留支付网关职责，账务模块通过其接口对接，不把积分、会员与资料业务塞入支付网关。现有 AI、Store 和 `stuhelper-docs` 均保留自己的用途，不因本次重构重新归属或被覆盖。
 
-当前只推进 Web 与 Admin。微信小程序、Android、iOS 与 HarmonyOS 搁置，以下保留各自未来应用仓库的命名规划。应用仓库分别使用 `stuhelper-web`、`stuhelper-admin`、`stuhelper-wechat`、`stuhelper-android`、`stuhelper-ios` 与 `stuhelper-harmony`。客户端按模块组合界面，使用版本化 SDK，不拥有服务端业务规则。仓库创建前检查同名项目，不能覆盖已有项目。
+当前只推进 `stuhelper-web` 与 `stuhelper-admin`。微信小程序、Android、iOS 与 HarmonyOS 暂时搁置，对应仓库名称规划为 `stuhelper-wechat`、`stuhelper-android`、`stuhelper-ios` 和 `stuhelper-harmony`。
+
+客户端按模块组合界面并使用版本化 SDK，服务端执行业务规则。新建仓库前检查同名项目，保留已有项目。
+
+运维仓库维护部署组合与恢复操作，模块运行时清单单独登记可启停模块。
 
 ## 依赖与可替换接口
 
@@ -69,4 +75,4 @@ updated: 2026-10-24
 
 私有模块的详细规格分别放在对应仓库，公共规格仅保留必要的使用与对接说明。公共仓库继续保持 public，历史提交按项目负责人决定保留，不重写已有公开历史。
 
-文档与私有仓库结构已迁移，platform、Web 和 Admin 的框架代码已完成。业务服务、跨仓库正式发布和生产部署继续单独推进。[模块清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)分别记录设计、框架和业务实现状态；实际验证以[框架工作记录](../development/framework-bootstrap.md)为准。
+文档与私有仓库结构已迁移，platform、Web 和 stuhelper-admin 的框架代码已完成。业务服务、跨仓库正式发布和生产部署继续单独推进。[模块清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/modules.json)分别记录设计、框架和业务实现状态；实际验证以[框架工作记录](../development/framework-bootstrap.md)为准。

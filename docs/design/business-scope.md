@@ -32,7 +32,7 @@ StuHelper Next 是现有 StuHelper 的重构版本。Next 是过渡名称，目�
 | 信息查询 | 从学号、姓名或 QQ 关联查看用户的全站业务记录 | [信息查询](../spec/information-query.md) |
 | 娱乐功能 | 使用和管理骰子、自助禁言等机器人命令 | [娱乐功能](../spec/bot-entertainment.md) |
 
-当前只交付 Web 与 Admin。社交独立延期，微信小程序、Android、iOS 与 HarmonyOS 暂时搁置，后续分别重新启动，见[社交说明](../spec/social-content.md)和[多端说明](native-clients.md)。独立官方 Casdoor SSO 继续负责登录，并保持 AI、Store 等已有消费方的账号连续性，见[独立 SSO](independent-sso.md)。
+当前只交付 Web 与 stuhelper-admin。社交独立延期，微信小程序、Android、iOS 与 HarmonyOS 暂时搁置，后续分别重新启动，见[社交说明](../spec/social-content.md)和[多端说明](native-clients.md)。独立官方 Casdoor SSO 继续负责登录，并保持 AI、Store 等已有消费方的账号连续性，见[独立 SSO](independent-sso.md)。
 
 机器人相关菜单统一分为群聊管理、信息查询和娱乐功能。群聊管理包含关键词、防复读、防撤回与 AI 举报分析。信息查询由管理后台提供完整入口，机器人能力按权限配置。
 

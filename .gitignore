@@ -21,9 +21,11 @@ backups/
 private/
 ops/sso/runtime/
 
-workspace/
+/workspace
 .tools/
 go.work.sum
 
 test-results/
 playwright-report/
+
+go.work

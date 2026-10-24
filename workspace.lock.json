@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "engineering_tools": {
+    "version": "0.1.3",
+    "revision": "bf954bc87a9f6a0d3a39f5a29402eb1dc9c51081"
+  },
+  "projects": {
+    "platform": {
+      "revision": "35db5a79a8d404fb462309e355582da75f256f41"
+    },
+    "web": {
+      "revision": "37b6f88144226becaaac5648036b3d0834af2474"
+    },
+    "admin": {
+      "revision": "8059242cc5817b48ac372212c4bb1a3fb8cd4c05"
+    }
+  }
+}
