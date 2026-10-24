@@ -15,9 +15,21 @@ test('release references require annotated version tags and the locked commit', 
   t.after(() => fs.rmSync(directory, { recursive: true }));
   const dependency = `git+https://github.com/StuHelper/stuhelper-next.git#${tag}`;
   fs.writeFileSync(path.join(directory, 'package.json'), JSON.stringify({ devDependencies: { '@stuhelper/engineering-tools': dependency } }));
-  fs.writeFileSync(path.join(directory, 'pnpm-lock.yaml'), JSON.stringify({ importers: { '.': { devDependencies: { '@stuhelper/engineering-tools': { specifier: dependency, version: `https://codeload.github.com/StuHelper/stuhelper-next/tar.gz/${revision}` } } } } }));
+  const archive = `https://codeload.github.com/StuHelper/stuhelper-next/tar.gz/${revision}`;
+  const lock = { importers: { '.': { devDependencies: { '@stuhelper/engineering-tools': { specifier: dependency, version: archive } } } }, packages: { [`@stuhelper/engineering-tools@${archive}`]: { resolution: { tarball: archive, integrity: 'sha512-test' } } } };
+  const write = () => fs.writeFileSync(path.join(directory, 'pnpm-lock.yaml'), JSON.stringify(lock));
+  write();
   checkConsumerRelease(directory, '0.1.0', revision);
   assert.throws(() => checkConsumerRelease(directory, '0.1.0', 'c'.repeat(40)), /tag 与锁定提交不一致/);
+  const gitVersion = `git+https://github.com/StuHelper/stuhelper-next.git#${revision}`;
+  lock.importers['.'].devDependencies['@stuhelper/engineering-tools'].version = gitVersion;
+  lock.packages = { [`@stuhelper/engineering-tools@${gitVersion}`]: { resolution: { type: 'git', repo: 'https://github.com/StuHelper/stuhelper-next.git', commit: revision } } };
+  write();
+  checkConsumerRelease(directory, '0.1.0', revision);
+  assert.throws(() => checkConsumerRelease(directory, '0.1.0', 'c'.repeat(40)), /tag 与锁定提交不一致/);
+  lock.packages[`@stuhelper/engineering-tools@${gitVersion}`].resolution.repo = 'git@github.com:StuHelper/stuhelper-next.git';
+  write();
+  assert.throws(() => checkConsumerRelease(directory, '0.1.0', revision), /必须通过 HTTPS/);
 });
 
 test('paired candidates apply only to their declared PR and reject unsupported inputs', t => {

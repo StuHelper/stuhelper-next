@@ -27,15 +27,17 @@ Renovate 适合需要共享更新预设、更多版本文件识别和集中更�
 发行 tag 可访问后，在完整工作区更新消费者：
 
 ```bash
-node scripts/workspace.mjs tooling 0.1.0 --write --remote
-mani exec --all 'pnpm install'
+node scripts/workspace.mjs tooling 0.1.1 --write --remote
+mani exec --all 'GIT_SSH_COMMAND=false pnpm install'
 mani run check --all
 node scripts/workspace.mjs toolchains --remote
 node scripts/workspace.mjs contracts
 pnpm run test:e2e
 ```
 
-示例版本替换为本次发行版本。更新命令同步八个消费者的版本声明，并将 tag 解析出的 SHA 写入架构记录。各消费者独立检查远端 tag 与 pnpm 锁文件一致性；源码检查同时核对包内容。tag 缺失或内容改变时，检查失败。
+示例版本替换为本次发行版本。更新命令同步八个消费者的版本声明，并将 tag 解析出的 SHA 写入架构记录。各消费者独立检查远端 tag 与 pnpm 锁文件一致性，接受 HTTPS Git 或带完整性校验的 GitHub 归档；源码检查同时核对包内容。tag 缺失或内容改变时，检查失败。
+
+pnpm 10 在网络探测失败时可能记录本机可用的 SSH 来源。生成公共工具锁文件时临时关闭 SSH，避免依赖开发者私钥；CI 拒绝 SSH 来源，安装使用已锁定的 HTTPS 来源。
 
 工具初次提交时，架构记录可只包含版本名，避免提交引用自身。tag 建立后补记解析出的 SHA，消费者锁文件固定相同 SHA。包源码不包含工作区组合记录。
 
