@@ -264,9 +264,26 @@ export function snapshot(directory = root, write = false) {
   if (write) fs.writeFileSync(path.join(directory, 'workspace.lock.json'), json);
   else process.stdout.write(json);
 }
+const documentationFiles = new Set(['README.md', 'CONTRIBUTING.md', 'AGENTS.md', 'LICENSE', 'mkdocs.yml', 'pyproject.toml', 'uv.lock', '.markdownlint-cli2.yaml']);
 export function needsIntegration(files) {
-  return files.some(file => /^(architecture\/|tooling\/|scripts\/|tests\/|\.github\/|docs\/spec\/terminology\.md$|mani\.yaml$|workspace\.lock\.json$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|playwright\.config\.mjs$|Makefile$|\.node-version$|\.go-version$)/.test(file));
+  // The glossary is shipped in the shared tools package and affects consumers.
+  return !files.length || files.some(file => file === 'docs/spec/terminology.md' ||
+    (!documentationFiles.has(file) && !file.startsWith('docs/')));
 }
+export function integrationPlan(directory, eventName, event = {}) {
+  // A previous push may have been cancelled before verifying its code changes.
+  if (eventName !== 'pull_request') return { integration: true, reason: 'Full maintained-branch or manual validation' };
+  try {
+    const { base, head } = event.pull_request;
+    for (const revision of [base.sha, head.sha]) assert.match(revision, /^[0-9a-f]{40}$/);
+    const files = git(directory, 'diff', '--name-only', '--no-renames', '-z', `${base.sha}...${head.sha}`, '--').split('\0').filter(Boolean);
+    const integration = needsIntegration(files);
+    return { integration, reason: integration ? 'PR includes integration inputs or unknown paths' : 'Documentation-only PR' };
+  } catch {
+    return { integration: true, reason: 'Diff unavailable: full validation' };
+  }
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const { positionals: [command, option], values } = parseArgs({ allowPositionals: true, options: {
@@ -290,7 +307,15 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       writeIntegrationRecord(record, values.output);
     } else if (command === 'checkout') checkoutRecord(root, readJSON(values.replay));
     else if (command === 'status') await integrationStatus(root, readJSON(values.replay));
-    else if (command === 'affected') console.log(String(needsIntegration(git(root, 'diff', '--name-only', option, 'HEAD').split('\n'))));
+    else if (command === 'affected') {
+      if (option) console.log(String(needsIntegration(git(root, 'diff', '--name-only', '--no-renames', '-z', option, 'HEAD', '--').split('\0').filter(Boolean))));
+      else {
+        const plan = integrationPlan(root, process.env.GITHUB_EVENT_NAME, readJSON(process.env.GITHUB_EVENT_PATH));
+        fs.appendFileSync(process.env.GITHUB_OUTPUT, `integration=${plan.integration}\n`);
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Integration selected: **${plan.integration}**. ${plan.reason}.\n`);
+        console.log(JSON.stringify(plan));
+      }
+    }
     else throw new Error('Use validate, contracts, toolchains [--write|--remote], tooling VERSION [--write], go-work, snapshot [--write], resolve, checkout --replay FILE, status --replay FILE, or affected BASE.');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

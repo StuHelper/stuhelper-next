@@ -18,7 +18,9 @@ Docker/OCI 镜像构建，以及 BJ1 Registry 的拉取、推送和镜像缓存�
 
 确认依据：项目负责人于 2026-10-23 指定 Docker build 使用自建 runner，因为 Registry 在 BJ1、自建网络更好。Registry 地址、凭据和实际传输性能没有在本次文档工作中探测或公开。
 
-2026-10-24，项目负责人要求托管检查改用 Ubuntu 26.04，并计划自行升级 StuHelper runner。普通检查关闭 Actions 依赖缓存，Docker 缓存使用自建环境或 BJ1 Registry，避免占用 GitHub 免费存储额度。版本引用使用明确 tag，摘要继续用于完整性核验。
+2026-10-24，项目负责人要求托管检查改用 Ubuntu 26.04，并计划自行升级 StuHelper runner。
+
+普通检查使用有大小限制的公开依赖缓存，PR 只恢复，可信 develop 成功检查后保存。Actions cache 免费额度独立于 artifact/Packages。Docker 缓存使用自建环境或 BJ1 Registry。版本引用使用明确 tag，摘要继续用于完整性核验。
 
 ## 备选与取舍
 

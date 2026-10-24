@@ -4,65 +4,102 @@ status: Accepted
 updated: 2026-10-24
 ---
 
-# CI runner 分工
+# CI 触发、runner 与缓存
 
-## 范围与确认依据
+## 范围
 
-适用于本仓库当前检查任务及未来镜像/客户端任务。项目负责人已确认[按任务分配 runner](../adr/0002-runner-placement.md)：Registry 位于 BJ1，Docker build 使用网络条件更好的 StuHelper 自建 runner。当前还没有镜像构建或发布工作流。
+适用于本仓库检查及后续镜像任务。普通检查使用免费标准托管 runner，Docker/OCI 与 BJ1 Registry 使用自建 runner，依据见[runner 决策](../adr/0002-runner-placement.md)。当前没有镜像构建或发布工作流。
 
-## 调度规则
+实现见 [ci.yml](https://github.com/StuHelper/stuhelper-next/blob/develop/.github/workflows/ci.yml)，日常操作见 [CI 指南](../guide/ci-runners.md)，本地 hook 见[检查指南](../guide/repository-checks.md)。
 
-| 任务 | 默认或固定 runner | 规则 |
-| --- | --- | --- |
-| 文档、格式、静态检查、不依赖私有 Registry 的测试 | GitHub 标准托管 `ubuntu-26.04` | 受信 develop/main 可手动选择 ARC |
-| Docker/OCI 镜像构建 | StuHelper ARC | 使用 `stuhelper-arc` 组与 `stuhelper-arc-sh-k8s` 标签，不允许普通检查变量改到托管 runner |
-| BJ1 Registry 拉取/推送/缓存及官方镜像原样复制 | StuHelper ARC | 保持制品 digest，凭据仅在受控任务使用 |
-| 官方 Casdoor 部署制品 | 无本项目构建任务 | 直接消费官方镜像；复制和部署不等于重新构建 |
-| Web/Android/小程序普通编译 | 平台支持的标准 runner，可按需要用自建 | 若包含 Docker build，镜像部分拆成自建 job |
-| iOS 原生编译 | macOS + Xcode | 不能调度到现有 Linux ARC；签名与上架独立授权 |
-| HarmonyOS 原生编译 | 已验证支持的 SDK 环境 | 环境与签名需实际验证，必要时专用 runner |
+## 触发与取消
 
-免费使用范围以 GitHub [当前计费说明](https://docs.github.com/en/billing/concepts/product-billing/github-actions)为准；标准公共仓库计算、存储与大规格 runner 不混为同一种资源。
+| 入口 | 检查范围 |
+| --- | --- |
+| develop/main push | 完整仓库与跨仓集成 |
+| 目标为 develop/main 的 PR，包括 draft | 仓库检查，以及完整 PR 差异选中的集成 |
+| 其他开发分支 push | 不自动运行 CI，准备共享时创建或更新同一个 PR |
+| workflow_dispatch | 完整检查，源码组合默认 latest，可选择 fixed、配套候选或 replay |
 
-## 当前检查工作流的配置
+当前未启用 release 分支流程，不预设 release 分支触发。tag 不触发这个检查工作流。
 
-工作流实现见 [ci.yml](https://github.com/StuHelper/stuhelper-next/blob/develop/.github/workflows/ci.yml)。PR 使用托管 runner。develop/main push 在 `CI_RUNNER=stuhelper` 时使用 ARC，其余值使用托管 runner。
+并发组包含 workflow、事件类型及 PR 编号或分支 ref，启用 `cancel-in-progress: true`。同一 PR 新提交、同分支新 push、同 ref 再次手动运行都会请求取消旧运行。不同事件、PR 和分支互不取消。
 
-手动 dispatch 的 `runner` 输入选择本次普通检查的环境，优先于仓库变量。
+手动比较 runner 或 fixed/latest 组合时顺序执行，同 ref 的新手动运行会取消旧运行。取消需要传播和进程退出时间。后续发布、迁移任务要单独设计并发策略。
 
-手动请求自建检查只支持 develop/main，其他 ref 明确失败。初始化默认值为 `CI_RUNNER=github`。上述变量和输入只控制普通检查，不是未来镜像任务的通用调度开关。
+## 路径选择与合并条件
 
-自建 runner 保留现有组名与标签。项目负责人计划手动升级到 Ubuntu 26.04，升级完成后再记录实际操作系统与检查结果。
+路径选择集中在 [workspace.mjs](https://github.com/StuHelper/stuhelper-next/blob/develop/scripts/workspace.mjs)。PR 使用完整 Git 历史计算 base...head 差异，包含早期提交、删除和重命名，不受 API 文件列表截断影响。
+
+普通 docs 文件、根 README/CONTRIBUTING/AGENTS/LICENSE 和文档配置只需仓库检查。`docs/spec/terminology.md` 属于共享工具包，必须运行集成。工具、架构、脚本、工作流、锁文件、固定组合和未知路径也运行集成。差异为空或无法读取时执行完整验证。
+
+develop/main push 始终完整验证，因为前一次 push 可能已被取消。只判断当前 push 的 before/after，会让后续文档提交掩盖前一次尚未验证的代码。手动运行同样完整验证。
+
+Repository validation 执行仓库检查并输出选择结果，Framework integration 按选择执行。最终 Repository checks 沿用分支保护要求的名称，要求仓库成功、选中的集成成功。只有明确未选中的集成允许 skipped，失败、取消、缺失输出和意外 skipped 均不能通过。
+
+工作流不使用顶层 paths-ignore 跳过必需检查，也不使用提交消息跳过检查，避免 PR 长期 Pending。
+
+集成默认使用当前候选与其他仓库最新 develop，先解析并记录完整源码组合，再按 SHA 检出。手动运行支持 fixed、配套候选和 replay，保留客户端契约来源与共享工具版本校验。具体规则见[集成来源](../guide/development-workspace.md#集成来源)。
+
+Mani 0.32.1 普通批量运行的退出码不能表达子任务失败。CI 按锁文件逐个进入项目目录，使用显式配置路径和原生 `--tty` 执行任务，让任务退出码直接决定结果。安装模块依赖前先用失败 fixture 验证这一行为。
+
+## runner 调度
+
+| 任务 | runner 与条件 |
+| --- | --- |
+| Repository validation | 默认 `ubuntu-26.04`，受信 develop/main 可选择 ARC |
+| Framework integration、最终汇总 | 固定 `ubuntu-26.04` |
+| Docker/OCI、BJ1 Registry 拉取/推送/缓存 | 固定 `stuhelper-arc` 组、`stuhelper-arc-sh-k8s` 标签 |
+| Casdoor | 直接消费官方镜像，无本项目构建任务 |
+| iOS 编译 | macOS 与 Xcode，签名和上架独立授权 |
+| HarmonyOS 编译 | 实际验证支持的 SDK 环境 |
+
+PR 始终使用托管 runner。develop/main push 的 Repository validation 只有 `CI_RUNNER=stuhelper` 时使用 ARC；手动 `runner` 输入优先于该变量。其他 ref 申请自建检查会失败。开关不影响集成、最终汇总或镜像任务。
+
+自建 runner 保留现有组与标签，操作系统升级由 owner 手动安排。GitHub 托管 runner 支持 Ubuntu 26.04，不表示自建系统已经升级。公共 PR 与共享 ARC 的组织级隔离仍需按[开发计划](../development/rewrite-roadmap.md)处理。
 
 ## 版本与存储
 
-Actions 使用明确的发行 tag，例如 `actions/checkout@v7.0.1`。部署镜像也使用明确的版本 tag，并按 tag 拉取，使服务器上的本地镜像保留可识别名称。digest 和 checksum 留作完整性核验记录，源码提交留作追溯依据。若同一镜像 tag 对应的 digest 改变，先核查差异并重新验收，不能沿用原来的通过记录。
+StuHelper 使用 Free 组织计划，本仓库公开。按 [GitHub 计费说明](https://docs.github.com/en/billing/concepts/product-billing/github-actions)，公开仓库标准托管计算和自建 runner 使用免费，Actions cache 每仓库 10 GB 免费额度独立于 artifact/Packages 存储。
 
-当前文档检查不使用 GitHub Actions 依赖缓存：`setup-node` 设置 `package-manager-cache: false`，`setup-uv` 设置 `enable-cache: false`，不添加 `actions/cache`。文档站只在 job 中构建，不上传为 artifact。
+Free 组织的私有仓库有每月 2,000 分钟，标准托管通常最多并发 20 个 job。公开计算仍受并发限制。实际额度与付费项目以 [Actions limits](https://docs.github.com/en/actions/reference/limits)和组织计费设置为准，不自动扩大额度或启用付费存储。
 
-Docker/BuildKit 缓存只放在任务专属自建 builder 或 BJ1 Registry，禁止使用 `type=gha`。缓存 tag 按项目和构建用途复用，不为每次提交永久增加一份。应设置大小或保留数量与过期清理规则，同时保留运行、回退和其他任务仍需使用的镜像。
+Actions 使用明确版本 tag，工具链从 `.node-version`、`.go-version` 和统一版本清单读取，依赖以 pnpm/uv 锁文件安装。部署镜像按明确 tag 拉取，摘要和源码提交用于核验。
 
-新增 GitHub 缓存或 artifact 的 PR 说明用途、估计大小、容量上限、保留期和清理方式。artifact 默认最多保留 3 天，只保存定位故障需要的小文件。
+缓存采用显式 restore/save，setup 工具的自动缓存保持关闭。缓存只保存任务临时目录中的公开依赖，不包含源码检出、node_modules、虚拟环境、凭据或部署产物。
 
-依赖缓存、构建缓存和 artifact 分别核算。容量扩展和付费存储由负责人决定，平台限额与计费以 [GitHub 官方说明](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#usage-limits-and-eviction-policy)为准。
+| 缓存 | 用途 | 预计未压缩大小 | 单条上传上限 |
+| --- | --- | --- | --- |
+| next-repository-v2 | 根 pnpm、uv、Go 检查工具依赖与编译缓存 | 约 0.2–1 GiB | 1 GiB |
+| next-framework-v2 | 实际组合的前端 pnpm store | 约 1–2 GiB | 2 GiB |
+| next-go-v2 | 实际组合的 Go module 和编译缓存 | 约 0.5–2 GiB | 2 GiB |
 
-## 信任与失败
+缓存键包含环境、统一工具版本和锁文件摘要。集成先解析实际源码组合，再读取模块锁文件、包配置与 patch 内容生成 key。普通源码提交不生成新 key，不设置宽泛的跨 key 回退。大小以 job summary 为准。
 
-不受信公共 PR 不直接执行需要内部网络、Registry 凭据或自建环境的镜像任务；由审查后的可信分支/受信调度入口承接。工作流条件不能代替组织级权限隔离。现有共享 ARC 组权限的观察与待处理事项记录在[开发计划](../development/rewrite-roadmap.md)，不能宣称公共 fork 已获得完整隔离验证。
+PR、main 和其他 ref 只恢复。仅架构仓库 develop 成功检查后保存未命中的缓存。空缓存或超限缓存不上传。缓存服务异常允许正常安装，只有缓存 restore/save 步骤允许失败后继续；安装和测试仍必须通过。
 
-自建容量不足或网络失败时保持排队/失败状态并定位原因，不自动切换到 GitHub 托管 runner 执行镜像构建，不关闭检查或更换制品制造成功。
+缓存超过 7 天未访问由 GitHub 删除，达到仓库限额按最近访问时间淘汰。单条上限不等于总量上限。仓库占用超过 8 GiB 时，维护者按 key/ref 和访问时间核实并删除旧缓存，操作见 [CI 指南](../guide/ci-runners.md#查询与清理缓存)。
+
+当前不上传文档或测试 artifact，也不缓存 Playwright 浏览器。新增 artifact 默认最多保留 3 天，只保存故障定位所需的小文件。新增缓存或 artifact 的 PR 说明用途、预计大小、上限、保留期与清理方式。
+
+Docker/BuildKit 缓存固定放在任务专属自建 builder 或 BJ1 Registry，禁止 `type=gha`。按项目和用途复用 tag，限制大小、保留数量与过期时间，保留运行、回退及其他任务仍需的资源。
 
 ## 验收场景
 
 | 场景 | 操作 | 预期结果 |
 | --- | --- | --- |
-| CI-01 | 默认 push/PR 运行普通检查 | GitHub 标准托管 runner 执行检查 |
-| CI-02 | develop 手动选择 stuhelper | 相同检查在目标 ARC 组执行，实际 job 标签可核实 |
-| CI-03 | 将普通检查变量恢复 github 后执行镜像任务 | 镜像 job 仍固定自建；本项在镜像流水线实现时验收 |
-| CI-04 | 自建 runner 不可用 | 保留排队/失败，不隐式改到托管构建 |
-| CI-05 | 更新官方 Casdoor 候选 | 不出现自编译或重新打包 Casdoor 的任务 |
-| CI-06 | 执行当前文档检查 | pnpm、uv 不写入 Actions cache，文档站不上传为 artifact |
-| CI-07 | 添加 Docker 构建缓存 | 使用自建 builder 或 BJ1 Registry，配置中没有 `type=gha` |
-| CI-08 | 按版本拉取部署镜像 | 本地保留版本 tag，核验摘要与本次候选记录一致 |
-
-操作方法见 [CI 指南](../guide/ci-runners.md)，实际检查结果见[文档工作记录](../guide/repository-checks.md)。
+| CI-01 | 默认 push/PR 运行普通检查 | 使用标准托管 runner |
+| CI-02 | develop 手动选择 stuhelper | Repository validation 使用 ARC，其余任务托管 |
+| CI-03 | 修改普通检查 runner 变量 | 镜像任务仍固定自建 |
+| CI-04 | 自建不可用 | 保持排队或失败，不隐式切换镜像环境 |
+| CI-05 | 更新 Casdoor 候选 | 不出现本项目重建任务 |
+| CI-06 | PR 恢复依赖缓存 | 按锁文件安装和检查，不保存共享缓存 |
+| CI-07 | 添加 Docker 缓存 | 使用自建 builder 或 BJ1 Registry |
+| CI-08 | 按版本拉取镜像 | 保留 tag 并核验摘要 |
+| CI-09 | 同一 PR 连续提交 | 新运行取消旧运行，判断整个 PR 差异 |
+| CI-10 | develop 代码 push 后紧接文档 push | 后一次运行仍执行完整回归 |
+| CI-11 | 文档 PR 或共享术语变更 | 普通文档跳过集成，共享术语执行集成 |
+| CI-12 | 选中的集成失败、取消或 skipped | 最终 Repository checks 失败 |
+| CI-13 | 缓存为空、缺失或超限 | 正常安装和检查，空或超限内容不上传 |
+| CI-14 | hook 检查部分暂存或非 HEAD 推送 | 保留实际历史和日期，只检查目标快照 |
+| CI-15 | 任一模块安装或检查返回非零 | CI 保留失败退出码，停止后续项目与汇总放行 |

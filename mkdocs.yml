@@ -94,7 +94,7 @@ nav:
       - 社交与内容治理: spec/social-content.md
       - SSO 兼容: spec/sso-compatibility.md
       - 原生客户端: spec/native-clients.md
-      - CI runner 分工: spec/ci-runners.md
+      - CI 触发与缓存: spec/ci-runners.md
       - 数据保留与删除: spec/data-retention.md
       - 国际化与本地化: spec/internationalization.md
       - 文件与媒体模块: spec/media.md
