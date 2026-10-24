@@ -4,7 +4,7 @@ status: Accepted
 updated: 2026-10-24
 ---
 
-# 使用 Mani 管理开发工作区
+# 0005：使用 Mani 管理开发工作区
 
 ## 背景与决定因素
 
@@ -12,9 +12,9 @@ StuHelper 的模块分别维护代码、接口、版本和 GitHub PR。当前需
 
 ## 决策与确认依据
 
-2026-10-24，项目负责人选择 Mani：统一检出和任务，各仓库独立维护，ops 固定部署组合。使用 Mani v0.32.1。仓库可以脱离 Mani 单独构建和检查。
+使用主机安装的 Mani 统一检出和任务，各仓库独立维护，ops 固定部署组合。仓库保留独立构建和检查入口。
 
-公开工作区只检出 platform、Web 和 Admin。私有工作区配置显式增加 SSO、认证、学校适配、账务与 ops。GitHub 仓库权限决定访问范围，配置分组不承担访问控制。
+单份 mani.yaml 登记 platform、Web、stuhelper-admin、SSO、认证、学校适配、账务和 ops。公私仓划分决定代码与文档的可见性，GitHub 管理仓库访问权限。
 
 ## 备选与取舍
 
@@ -24,9 +24,9 @@ Mani 更贴近当前日常操作，但 `mani sync` 主要克隆缺失仓库，�
 
 ## 后果与验证
 
-固定工具版本，默认关闭 remote 重写、worktree 删除与自动修改 gitignore。项目命令使用空的项目级用户配置，避免 CI 混入个人全局 Mani 任务。
+配置保留现有 remotes、工作树和 gitignore。开发者直接运行 Mani 命令，CI 在临时工具目录安装明确版本。
 
-`make workspace` 只初始化公开工作区。`fetch` 任务只更新远端引用，保留当前分支与文件。通过真实检出、独立构建、接口快照一致性和端到端检查验证工作区，操作见[开发工作区](../guide/development-workspace.md)。
+`mani sync` 初始化工作区。`fetch` 任务只更新远端引用，保留当前分支与文件。固定源码组合、契约来源、独立构建和端到端检查共同验证工作区，操作见[开发工作区](../guide/development-workspace.md)。
 
 ## 关联
 

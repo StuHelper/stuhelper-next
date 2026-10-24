@@ -8,7 +8,7 @@ updated: 2026-10-24
 
 ## 范围与适用情况
 
-当前只推进 Web 和 Admin，微信小程序、Android、iOS 与 HarmonyOS 暂时搁置。以下原生端机制保留为后续参考，当前没有客户端实现。技术机制与各端成本见[原生多端设计](../design/native-clients.md)。
+当前只推进 Web 和 stuhelper-admin，微信小程序、Android、iOS 与 HarmonyOS 暂时搁置。以下原生端机制保留为后续参考，当前没有客户端实现。技术机制与各端成本见[原生多端设计](../design/native-clients.md)。
 
 ## 身份与会话
 

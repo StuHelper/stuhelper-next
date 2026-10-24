@@ -53,6 +53,7 @@ function parsedFile(file, siteDocument) {
   const tokens = markdown.parse(body, {});
   const slugger = new GithubSlugger();
   const anchors = new Set();
+  const githubAnchors = new Set();
   const links = [];
   const prose = [];
   tokens.forEach((token, index) => {
@@ -60,7 +61,9 @@ function parsedFile(file, siteDocument) {
       const text = (tokens[index + 1]?.children ?? [])
         .filter((child) => ['text', 'code_inline', 'image'].includes(child.type))
         .map((child) => child.content).join('');
-      anchors.add(siteDocument ? siteSlug(text, anchors) : slugger.slug(text));
+      const githubAnchor = slugger.slug(text);
+      githubAnchors.add(githubAnchor);
+      anchors.add(siteDocument ? siteSlug(text, anchors) : githubAnchor);
     }
     for (const child of token.children ?? []) {
       if (child.type === 'link_open') links.push(child.attrGet('href'));
@@ -68,7 +71,7 @@ function parsedFile(file, siteDocument) {
       if (child.type === 'text') prose.push(child.content);
     }
   });
-  return { frontmatter, anchors, links, prose };
+  return { frontmatter, anchors, githubAnchors, links, prose };
 }
 
 export function checkDocs(directory) {
@@ -80,6 +83,15 @@ export function checkDocs(directory) {
     return cache.get(file);
   };
   const files = filesIn(root);
+  const glossary = path.join(root, 'docs/spec/terminology.md');
+  const aliases = fs.existsSync(glossary) ? fs.readFileSync(glossary, 'utf8').split('\n').filter(line => line.startsWith('|')).flatMap(line => {
+    const cells = line.split('|').map(cell => cell.trim());
+    return cells.length === 7 && !['替代表述', '---', '—'].includes(cells[5]) ? cells[5].split('、').map(alias => [alias, cells[1]]) : [];
+  }) : [['有效学生资格', '有效校园资格'], ['学生认证通过', '具备有效校园资格']];
+  const siteFile = path.join(root, 'mkdocs.yml');
+  const siteConfig = fs.existsSync(siteFile) ? fs.readFileSync(siteFile, 'utf8') : '';
+  const repository = siteConfig.match(/^repo_url:\s*(https:\/\/github\.com\/[^\s]+)\s*$/m)?.[1];
+
   for (const file of files) {
     const relative = posix(path.relative(root, file));
     const report = (message) => errors.push(`${relative}: ${message}`);
@@ -105,7 +117,17 @@ export function checkDocs(directory) {
       }
       if (!template && parsed.prose.some((text) => placeholder.test(text))) report('unfilled prose placeholder');
     }
-    for (const href of parsed.links) {
+    if (file !== glossary) for (const [alias, canonical] of aliases) {
+      if (parsed.prose.some(text => text.includes(alias))) report(`use standard term "${canonical}" instead of "${alias}"`);
+    }
+    for (let href of parsed.links) {
+      let github = false;
+      if (repository && href?.startsWith(`${repository}/blob/develop/`)) {
+        const url = new URL(href);
+        const relativeTarget = url.pathname.split('/blob/develop/')[1];
+        href = posix(path.relative(path.dirname(file), path.join(root, relativeTarget))) + url.search + url.hash;
+        github = true;
+      }
       if (!href || /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href)) continue;
       try {
         const hash = href.indexOf('#');
@@ -114,12 +136,27 @@ export function checkDocs(directory) {
         const target = pathname ? path.resolve(path.dirname(file), pathname) : file;
         if (!inside(root, target) || !fs.existsSync(target) || !inside(root, fs.realpathSync(target))) {
           report(`missing or external local target: ${href}`);
-        } else if (fragment && /\.(?:md|markdown)$/i.test(target) && fs.statSync(target).isFile() && !read(target).anchors.has(fragment)) {
+        } else if (fragment && /\.(?:md|markdown)$/i.test(target) && fs.statSync(target).isFile() && !(github ? read(target).githubAnchors : read(target).anchors).has(fragment)) {
           report(`missing heading anchor: ${href}`);
         }
       } catch {
         report(`invalid local link: ${href}`);
       }
+    }
+  }
+  for (const category of categories) {
+    const index = path.join(root, 'docs', category, 'README.md');
+    if (!fs.existsSync(index)) continue;
+    const listed = new Set(read(index).links.map(link => path.resolve(path.dirname(index), link.split('#')[0])));
+    for (const file of files.filter(file => path.dirname(file) === path.dirname(index) && !['README.md', 'TEMPLATE.md'].includes(path.basename(file)))) {
+      if (!listed.has(file)) errors.push(`${posix(path.relative(root, index))}: missing topic ${path.basename(file)}`);
+    }
+  }
+  if (/^nav:/m.test(siteConfig)) {
+    const navigation = new Set([...siteConfig.matchAll(/^\s*-\s+[^:\n]+:\s+([\w./-]+\.md)\s*$/gm)].map(match => match[1]));
+    for (const file of files.filter(file => posix(path.relative(root, file)).startsWith('docs/'))) {
+      const target = posix(path.relative(path.join(root, 'docs'), file));
+      if (!navigation.has(target)) errors.push(`mkdocs.yml: missing navigation ${target}`);
     }
   }
   return { count: files.length, errors };

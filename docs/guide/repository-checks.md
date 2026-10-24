@@ -6,54 +6,61 @@ updated: 2026-10-24
 
 # 仓库检查与文档预览
 
-## 适用范围与前置条件
+## 检查入口
 
-适用于本仓库文档与工程检查，需 Git、Node.js 24、npm、Python 3.11+ 和 uv 0.12.18。Linux x86_64 还可运行固定 actionlint 下载器；下载需要访问 GitHub Releases。首次安装依赖需访问公开 npm/PyPI 源。
-
-Node 工具由 `package-lock.json` 固定，MkDocs 工具由 `uv.lock` 固定。本指南不执行 Docker build，不访问 BJ1 Registry，不使用生产凭据。
-
-## 操作步骤
-
-在仓库根目录安装并检查：
+安装锁定依赖后，在架构仓库运行：
 
 ```bash
-npm ci
-python3 scripts/check.py
-python3 -m unittest discover -s scripts -p "test_*.py"
-npm run check:docs
-npm run test:docs
-python3 scripts/lint_workflows.py
-uv run --locked mkdocs build --strict
+make setup
+make check
 ```
 
-`check:docs` 包含 Markdown 格式、元信息、本地链接、标题锚点和占位符检查；`test:docs` 验证检查器的重要错误处理。文档变更后重跑相关检查，检查器或依赖更新后执行回归测试。实际结果见[工作记录](../development/documentation-bootstrap.md)。
+该入口检查仓库清单、私有文件名、检查器回归、统一工作区、术语、Markdown、导航、工作流和文档站。工具链版本由[版本清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/toolchains.json)维护。
 
-actionlint 1.7.12 的内置 runner 名单尚未包含 GitHub 已提供的 `ubuntu-26.04`，因此 `.github/actionlint.yaml` 只补充这个精确标签。该配置仅影响静态检查，不改变工作流的调度方式，也不忽略其他 runner 标签错误。后续 actionlint 原生支持后移除这项兼容配置。
+代码检查与联调分别运行：
 
-本地预览：
+```bash
+mani run check --tags code
+node scripts/workspace.mjs toolchains
+node scripts/workspace.mjs contracts
+npm run test:e2e
+```
+
+## 脚本与测试的职责
+
+| 入口 | 验证内容 |
+| --- | --- |
+| `scripts/check.py` | 模块归属、依赖图、规格引用、文件类型及语法 |
+| `scripts/workspace.mjs` | Mani 清单、工具链、Go Workspace、固定源码组合与契约来源 |
+| `scripts/lint_workflows.py` | 固定版本 actionlint 的下载、校验与运行 |
+| `.github/check-docs/` | 文档格式、元信息、链接、导航与术语规则 |
+| `scripts/test_*.py`、`scripts/workspace.test.mjs` | 错误清单、优化模式、快照篡改与工作区保护等回归 |
+| `tests/e2e/` | 实际 HTTP、客户端错误恢复、八语言页面与移动端布局 |
+
+platform 的独立检查还覆盖 Go race、导入边界、OpenAPI 和生成一致性。Web 与 stuhelper-admin 的检查覆盖类型、lint、八语言键与占位符、复数和格式化、共享客户端行为及生产构建。
+
+## 预览与结果
 
 ```bash
 uv run --locked mkdocs serve --dev-addr 127.0.0.1:8000
 ```
 
-打开终端给出的本地地址。导航按五类目录组织，Mermaid 支持图表与缩放；图表脚本来自配置中固定版本的 jsDelivr 资源，浏览器需要访问该 CDN。修改图表或相关配置后，在浏览器中确认实际显示结果。
+严格构建生成 `site/`。依赖目录、站点、工作区和测试输出由 Git 忽略。结果按命令退出码与实际范围记录在 PR、CI 和当前实施状态中。
 
-## 结果检查
+普通检查使用锁文件并关闭 Actions 缓存及 artifact。actionlint 的精确 runner 标签兼容配置只补充 `ubuntu-26.04`。
 
-所有检查应以退出码 0 结束。严格构建生成 `site/`，不自动发布网站。检查分类入口能到达各主题、状态与实现范围表达正确，尤其不能把 `Accepted` 写成已部署。
+## 故障处理
 
-自动检查不验证外部链接可达性、HTML 链接、业务规则正确性或代码块能否执行。技术事实和生产步骤仍要依据具体证据审查。
+| 失败 | 处理方式 |
+| --- | --- |
+| 术语、链接或导航错误 | 修正对应主题和引用，重跑 `make check` |
+| 工具链不一致 | 更新统一版本清单后执行 `node scripts/workspace.mjs toolchains --write`，重装依赖并检查各仓库 |
+| 契约快照不一致 | 核对提供方来源，重新生成客户端快照并更新来源记录 |
+| 翻译缺失或格式化失败 | 补齐八语言消息及对应行为，再运行原失败检查 |
+| 下载或完整性校验失败 | 核对网络和发行来源，再运行原命令 |
 
-## 故障与清理
+Docker 测试使用任务专属资源。退出时清理本任务的容器、闲置镜像和确认可删除的缓存，保留其他任务资源与持久数据。
 
-| 症状 | 判断与操作 | 恢复检查 |
-| --- | --- | --- |
-| 元信息/日期错误 | 按报错路径修正文档分类、状态与实际日期 | 重跑 check:docs |
-| 文件或锚点缺失 | 核对移动后的主题、标题和入站引用 | 重跑链接检查和严格构建 |
-| lockfile 不一致 | 明确升级范围并重新生成 lockfile，不跳过锁定 | 重新安装后完整检查 |
-| 下载失败 | 区分网络和内容校验错误，不关闭 checksum 或换未知来源 | 重跑原失败步骤 |
-| 图表未显示 | 查看浏览器 CDN 加载和 Mermaid 语法 | 在预览页核实图表，确认图表实际显示 |
+## 场景与实现
 
-开发中另行运行 Docker 测试时，先用任务专属容器名、镜像 tag、Compose project 或 builder 标记资源，并在失败与中断路径安排清理。运行结束后停止并销毁测试容器，测试完成后删除本次创建且不再使用的本地镜像；确认本任务的构建缓存无用后自动清理。不要清理共享 builder、其他任务的镜像、持久卷、生产或回退资源，也不要执行全局 `docker system prune`。
-
-预览使用 Ctrl+C 停止。`site/`、`node_modules/` 和 `.venv/` 是本地构建/依赖目录，已忽略；不删除源码、lockfile、工作树或其他项目的数据。
+规格的验收表使用稳定场景编号。模块完成某个场景后，在模块清单的 `scenario_tests` 中登记实际测试函数；工作区契约检查核对规格编号和测试函数存在性，模块自身检查负责执行测试。当前平台登记 MOD-06 至 MOD-09，业务场景随对应实现登记，未登记项保留为待实施。

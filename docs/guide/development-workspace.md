@@ -8,76 +8,65 @@ updated: 2026-10-24
 
 ## 准备
 
-需要 Git、Go 1.27.2、Node.js 24、Corepack、uv，以及 GitHub 仓库访问权限。公开框架不需要私有仓库权限。架构与模块仓库的开发工作区统一检出 develop，正式发行组合单独固定版本 tag。
+主机安装 Git、Mani、Go、Node.js、Corepack 和 uv。项目工具链版本以[版本清单](https://github.com/StuHelper/stuhelper-next/blob/develop/architecture/toolchains.json)为准。完整工作区需要访问清单中的八个仓库。
 
 ```bash
 git clone --branch develop https://github.com/StuHelper/stuhelper-next.git
 cd stuhelper-next
-make tools
 make setup
-make workspace
-.tools/bin/mani --user-config scripts/mani-user.yaml run setup --all
+mani sync
+mani run setup --tags code
+node scripts/workspace.mjs go-work
 ```
 
-工具安装在本工作区 .tools/bin，不修改全局 Git 或 shell 配置。Mani 的开发清单位于 mani.yaml，项目分别检出到 workspace/platform、workspace/web 和 workspace/admin。
+`mani.yaml` 统一登记代码和文档仓库。GitHub 管理源码访问权限，业务系统管理运行时权限。Go Workspace 包含当前已检出的 Go 模块；各模块同时保留自己的独立构建入口。
 
 ## 日常操作
 
 ```bash
-.tools/bin/mani --user-config scripts/mani-user.yaml run status --all
-.tools/bin/mani --user-config scripts/mani-user.yaml run fetch --all
-make workspace-check
+mani run status --all
+mani run fetch --all
+mani run check --tags code
+node scripts/workspace.mjs toolchains
+node scripts/workspace.mjs contracts
 ```
 
-`sync` 克隆缺失仓库。`fetch` 只获取远端引用，两者均不承担已有分支的版本更新。修改代码前按仓库约定，从最新 origin/develop 创建专用分支和独立 worktree；保留当前任务的未提交内容。不要把批量 checkout、reset 或 rebase 混入常规检查任务。
+Mani 的 `sync` 克隆缺失仓库，`fetch` 更新远端引用。分支选择和合并由各仓库的 Git 操作完成。配置保留现有 remotes、工作树和 gitignore。
 
-`make workspace-check` 调用各仓库自己的 make check，再核对接口快照。任何仓库失败都必须修复，不使用 ignore-errors 或 ignore-non-existing 跳过问题。可用 `--tags backend` 或 `--tags frontend` 缩小任务范围。
+## 任务工作树
 
-## 本地启动
+主检出位于 `workspace/<仓库名>`。同一任务的工作树放在 `workspace/worktrees/<任务>/<仓库名>`：
 
-在三个终端分别执行：
+工作树目标使用绝对路径：
 
 ```bash
-cd workspace/platform
-make run
+task_root="$PWD/workspace/worktrees/example"
+mkdir -p "$task_root"
+git -C workspace/platform fetch origin
+git -C workspace/platform worktree add -b fix/example "$task_root/platform" origin/develop
 ```
+
+架构仓库需要同一任务的工作树时，将其放在同一任务目录的 `architecture` 中。该工作树的本地 `workspace` 可指向同级模块工作树，联调也支持 `PLATFORM_PATH`、`WEB_PATH`、`ADMIN_PATH` 指定路径。工作区目录均由 Git 忽略。
+
+## 启动与联调
+
+分别在 platform 执行 `make run`，在 Web 和 stuhelper-admin 执行 `make dev`。默认端口依次为 8080、5173、5174，客户端代理通过 `STUHELPER_API_TARGET` 指定 API 地址。页面提供八种语言和开发状态，真实身份适配器由 SSO 接入任务实现。
 
 ```bash
-cd workspace/web
-make dev
+npm run test:e2e
 ```
+
+联调使用任务端口 18780—18782，在结束时停止自有服务。
+
+## 固定组合与契约
+
+`workspace.lock.json` 保存集成测试的精确源码组合。代码仓库提交并通过检查后，运行以下命令更新组合：
 
 ```bash
-cd workspace/admin
-make dev
+node scripts/workspace.mjs contracts
+node scripts/workspace.mjs snapshot --write
 ```
 
-API 默认监听 127.0.0.1:8080，Web 为 127.0.0.1:5173，Admin 为 127.0.0.1:5174。浏览器请求通过开发代理访问 API。需要使用其他 API 地址时，为客户端进程设置 STUHELPER_API_TARGET。Admin 的 setup 只在缺失时从 .env.example 生成被 Git 忽略的本地文件，不覆盖已有配置。
+集成 CI 在空目录中按该组合检出。客户端的 `contracts/platform.source.json` 记录所消费的提供方版本、提交和摘要，检查器验证来源快照与当前提供方兼容性。兼容的提供方升级允许客户端继续使用已有版本。
 
-框架页面可以打开。管理接口尚未接入真实身份服务，页面会显示相应状态；它不会建立演示管理员会话。使用 Ctrl+C 停止本任务的进程。
-
-## 可选私有检出
-
-```bash
-make workspace-private
-.tools/bin/mani --user-config scripts/mani-user.yaml --config mani.private.yaml run status --all
-```
-
-私有配置目前检出相关文档仓库，不会启动 SSO、认证、学校适配、支付或生产部署，也不连接真实数据源。具体检查按每个私有仓库的 README 执行。
-
-## 接口更新和来源记录
-
-先修改 platform/contracts/platform.openapi.yaml，运行 platform 的 make generate，再更新两个客户端的契约与生成类型快照并重跑工作区检查。Admin 的生成工具独立使用兼容的 TypeScript 5，不改变 Vben 自身的 TypeScript 工具链。
-
-```bash
-make contracts-check
-python3 scripts/workspace.py snapshot
-```
-
-snapshot 只在三个代码仓库均干净时输出源码提交和契约摘要，供本次验收追溯。它不充当部署版本清单。生产仍使用私有 ops 维护的版本 tag 与镜像核验记录。
-
-## 故障处理
-
-检出失败先确认仓库可见性、网络及现有 Git 凭据。已有目录不是目标仓库时，先确认归属，不能覆盖目录。接口快照漂移时重新生成并同步快照，不能改检查器来接受不一致文件。
-
-Admin 基于官方 Vben 的 pnpm workspace。使用 Corepack 读取其 packageManager 指定版本，不用 npm 安装 Admin 的 workspace 依赖。
+正式部署使用 ops 中的版本 tag 和镜像核验记录。源码组合记录用于开发验证。

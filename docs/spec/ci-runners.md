@@ -61,4 +61,4 @@ Docker/BuildKit 缓存只放在任务专属自建 builder 或 BJ1 Registry，禁
 | CI-07 | 添加 Docker 构建缓存 | 使用自建 builder 或 BJ1 Registry，配置中没有 `type=gha` |
 | CI-08 | 按版本拉取部署镜像 | 本地保留版本 tag，核验摘要与本次候选记录一致 |
 
-操作方法见 [CI 指南](../guide/ci-runners.md)，实际检查结果见[文档工作记录](../development/documentation-bootstrap.md)。
+操作方法见 [CI 指南](../guide/ci-runners.md)，实际检查结果见[文档工作记录](../guide/repository-checks.md)。

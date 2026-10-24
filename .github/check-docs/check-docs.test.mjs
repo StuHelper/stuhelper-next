@@ -119,3 +119,32 @@ test('only the first matching Markdown override is applied', async (t) => {
     "overrides:\n  - filter: ['README.md']\n    config: {MD041: false}\n    combine: merge\n  - filter: ['**/*.md']\n    config: {MD041: true}\n    combine: merge\n");
   assert.doesNotMatch((await lintMarkdown(root)).join('\n'), /MD041/);
 });
+
+
+test('standard terminology rejects old aliases but accepts code identifiers', (t) => {
+  const root = fixture(t, { 'docs/spec/a.md': doc('# 资格\n\n有效学生资格与 `学生认证通过`') });
+  const errors = checkDocs(root).errors;
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /use standard term/);
+});
+
+test('repository GitHub links validate files and GitHub anchors locally', (t) => {
+  const root = fixture(t, {
+    'mkdocs.yml': 'repo_url: https://github.com/StuHelper/example\nnav:\n  - Topic: spec/a.md\n',
+    'docs/spec/a.md': doc('# 行为\n\n## 行为\n\n[有效](https://github.com/StuHelper/example/blob/develop/docs/spec/a.md#行为-1) [错误](https://github.com/StuHelper/example/blob/develop/gone.md)'),
+  });
+  const errors = checkDocs(root).errors;
+  assert.equal(errors.length, 1);
+  assert.match(errors[0], /missing or external local target/);
+});
+
+test('new topics must appear in both category index and site navigation', (t) => {
+  const root = fixture(t, {
+    'mkdocs.yml': 'nav:\n  - Index: spec/README.md\n',
+    'docs/spec/README.md': doc('# 索引'),
+    'docs/spec/a.md': doc('# 新主题'),
+  });
+  const errors = checkDocs(root).errors.join('\n');
+  assert.match(errors, /missing topic a.md/);
+  assert.match(errors, /missing navigation spec\/a.md/);
+});

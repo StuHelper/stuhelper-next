@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "projects": {
+    "platform": {
+      "revision": "6f840a0b494591c6ded920a87fb6f43e5c1438fa"
+    },
+    "web": {
+      "revision": "7dc5188320125d8eafd4f4d5f7861a652e1b2a10"
+    },
+    "admin": {
+      "revision": "1f1fc76782bad043261bd2e7cb19bcea7c2fab78"
+    }
+  }
+}

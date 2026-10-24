@@ -35,11 +35,14 @@ jobs:
         '{"group":"stuhelper-arc","labels":"stuhelper-arc-sh-k8s"}' ||
         '"ubuntu-26.04"') }}
     timeout-minutes: 10
+    outputs:
+      integration: ${{ steps.changes.outputs.integration }}
     steps:
       - name: Check out source
         uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Verify runner request
         env:
@@ -60,7 +63,7 @@ jobs:
       - name: Set up Node.js for documentation
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: '24'
+          node-version-file: .node-version
           package-manager-cache: false
 
       - name: Install locked documentation tools
@@ -70,7 +73,8 @@ jobs:
         run: |
           npm run check:docs
           npm run test:docs
-          node scripts/check-workspace.mjs
+          node scripts/workspace.mjs validate
+          node --test scripts/workspace.test.mjs
 
       - name: Set up uv for documentation build
         uses: astral-sh/setup-uv@v10.3.2
@@ -84,36 +88,64 @@ jobs:
       - name: Validate GitHub Actions workflows
         run: python3 scripts/lint_workflows.py
 
+      - name: Select integration scope
+        id: changes
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          if [[ "$EVENT_NAME" == workflow_dispatch || -z "$BASE_REF" || "$BASE_REF" =~ ^0+$ ]]; then
+            echo 'integration=true' >> "$GITHUB_OUTPUT"
+          else
+            result=$(node scripts/workspace.mjs affected "$BASE_REF")
+            echo "integration=$result" >> "$GITHUB_OUTPUT"
+          fi
+
   integration:
     name: Framework integration
+    needs: repository
     runs-on: ubuntu-26.04
     timeout-minutes: 25
     steps:
+      - name: Record documentation-only scope
+        if: needs.repository.outputs.integration != 'true'
+        run: echo 'Framework integration is not applicable to this documentation-only change.'
       - uses: actions/checkout@v7.0.1
+        if: needs.repository.outputs.integration == 'true'
         with:
           persist-credentials: false
       - uses: actions/setup-go@v7.0.0
+        if: needs.repository.outputs.integration == 'true'
         with:
-          go-version: '1.27.2'
+          go-version-file: .go-version
           cache: false
       - uses: actions/setup-node@v7.1.0
+        if: needs.repository.outputs.integration == 'true'
         with:
-          node-version: '24'
+          node-version-file: .node-version
           package-manager-cache: false
-      - name: Install workspace tools
+      - name: Install integration tools
+        if: needs.repository.outputs.integration == 'true'
         run: |
           npm install --global corepack@0.34.5
           npm ci --ignore-scripts
-          make tools
-      - name: Check out public framework repositories with Mani
+          GOBIN="$RUNNER_TEMP/bin" GOWORK=off go install github.com/alajmo/mani@v0.32.1
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: Check out the recorded source combination
+        if: needs.repository.outputs.integration == 'true'
         run: |
-          make workspace
-          .tools/bin/mani --user-config scripts/mani-user.yaml run setup --all
-      - name: Check independent repositories and shared contracts
-        run: make workspace-check
+          node scripts/workspace.mjs checkout
+          mani run setup --tags code
+      - name: Check repositories, toolchains and compatible contracts
+        if: needs.repository.outputs.integration == 'true'
+        run: |
+          mani run check --tags code
+          node scripts/workspace.mjs toolchains
+          node scripts/workspace.mjs contracts
       - name: Install browser
+        if: needs.repository.outputs.integration == 'true'
         run: npx playwright install --with-deps chromium
-      - name: Exercise built clients against the real framework server
+      - name: Exercise all supported languages against the framework
+        if: needs.repository.outputs.integration == 'true'
         run: npm run test:e2e
-      - name: Record the tested public source combination
-        run: python3 scripts/workspace.py snapshot

@@ -1,4 +1,4 @@
-# Development workspace. Formal deployment combinations use fixed version tags.
+# Developer checkout. Integration inputs are recorded in workspace.lock.json.
 shell: bash
 sync_gitignore: false
 sync_remotes: false
@@ -9,17 +9,43 @@ projects:
     path: workspace/platform
     url: https://github.com/StuHelper/stuhelper-platform.git
     branch: develop
-    tags: [public, backend, code]
+    tags: [backend, code]
   web:
     path: workspace/web
     url: https://github.com/StuHelper/stuhelper-web.git
     branch: develop
-    tags: [public, frontend, code]
+    tags: [frontend, code]
   admin:
     path: workspace/admin
     url: https://github.com/StuHelper/stuhelper-admin.git
     branch: develop
-    tags: [public, frontend, code]
+    tags: [frontend, code]
+
+  sso:
+    path: workspace/sso
+    url: https://github.com/StuHelper/stuhelper-sso.git
+    branch: develop
+    tags: [documents]
+  verification:
+    path: workspace/verification
+    url: https://github.com/StuHelper/stuhelper-verification.git
+    branch: develop
+    tags: [documents]
+  campus-adapters:
+    path: workspace/campus-adapters
+    url: https://github.com/StuHelper/stuhelper-campus-adapters.git
+    branch: develop
+    tags: [documents]
+  billing:
+    path: workspace/billing
+    url: https://github.com/StuHelper/stuhelper-billing.git
+    branch: develop
+    tags: [documents]
+  ops:
+    path: workspace/ops
+    url: https://github.com/StuHelper/stuhelper-ops.git
+    branch: develop
+    tags: [documents]
 
 specs:
   default:

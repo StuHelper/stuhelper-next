@@ -1,0 +1,38 @@
+{
+  "default": "zh-CN",
+  "default_time_zone": "Asia/Shanghai",
+  "languages": {
+    "zh-CN": {
+      "name": "简体中文",
+      "direction": "ltr"
+    },
+    "en-US": {
+      "name": "English",
+      "direction": "ltr"
+    },
+    "fr-FR": {
+      "name": "Français",
+      "direction": "ltr"
+    },
+    "ru-RU": {
+      "name": "Русский",
+      "direction": "ltr"
+    },
+    "ja-JP": {
+      "name": "日本語",
+      "direction": "ltr"
+    },
+    "ko-KR": {
+      "name": "한국어",
+      "direction": "ltr"
+    },
+    "es-ES": {
+      "name": "Español",
+      "direction": "ltr"
+    },
+    "ar-EG": {
+      "name": "العربية",
+      "direction": "rtl"
+    }
+  }
+}

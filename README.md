@@ -1,62 +1,56 @@
 # StuHelper Next
 
-现有 StuHelper 的重构版本。Next 是过渡名称，未来以 StuHelper 的名称继续维护。项目采用独立官方 Casdoor SSO，各业务模块通过公开接口协作，当前开发 Web 与 Admin，微信小程序、Android、iOS 和 HarmonyOS 暂时搁置。
+StuHelper 的重构工程，采用 Go 平台、Vue Web、stuhelper-admin 和按业务划分的独立仓库。Next 是过渡名称。Casdoor 使用官方发行版本，各业务通过 OIDC 和官方 API 接入。
 
-**当前阶段：工程框架。** 公共文档与私有模块文档已整理，正在搭建 Go 平台运行时、Web 和 Vben Admin 应用。业务 API、真实身份接入、SSO 部署和数据迁移尚未实施。详见[框架工作记录](docs/development/framework-bootstrap.md)。
+**当前阶段：框架可运行，业务按规格实施。** platform 提供模块依赖、生命周期、能力发现、HTTP 访问边界和远程服务降级。Web 与 stuhelper-admin 提供八语言应用入口和服务状态。真实身份、数据库、校园业务与生产迁移仍在后续实施范围，见[框架状态](docs/development/framework-bootstrap.md)。
 
-## 已确定的方向
+## 工程入口
 
-- `StuHelper/stuhelper-next` 是公共仓库；默认使用 GitHub 标准托管 runner，可手动选用 StuHelper ARC。
-- Casdoor 直接使用官方未经修改的发行镜像，独立数据库、运行环境与更新生命周期；不得依赖主站后台、主站数据库或主站发布。
-- 保留现有 SSO 数据、issuer、用户标识和消费方绑定；AI、Store 等已有应用独立接入同一身份提供方。
-- 采用按业务模块划分的多仓库，各模块拥有自己的接口、数据、版本与生命周期，详见[仓库划分](docs/design/module-repositories.md)。
-- Web 与 Admin 共享 API 和领域术语，原生端参考设计保留，恢复实施时再安排各端工作。
-- 已确认课程与评课、认证、资料共享、课表、内容运营、开放平台和存储贡献等业务。机器人功能分为群聊管理、信息查询和娱乐功能。完整范围见[业务设计](docs/design/business-scope.md)，确认结果见[业务确认结果与延期事项](docs/development/business-decisions.md)。
-
-## 文档入口
-
-采用 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0) 的五类文档架构，从[文档导航](docs/README.md)进入。
-
-| 分类 | 内容 |
+| 入口 | 用途 |
 | --- | --- |
-| [design](docs/design/README.md) | 重构业务范围、身份与货币概念、系统架构、独立 SSO 与原生端机制 |
-| [spec](docs/spec/README.md) | 各业务行为、资料权益、积分与余额、身份兼容和验收场景 |
-| [development](docs/development/README.md) | 调研、实施任务、实际进度与验证证据 |
-| [guide](docs/guide/README.md) | 本地检查、文档预览、CI 操作与候选解析 |
-| [adr](docs/adr/README.md) | 官方镜像、runner 分工和文档架构的已确认决策 |
+| [文档导航](docs/README.md) | design、spec、development、guide、adr 五类文档 |
+| [开发工作区](docs/guide/development-workspace.md) | Mani、独立仓库和任务工作树 |
+| [检查指南](docs/guide/repository-checks.md) | 本地检查、联调和检查器说明 |
+| [依赖维护](docs/guide/dependency-maintenance.md) | 工具链升级、Dependabot 和 Vben 更新 |
+| [业务范围](docs/design/business-scope.md) | 当前实施与延期范围 |
+| [术语](docs/spec/terminology.md) | 领域概念、API 名称与翻译约定 |
 
-## 开发工作区
+## 本地开发
 
-使用 Mani 管理公开与可选私有检出。各代码仓库有独立的构建和检查入口，完整操作见[开发工作区](docs/guide/development-workspace.md)。Admin 固定 Vben Admin v5.7.0 官方默认 web-antd 应用。
-
-## 本地检查
-
-需要 Git、Python 3.11+、Node.js 24 和 uv 0.12.18。依赖通过 lockfile 固定，检查不需要数据库或生产凭据：
+主机安装 Git、Mani、Go、Node.js、Corepack 和 uv。精确版本由 [toolchains.json](architecture/toolchains.json) 维护，当前统一 Go 1.27.3 和 Node.js 24.22.1。仓库依赖使用 lockfile。
 
 ```bash
-npm ci
-python3 scripts/check.py
-python3 -m unittest discover -s scripts -p "test_*.py"
-npm run check:docs
-npm run test:docs
-uv run --locked mkdocs build --strict
+make setup
+make check
+mani sync
+mani run setup --tags code
+mani run check --tags code
+node scripts/workspace.mjs contracts
+npm run test:e2e
 ```
 
-完整命令、预览与限制见[检查指南](docs/guide/repository-checks.md)。CI 还运行固定版本的 actionlint。普通检查默认 GitHub 托管 runner；Docker/OCI 构建与 BJ1 Registry 拉取、推送、缓存固定使用 StuHelper 自建 runner。Casdoor 直接消费官方原件，不在本项目构建。
+根仓库 `make check` 检查架构、工具链清单、工作区配置、文档和 Actions。各代码仓库独立构建与检查。跨仓集成使用 `workspace.lock.json` 中的固定提交组合，客户端声明所消费的契约版本。
 
-普通开发从最新 `origin/develop` 建短期分支并通过 PR squash 合入。正式发行经 `develop -> main` merge commit，项目负责人授权后才创建不可变 CalVer tag。
+`mani.yaml` 统一登记八个模块仓库。公开与私有区分源码和文档的可见性，GitHub 管理仓库访问权限。任务工作树统一放在 `workspace/worktrees/<任务>/<仓库名>`，主检出位于 `workspace/<仓库名>`。
+
+## 技术约定
+
+- 模块拥有自己的接口和数据，通过公开接口协作。必需依赖决定模块基础可用性，可选依赖通过能力级规则影响具体操作。
+- Casdoor 独立部署，保持既有 issuer、subject、用户标识和消费方绑定。
+- Web 和 stuhelper-admin 默认中文，完整支持八种语言。国际化检查覆盖消息、插值、复数和区域格式，阿拉伯语使用 RTL 布局。
+- 普通 CI 默认使用 GitHub 托管 runner。Docker/OCI 与 BJ1 Registry 任务使用 StuHelper 自建 runner，版本和验证规则见 [runner 规格](docs/spec/ci-runners.md)。
+- 短期分支通过 PR squash 合入 develop。正式发行由 develop 向 main 合并，经负责人授权后创建版本 tag、镜像和生产晋级。
 
 ## 目录
 
 ```text
-architecture/modules.json   模块仓库与依赖设计清单
-docs/                      design / spec / development / guide / adr
-scripts/                   仓库检查与 CI 工具
-.github/workflows/         默认托管、可选 ARC 的基础 CI
-.github/check-docs/        文档元信息、链接与锚点检查
-mkdocs.yml                 本地文档站与严格构建配置
+architecture/        模块、语言和工具链清单
+docs/                五类工程文档
+scripts/             架构、工作区与工作流检查
+tests/e2e/           跨仓浏览器联调
+.github/check-docs/  文档检查与检查器回归
+mani.yaml            统一工作区配置
+workspace.lock.json  集成测试源码组合
 ```
 
-业务代码的目录提案见架构文档，实际实现与验证进度记录在 development 分类中。沟通和技术文档写作遵循 [AGENTS.md](AGENTS.md)。
-
-代码与文档延续 StuHelper 的 [AGPL-3.0-only](LICENSE) 许可；Casdoor 是单独部署的第三方软件，保留其自己的官方许可证。
+文档组织参考 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0)。项目代码和文档使用 [AGPL-3.0-only](LICENSE)，第三方组件保留原许可证。沟通与写作遵循 [AGENTS.md](AGENTS.md)。

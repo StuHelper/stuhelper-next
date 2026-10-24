@@ -1,19 +1,17 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # 操作指南
 
-这里维护当前已有工具的操作方法。尚未实现的 SSO 部署器和业务功能留在设计与开发计划中。
-
-| 主题 | 成果 |
+| 主题 | 内容 |
 | --- | --- |
 | [仓库检查与文档预览](repository-checks.md) | 安装固定依赖，检查文档，生成或预览文档站 |
-| [选择 CI runner](ci-runners.md) | 运行同一套检查，确认实际 runner 和结果 |
-| [解析 SSO 候选](sso-candidate.md) | 获得官方 release、commit、镜像 digest；不进行部署 |
+| [选择普通检查的 CI runner](ci-runners.md) | 普通检查、镜像任务与平台构建的调度规则 |
+| [SSO 候选工具的位置](sso-candidate.md) | 获得官方 release、commit、镜像 digest；不进行部署 |
+| [开发工作区](development-workspace.md) | 统一检出、任务工作树与固定源码组合 |
+| [工具链与依赖维护](dependency-maintenance.md) | 工具链同步、依赖更新与框架升级 |
 
-新增主题使用[指南模板](TEMPLATE.md)，遵循[维护约定](../authoring.md)。
-
-- [开发工作区](development-workspace.md)
+新增主题使用[分类模板](TEMPLATE.md)，并同步维护[文档导航](../README.md)。
