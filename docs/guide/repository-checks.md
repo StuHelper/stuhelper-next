@@ -23,19 +23,23 @@ make check
 mani run check --tags code
 node scripts/workspace.mjs toolchains
 node scripts/workspace.mjs contracts
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 ## 脚本与测试的职责
 
 | 入口 | 验证内容 |
 | --- | --- |
-| `scripts/check.py` | 模块归属、依赖图、规格引用、文件类型及语法 |
+| `scripts/check.py` | 模块归属、依赖图、能力声明与规格引用 |
 | `scripts/workspace.mjs` | Mani 清单、工具链、Go Workspace、固定源码组合与契约来源 |
-| `scripts/lint_workflows.py` | 固定版本 actionlint 的下载、校验与运行 |
-| `.github/check-docs/` | 文档格式、元信息、链接、导航与术语规则 |
+| `tooling/cli.mjs` | 共享检查入口，通过 Go 执行固定版本 actionlint |
+| `tooling/docs/` | Markdown 格式、元信息、链接、导航、术语和文档编号 |
+| `tooling/i18n/` | 八语言键、占位符、复数和同英文消息例外 |
+| `tooling/check_repository.py` | 文档仓库的文件类型、语法与敏感文件名 |
 | `scripts/test_*.py`、`scripts/workspace.test.mjs` | 错误清单、优化模式、快照篡改与工作区保护等回归 |
 | `tests/e2e/` | 实际 HTTP、客户端错误恢复、八语言页面与移动端布局 |
+
+这些共享检查以 `@stuhelper/engineering-tools` 安装到八个模块仓库。源码位于架构仓库的 `tooling/`，消费者通过同一 Git 提交固定版本；工作区检查验证来源和版本，升级方法见[依赖维护](dependency-maintenance.md)。Markdown 格式采用 markdownlint，文档站采用 MkDocs strict。共享检查另外覆盖站点之外的 README、AGENTS、本地链接和项目规则。
 
 platform 的独立检查还覆盖 Go race、导入边界、OpenAPI 和生成一致性。Web 与 stuhelper-admin 的检查覆盖类型、lint、八语言键与占位符、复数和格式化、共享客户端行为及生产构建。
 
@@ -62,5 +66,7 @@ uv run --locked mkdocs serve --dev-addr 127.0.0.1:8000
 Docker 测试使用任务专属资源。退出时清理本任务的容器、闲置镜像和确认可删除的缓存，保留其他任务资源与持久数据。
 
 ## 场景与实现
+
+文档检查按可见 Unicode 字符计算段落长度，链接地址和代码块不计入 200 字上限。检查器核对 ADR 文件名与标题编号、规格场景编号唯一性、索引说明、术语别名，以及修改正文后的 `updated` 日期。日期以文件最近一次正文提交为依据，CI 重新运行不会要求修改未变化的文档。
 
 规格的验收表使用稳定场景编号。模块完成某个场景后，在模块清单的 `scenario_tests` 中登记实际测试函数；工作区契约检查核对规格编号和测试函数存在性，模块自身检查负责执行测试。当前平台登记 MOD-06 至 MOD-09，业务场景随对应实现登记，未登记项保留为待实施。

@@ -12,7 +12,9 @@ updated: 2026-10-24
 
 ## 身份与会话
 
-移动端分别注册公有客户端（public client），通过系统认证会话使用授权码与 S256 PKCE 登录，客户端不保存长期 secret。PKCE 用于防止他人用截获的授权码换取 token。校验 state、nonce、redirect、issuer、audience 和令牌有效期；不同 client 的 token 不因同一 issuer 自动互通。取消、过期或进程恢复后必须重新核对授权意图，不能让回调绑定到另一用户。
+移动端分别注册公有客户端，通过系统认证会话使用授权码与 S256 PKCE 登录。PKCE 保护授权码兑换过程，客户端使用适用于公有客户端的凭据方案。
+
+登录核对 state、nonce、redirect、issuer、audience 和令牌有效期，按具体 client 与 audience 接受 token。取消、过期或进程恢复后重新核对授权意图，回调继续绑定原发起用户。
 
 微信登录只证明对应 appid 下的平台身份。绑定已有 SSO 账号必须有双方身份的有效证明与用户确认；缺失 unionid 时不推断跨应用身份。换绑/解绑需重新认证与审计。绑定凭证短时、一次性并关联发起端，不通过 URL、二维码或 postMessage 明文传递 access token。
 

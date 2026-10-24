@@ -33,7 +33,14 @@
         "MOD-09": [
           "module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness"
         ]
-      }
+      },
+      "api": 1,
+      "capabilities": [
+        "platform.status",
+        "platform.modules"
+      ],
+      "capability_requires": {},
+      "critical": true
     },
     {
       "id": "identity",
@@ -165,13 +172,20 @@
       ],
       "optional": [
         "profiles",
-        "verification"
+        "verification",
+        "identity"
       ],
       "interface_owner": "reviews",
       "contract_status": "design-only",
       "specifications": [
         "docs/spec/academic-content.md"
-      ]
+      ],
+      "eligibility_facts": {
+        "campus_eligibility": "verification",
+        "phone_bound": "identity",
+        "identity_verified": "verification",
+        "course_enrollment": "catalog"
+      }
     },
     {
       "id": "resources",
@@ -186,13 +200,19 @@
       ],
       "optional": [
         "verification",
-        "billing"
+        "billing",
+        "identity"
       ],
       "interface_owner": "resources",
       "contract_status": "design-only",
       "specifications": [
         "docs/spec/resource-sharing.md"
-      ]
+      ],
+      "eligibility_facts": {
+        "campus_eligibility": "verification",
+        "phone_bound": "identity",
+        "identity_verified": "verification"
+      }
     },
     {
       "id": "billing",

@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from check import private_material_errors
+from check_repository import private_material_errors
 
 
 class PrivateMaterialTests(unittest.TestCase):

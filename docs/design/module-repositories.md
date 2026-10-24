@@ -43,7 +43,9 @@ updated: 2026-10-24
 
 现有私有 `stuhelper-payment` 保留支付网关职责，账务模块通过其接口对接，不把积分、会员与资料业务塞入支付网关。现有 AI、Store 和 `stuhelper-docs` 均保留自己的用途，不因本次重构重新归属或被覆盖。
 
-当前只推进 Web 与 stuhelper-admin。微信小程序、Android、iOS 与 HarmonyOS 搁置，以下保留各自未来应用仓库的命名规划。应用仓库分别使用 `stuhelper-web`、`stuhelper-admin`、`stuhelper-wechat`、`stuhelper-android`、`stuhelper-ios` 与 `stuhelper-harmony`。客户端按模块组合界面，使用版本化 SDK，不拥有服务端业务规则。仓库创建前检查同名项目，不能覆盖已有项目。
+当前只推进 `stuhelper-web` 与 `stuhelper-admin`。微信小程序、Android、iOS 与 HarmonyOS 暂时搁置，对应仓库名称规划为 `stuhelper-wechat`、`stuhelper-android`、`stuhelper-ios` 和 `stuhelper-harmony`。
+
+客户端按模块组合界面并使用版本化 SDK，服务端执行业务规则。新建仓库前检查同名项目，保留已有项目。
 
 运维仓库维护部署组合与恢复操作，模块运行时清单单独登记可启停模块。
 

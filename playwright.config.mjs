@@ -27,7 +27,7 @@ export default defineConfig({
       gracefulShutdown: { signal: 'SIGTERM', timeout: 5000 },
     },
     {
-      command: 'npm run preview -- --port 18781', cwd: web,
+      command: 'pnpm run preview --port 18781', cwd: web,
       env: { STUHELPER_API_TARGET: 'http://127.0.0.1:18780' },
       url: 'http://127.0.0.1:18781', reuseExistingServer: false,
       gracefulShutdown: { signal: 'SIGTERM', timeout: 5000 },

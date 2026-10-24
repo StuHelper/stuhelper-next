@@ -12,7 +12,7 @@ updated: 2026-10-24
 
 | 标准中文 | English | 接口标识 | 定义 | 替代表述 |
 | --- | --- | --- | --- | --- |
-| 有效校园资格 | Campus eligibility | `campus_eligibility` | 普通认证、已认证校友或未过期临时新生所提供的当前资格 | 有效学生资格、学生认证通过 |
+| 有效校园资格 | Campus eligibility | `campus_eligibility` | 普通认证、已认证校友或未过期临时新生所提供的当前资格 | 有效学生资格、学生认证通过、已认证学生 |
 | 学生认证 | Student verification | `student_verification` | 核验学习经历和身份归属的流程及结果 | — |
 | 独立实名 | Identity verification | `identity_verification` | 独立的实名核验结果 | — |
 | 选课记录 | Course enrollment | `course_enrollment` | 从获准教务来源取得的本人课程与任课关系 | — |
@@ -25,4 +25,4 @@ updated: 2026-10-24
 | Ivory | Ivory | `ivory` | 站内余额计价单位 | — |
 | 修订号 | Revision | `revision` | 同一业务对象单调递增的状态版本 | — |
 
-OIDC `scope` 表示身份协议中的请求范围；业务授权范围按业务接口表达。数据库 `schema`、事务 `outbox` 和事件 `revision` 保留技术含义。术语检查针对当前仓库文档及源码中的替代表述，术语表自身保留用于检查的映射。
+OIDC `scope` 表示身份协议中的请求范围；业务授权范围按业务接口表达。数据库 `schema`、事务 `outbox` 和事件 `revision` 保留技术含义。术语检查针对当前仓库文档正文中的替代表述，术语表自身保留用于检查的映射。

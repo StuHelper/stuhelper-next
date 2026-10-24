@@ -34,5 +34,138 @@
       "name": "العربية",
       "direction": "rtl"
     }
+  },
+  "same_text_exceptions": {
+    "web": {
+      "shared": {
+        "brand.name": {
+          "value": "StuHelper",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "language.chinese": {
+          "value": "简体中文",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "language.english": {
+          "value": "English",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "notFound.code": {
+          "value": "404",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        }
+      },
+      "languages": {}
+    },
+    "admin": {
+      "shared": {
+        "authentication.qq": {
+          "value": "QQ",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "authentication.gitHub": {
+          "value": "GitHub",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "authentication.google": {
+          "value": "Google",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "preferences.tabbar.styleType.chrome": {
+          "value": "Chrome",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "ui.tiptap.toolbar.heading1": {
+          "value": "H1",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "ui.tiptap.toolbar.heading2": {
+          "value": "H2",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "ui.tiptap.toolbar.heading3": {
+          "value": "H3",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "ui.tiptap.toolbar.heading4": {
+          "value": "H4",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        },
+        "authentication.weChat": {
+          "value": "WeChat",
+          "reason": "品牌名称或通用格式标记保持原文。"
+        }
+      },
+      "languages": {
+        "fr-FR": {
+          "preferences.vertical": {
+            "value": "Vertical",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.horizontal": {
+            "value": "Horizontal",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.normal": {
+            "value": "Normal",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.mode": {
+            "value": "Mode",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.theme.builtin.violet": {
+            "value": "Violet",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.theme.builtin.orange": {
+            "value": "Orange",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.copyright.date": {
+            "value": "Date",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "ui.tiptap.toolbar.code": {
+            "value": "Code",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "ui.tiptap.toolbar.image": {
+            "value": "Image",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "ui.widgets.notifications": {
+            "value": "Notifications",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "page.framework.title": {
+            "value": "Administration",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          }
+        },
+        "es-ES": {
+          "preferences.vertical": {
+            "value": "Vertical",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.horizontal": {
+            "value": "Horizontal",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.normal": {
+            "value": "Normal",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "preferences.general": {
+            "value": "General",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          },
+          "common.no": {
+            "value": "No",
+            "reason": "本语言的正确词语与英文拼写相同。"
+          }
+        }
+      }
+    }
   }
 }

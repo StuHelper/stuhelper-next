@@ -2,16 +2,24 @@ name: CI
 
 on:
   push:
-    branches: [develop, main]
+    branches: [ develop, main ]
   pull_request:
-    branches: [develop, main]
+    branches: [ develop, main ]
   workflow_dispatch:
     inputs:
       runner:
         description: Runner for this trusted branch check
         type: choice
-        options: [github, stuhelper]
+        options: [ github, stuhelper ]
         default: github
+        required: true
+      combination:
+        description: Integration source selection
+        type: choice
+        options:
+          - fixed
+          - latest
+        default: fixed
         required: true
 
 permissions:
@@ -38,8 +46,7 @@ jobs:
     outputs:
       integration: ${{ steps.changes.outputs.integration }}
     steps:
-      - name: Check out source
-        uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -54,39 +61,32 @@ jobs:
             exit 1
           fi
           python3 --version
-
-      - name: Validate repository
-        run: |
-          python3 scripts/check.py
-          python3 -m unittest discover -s scripts -p "test_*.py"
-
-      - name: Set up Node.js for documentation
+      - name: Set up Node.js
         uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
           package-manager-cache: false
-
-      - name: Install locked documentation tools
-        run: npm ci --ignore-scripts
-
-      - name: Check documentation and checker regressions
-        run: |
-          npm run check:docs
-          npm run test:docs
-          node scripts/workspace.mjs validate
-          node --test scripts/workspace.test.mjs
-
-      - name: Set up uv for documentation build
+      - name: Set up the declared pnpm version
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          cache: false
+      - name: Set up Go for pinned tools
+        uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: .go-version
+          cache: false
+      - name: Set up uv
         uses: astral-sh/setup-uv@v10.3.2
         with:
-          version: '0.12.18'
+          version: 0.12.18
           enable-cache: false
-
-      - name: Build documentation strictly
-        run: uv run --locked mkdocs build --strict
-
-      - name: Validate GitHub Actions workflows
-        run: python3 scripts/lint_workflows.py
+      - name: Install locked tools
+        run: make setup
+      - name: Run repository checks
+        env:
+          GOWORK: off
+          DOCS_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+        run: make check
 
       - name: Select integration scope
         id: changes
@@ -112,32 +112,45 @@ jobs:
         if: needs.repository.outputs.integration != 'true'
         run: echo 'Framework integration is not applicable to this documentation-only change.'
       - uses: actions/checkout@v7.0.1
-        if: needs.repository.outputs.integration == 'true'
         with:
           persist-credentials: false
-      - uses: actions/setup-go@v7.0.0
+          fetch-depth: 0
         if: needs.repository.outputs.integration == 'true'
-        with:
-          go-version-file: .go-version
-          cache: false
-      - uses: actions/setup-node@v7.1.0
-        if: needs.repository.outputs.integration == 'true'
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
         with:
           node-version-file: .node-version
           package-manager-cache: false
+        if: needs.repository.outputs.integration == 'true'
+      - name: Set up the declared pnpm version
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          cache: false
+        if: needs.repository.outputs.integration == 'true'
+      - name: Set up Go for pinned tools
+        uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: .go-version
+          cache: false
+        if: needs.repository.outputs.integration == 'true'
       - name: Install integration tools
         if: needs.repository.outputs.integration == 'true'
         run: |
-          npm install --global corepack@0.34.5
-          npm ci --ignore-scripts
+          pnpm install --frozen-lockfile
           GOBIN="$RUNNER_TEMP/bin" GOWORK=off go install github.com/alajmo/mani@v0.32.1
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-      - name: Check out the recorded source combination
+      - name: Resolve and check out the integration combination
         if: needs.repository.outputs.integration == 'true'
+        env:
+          INTEGRATION_SOURCE: ${{ inputs.combination || 'fixed' }}
         run: |
-          node scripts/workspace.mjs checkout
+          if [[ "$INTEGRATION_SOURCE" == latest ]]; then
+            node scripts/workspace.mjs checkout --latest
+          else
+            node scripts/workspace.mjs checkout
+          fi
           mani run setup --tags code
-      - name: Check repositories, toolchains and compatible contracts
+      - name: Check repositories, toolchains and contracts
         if: needs.repository.outputs.integration == 'true'
         run: |
           mani run check --tags code
@@ -145,7 +158,7 @@ jobs:
           node scripts/workspace.mjs contracts
       - name: Install browser
         if: needs.repository.outputs.integration == 'true'
-        run: npx playwright install --with-deps chromium
-      - name: Exercise all supported languages against the framework
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Exercise all supported languages
         if: needs.repository.outputs.integration == 'true'
-        run: npm run test:e2e
+        run: pnpm run test:e2e

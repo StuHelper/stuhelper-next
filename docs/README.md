@@ -1,7 +1,7 @@
 ---
 type: index
 status: Accepted
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # StuHelper Next 文档

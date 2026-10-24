@@ -17,7 +17,7 @@ StuHelper 的重构工程，采用 Go 平台、Vue Web、stuhelper-admin 和按�
 
 ## 本地开发
 
-主机安装 Git、Mani、Go、Node.js、Corepack 和 uv。精确版本由 [toolchains.json](architecture/toolchains.json) 维护，当前统一 Go 1.27.3 和 Node.js 24.22.1。仓库依赖使用 lockfile。
+主机安装 Git、Mani、Go、Node.js、pnpm 和 uv。精确版本由 [toolchains.json](architecture/toolchains.json) 维护，当前统一 Go 1.27.3、Node.js 24.22.1 和 pnpm 10.33.4。JavaScript 依赖统一使用 pnpm-lock.yaml。
 
 ```bash
 make setup
@@ -26,7 +26,7 @@ mani sync
 mani run setup --tags code
 mani run check --tags code
 node scripts/workspace.mjs contracts
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 根仓库 `make check` 检查架构、工具链清单、工作区配置、文档和 Actions。各代码仓库独立构建与检查。跨仓集成使用 `workspace.lock.json` 中的固定提交组合，客户端声明所消费的契约版本。
@@ -37,7 +37,7 @@ npm run test:e2e
 
 - 模块拥有自己的接口和数据，通过公开接口协作。必需依赖决定模块基础可用性，可选依赖通过能力级规则影响具体操作。
 - Casdoor 独立部署，保持既有 issuer、subject、用户标识和消费方绑定。
-- Web 和 stuhelper-admin 默认中文，完整支持八种语言。国际化检查覆盖消息、插值、复数和区域格式，阿拉伯语使用 RTL 布局。
+- Web 和 stuhelper-admin 默认中文，提供八种界面语言。国际化检查覆盖消息键、插值、复数和区域格式，翻译质量由人工审阅，阿拉伯语使用 RTL 布局。
 - 普通 CI 默认使用 GitHub 托管 runner。Docker/OCI 与 BJ1 Registry 任务使用 StuHelper 自建 runner，版本和验证规则见 [runner 规格](docs/spec/ci-runners.md)。
 - 短期分支通过 PR squash 合入 develop。正式发行由 develop 向 main 合并，经负责人授权后创建版本 tag、镜像和生产晋级。
 
@@ -46,9 +46,9 @@ npm run test:e2e
 ```text
 architecture/        模块、语言和工具链清单
 docs/                五类工程文档
-scripts/             架构、工作区与工作流检查
+scripts/             架构与跨仓工作区检查
 tests/e2e/           跨仓浏览器联调
-.github/check-docs/  文档检查与检查器回归
+tooling/             各仓库共用的工程工具包
 mani.yaml            统一工作区配置
 workspace.lock.json  集成测试源码组合
 ```

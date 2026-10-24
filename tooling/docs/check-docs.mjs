@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import MarkdownIt from 'markdown-it';
@@ -56,11 +57,32 @@ function parsedFile(file, siteDocument) {
   const githubAnchors = new Set();
   const links = [];
   const prose = [];
+  const paragraphs = [];
+  const headings = [];
+  const scenarios = [];
+  const tableRows = [];
+  const offset = frontmatter ? frontmatter[0].split('\n').length - 1 : 0;
+  let row = null;
+  let column = 0;
   tokens.forEach((token, index) => {
+    const visible = children => (children ?? []).filter(child => ['text', 'code_inline', 'image', 'softbreak'].includes(child.type)).map(child => child.type === 'softbreak' ? ' ' : child.content).join('');
+    if (token.type === 'tr_open') { row = { line: (token.map?.[0] ?? 0) + offset + 1, cells: [] }; column = 0; }
+    if (token.type === 'td_open' || token.type === 'th_open') column++;
+    if (token.type === 'tr_close' && row) { tableRows.push(row); row = null; }
+    if (token.type === 'inline' && row) {
+      const text = visible(token.children);
+      row.cells.push({ text, link: token.children?.some(child => child.type === 'link_open') });
+      const id = column === 1 && text.match(/^([A-Z][A-Z0-9]*(?:-[A-Z]+)*-\d+)(?:[：:]|\s|$)/)?.[1];
+      if (id) scenarios.push({ id, line: row.line });
+    }
+    if (token.type === 'inline' && tokens[index - 1]?.type === 'paragraph_open') {
+      paragraphs.push({ text: visible(token.children), line: (token.map?.[0] ?? 0) + offset + 1 });
+    }
     if (token.type === 'heading_open') {
       const text = (tokens[index + 1]?.children ?? [])
         .filter((child) => ['text', 'code_inline', 'image'].includes(child.type))
         .map((child) => child.content).join('');
+      headings.push({ text, line: (token.map?.[0] ?? 0) + offset + 1, level: token.tag });
       const githubAnchor = slugger.slug(text);
       githubAnchors.add(githubAnchor);
       anchors.add(siteDocument ? siteSlug(text, anchors) : githubAnchor);
@@ -71,10 +93,51 @@ function parsedFile(file, siteDocument) {
       if (child.type === 'text') prose.push(child.content);
     }
   });
-  return { frontmatter, anchors, githubAnchors, links, prose };
+  return { source, frontmatter, anchors, githubAnchors, links, prose, paragraphs, headings, scenarios, tableRows };
 }
 
-export function checkDocs(directory) {
+const gitText = (root, ...args) => execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+const shanghaiDate = date => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit', numberingSystem: 'latn' }).format(new Date(date));
+const withoutUpdated = source => source.replace(/^updated:.*$/m, '').trim();
+function contentDate(root, relative) {
+  for (const entry of gitText(root, 'log', '--format=%H %cI', '--', relative).split('\n')) {
+    const [revision, date] = entry.split(' ');
+    const current = gitText(root, 'show', `${revision}:${relative}`);
+    let previous = '';
+    try { previous = gitText(root, 'show', `${revision}^:${relative}`); } catch { /* New file. */ }
+    if (withoutUpdated(current) !== withoutUpdated(previous)) return shanghaiDate(date);
+  }
+  throw new Error(`Cannot determine the content date of ${relative}`);
+}
+function changedDates(root, files, requestedBase, now) {
+  let base = requestedBase;
+  try { if (fs.realpathSync(gitText(root, 'rev-parse', '--show-toplevel')) !== root) return new Map(); }
+  catch { return new Map(); }
+  if (!base) {
+    try { gitText(root, 'rev-parse', '--verify', 'origin/develop'); base = 'origin/develop'; }
+    catch { base = 'HEAD'; }
+  }
+  if (/^0+$/.test(base)) base = null;
+  if (base) gitText(root, 'rev-parse', '--verify', `${base}^{commit}`);
+  const dates = new Map();
+  for (const file of files) {
+    const relative = posix(path.relative(root, file));
+    if (!relative.startsWith('docs/') || path.basename(file) === 'TEMPLATE.md') continue;
+    const current = fs.readFileSync(file, 'utf8');
+    let previous = '';
+    try { if (base) previous = gitText(root, 'show', `${base}:${relative}`); } catch { /* New topic. */ }
+    if (withoutUpdated(current) === withoutUpdated(previous)) continue;
+    let committed = '';
+    try { committed = gitText(root, 'show', `HEAD:${relative}`); } catch { /* New uncommitted topic. */ }
+    const date = withoutUpdated(current) !== withoutUpdated(committed)
+      ? shanghaiDate(now)
+      : contentDate(root, relative);
+    dates.set(file, date);
+  }
+  return dates;
+}
+
+export function checkDocs(directory, { base = process.env.DOCS_BASE_REF, now = Date.now() } = {}) {
   const root = fs.realpathSync(directory);
   const errors = [];
   const cache = new Map();
@@ -83,7 +146,12 @@ export function checkDocs(directory) {
     return cache.get(file);
   };
   const files = filesIn(root);
-  const glossary = path.join(root, 'docs/spec/terminology.md');
+  const ownGlossary = path.join(root, 'docs/spec/terminology.md');
+  const packagedGlossary = fileURLToPath(new URL('../../docs/spec/terminology.md', import.meta.url));
+  const glossary = fs.existsSync(ownGlossary) ? ownGlossary : packagedGlossary;
+  const requiredDates = changedDates(root, files, base, now);
+  const scenarioOwners = new Map();
+  const adrOwners = new Map();
   const aliases = fs.existsSync(glossary) ? fs.readFileSync(glossary, 'utf8').split('\n').filter(line => line.startsWith('|')).flatMap(line => {
     const cells = line.split('|').map(cell => cell.trim());
     return cells.length === 7 && !['替代表述', '---', '—'].includes(cells[5]) ? cells[5].split('、').map(alias => [alias, cells[1]]) : [];
@@ -111,11 +179,27 @@ export function checkDocs(directory) {
           const valid = typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)
             && Number.isFinite(Date.parse(date)) && new Date(date).toISOString().slice(0, 10) === date;
           if (!valid && !(template && date === 'YYYY-MM-DD')) report('invalid updated date');
+          if (valid && requiredDates.has(file) && date < requiredDates.get(file)) report(`updated 必须不早于本次内容修改日期 ${requiredDates.get(file)}，实际为 ${date}`);
         } catch {
           report('invalid YAML metadata');
         }
       }
       if (!template && parsed.prose.some((text) => placeholder.test(text))) report('unfilled prose placeholder');
+    }
+    if (!template) for (const paragraph of parsed.paragraphs) {
+      const count = [...paragraph.text].length;
+      if (count > 200) report(`第 ${paragraph.line} 行段落有 ${count} 个可见字符，超过 200；请按主题拆分。`);
+      if (/(?:不是.{0,80}而是|不应该.{0,80}而应该|不应.{0,80}而应)/u.test(paragraph.text)) report(`第 ${paragraph.line} 行请直接描述当前规则，必要的技术对比应明确具体条件。`);
+    }
+    for (const { id, line } of relative.startsWith('docs/spec/') ? parsed.scenarios : []) {
+      if (scenarioOwners.has(id)) report(`第 ${line} 行场景编号 ${id} 与 ${scenarioOwners.get(id)} 重复。`);
+      else scenarioOwners.set(id, `${relative}:${line}`);
+    }
+    if (/^docs\/adr\/\d/.test(relative)) {
+      const number = path.basename(file).match(/^(\d{4})-/)?.[1];
+      if (!number || !parsed.headings.some(heading => heading.level === 'h1' && heading.text.startsWith(`${number}：`))) report('ADR 文件编号必须与一级标题中的四位编号一致。');
+      if (number && adrOwners.has(number)) report(`ADR 编号 ${number} 与 ${adrOwners.get(number)} 重复。`);
+      if (number) adrOwners.set(number, relative);
     }
     if (file !== glossary) for (const [alias, canonical] of aliases) {
       if (parsed.prose.some(text => text.includes(alias))) report(`use standard term "${canonical}" instead of "${alias}"`);
@@ -147,6 +231,7 @@ export function checkDocs(directory) {
   for (const category of categories) {
     const index = path.join(root, 'docs', category, 'README.md');
     if (!fs.existsSync(index)) continue;
+    for (const row of read(index).tableRows) if (row.cells[0]?.link && row.cells[0].text === row.cells[1]?.text) errors.push(`${posix(path.relative(root, index))}:${row.line}: 主题描述需要说明内容，不能重复标题。`);
     const listed = new Set(read(index).links.map(link => path.resolve(path.dirname(index), link.split('#')[0])));
     for (const file of files.filter(file => path.dirname(file) === path.dirname(index) && !['README.md', 'TEMPLATE.md'].includes(path.basename(file)))) {
       if (!listed.has(file)) errors.push(`${posix(path.relative(root, index))}: missing topic ${path.basename(file)}`);

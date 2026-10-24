@@ -26,7 +26,9 @@ updated: 2026-10-24
 
 ## 当前检查工作流的配置
 
-权威实现为 [ci.yml](https://github.com/StuHelper/stuhelper-next/blob/develop/.github/workflows/ci.yml)。PR 在该维护版本中使用托管 runner；develop/main push 只有仓库变量 `CI_RUNNER=stuhelper` 才使用 ARC，省略或其他值均使用托管 runner；手动 dispatch 使用 `runner=github` 或 `runner=stuhelper`，覆盖普通检查变量。
+工作流实现见 [ci.yml](https://github.com/StuHelper/stuhelper-next/blob/develop/.github/workflows/ci.yml)。PR 使用托管 runner。develop/main push 在 `CI_RUNNER=stuhelper` 时使用 ARC，其余值使用托管 runner。
+
+手动 dispatch 的 `runner` 输入选择本次普通检查的环境，优先于仓库变量。
 
 手动请求自建检查只支持 develop/main，其他 ref 明确失败。初始化默认值为 `CI_RUNNER=github`。上述变量和输入只控制普通检查，不是未来镜像任务的通用调度开关。
 
@@ -40,7 +42,9 @@ Actions 使用明确的发行 tag，例如 `actions/checkout@v7.0.1`。部署镜
 
 Docker/BuildKit 缓存只放在任务专属自建 builder 或 BJ1 Registry，禁止使用 `type=gha`。缓存 tag 按项目和构建用途复用，不为每次提交永久增加一份。应设置大小或保留数量与过期清理规则，同时保留运行、回退和其他任务仍需使用的镜像。
 
-新增 GitHub 缓存或 artifact 时，在 PR 中说明用途、估计大小、大小上限、保留期和清理方式。artifact 默认最多保留 3 天，只上传定位故障所需的小文件。不得自动提高缓存限额或启用付费存储；依赖安装缓存、构建缓存和 Actions artifact 分别核算。GitHub 当前缓存默认限额为每仓库 10 GB，超过免费额度的扩容可能计费，见[官方缓存说明](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#usage-limits-and-eviction-policy)。
+新增 GitHub 缓存或 artifact 的 PR 说明用途、估计大小、容量上限、保留期和清理方式。artifact 默认最多保留 3 天，只保存定位故障需要的小文件。
+
+依赖缓存、构建缓存和 artifact 分别核算。容量扩展和付费存储由负责人决定，平台限额与计费以 [GitHub 官方说明](https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#usage-limits-and-eviction-policy)为准。
 
 ## 信任与失败
 
@@ -57,7 +61,7 @@ Docker/BuildKit 缓存只放在任务专属自建 builder 或 BJ1 Registry，禁
 | CI-03 | 将普通检查变量恢复 github 后执行镜像任务 | 镜像 job 仍固定自建；本项在镜像流水线实现时验收 |
 | CI-04 | 自建 runner 不可用 | 保留排队/失败，不隐式改到托管构建 |
 | CI-05 | 更新官方 Casdoor 候选 | 不出现自编译或重新打包 Casdoor 的任务 |
-| CI-06 | 执行当前文档检查 | npm、uv 不写入 Actions cache，文档站不上传为 artifact |
+| CI-06 | 执行当前文档检查 | pnpm、uv 不写入 Actions cache，文档站不上传为 artifact |
 | CI-07 | 添加 Docker 构建缓存 | 使用自建 builder 或 BJ1 Registry，配置中没有 `type=gha` |
 | CI-08 | 按版本拉取部署镜像 | 本地保留版本 tag，核验摘要与本次候选记录一致 |
 

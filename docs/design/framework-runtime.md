@@ -44,12 +44,12 @@ platform 维护 OpenAPI 3.1 并生成 Go 和 TypeScript 类型。客户端保存
 
 两个客户端使用提供方维护的同一组行为用例，覆盖能力、模块状态和错误响应。后续共享 SDK 包承载稳定的请求封装与生成类型，具体时机按接口规模安排。
 
-Web 使用 Vue 3、TypeScript、Vite 和 Vue Router。stuhelper-admin 基于 Vben Admin v5.7.0 的 web-antd 应用，保留布局、主题、组件和 pnpm workspace。第三方源码与许可证保持可追溯，升级方法见[依赖维护](../guide/dependency-maintenance.md)。
+Web 使用 Vue 3、TypeScript、Vite 和 Vue Router，类型与 ESLint 配置复用官方 create-vue 所采用的预设。stuhelper-admin 基于 Vben Admin v5.7.0 的 web-antd 应用，保留布局、主题、组件和 pnpm workspace。第三方源码与许可证保持可追溯，升级方法见[依赖维护](../guide/dependency-maintenance.md)。
 
 两端的语言、格式和 RTL 规则由[国际化规格](../spec/internationalization.md)统一管理。页面只呈现实际接口结果，真实业务随模块接入。
 
 ## 工作区与验证
 
-Mani 统一管理本地独立仓库。Go Workspace 按已检出的 Go 模块生成，各 Go 仓库保持独立构建。集成 CI 按 `workspace.lock.json` 检出固定提交，部署版本由 ops 的版本 tag 组合维护。
+Mani 统一管理本地独立仓库。Go Workspace 按已检出的 Go 模块生成，各 Go 仓库保持独立构建。PR 集成 CI 按 `workspace.lock.json` 检出固定提交，手动兼容检查可解析最新 develop 组合。部署版本由 ops 的版本 tag 组合维护。
 
 验证覆盖依赖、能力降级、生命周期回退、远程恢复、身份拒绝、契约兼容、客户端共用用例和八语言浏览器联调。持久化、事件、真实会话和业务数据迁移在对应实现中增加专门验收。

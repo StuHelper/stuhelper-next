@@ -5,6 +5,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
+import { descriptor } from '../tooling/modules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const readJSON = file => JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -40,6 +41,7 @@ export function validate(directory = root) {
     const lock = readJSON(lockFile);
     assert.deepEqual(Object.keys(lock.projects).sort(), projects(directory).filter(project => project.tags.includes('code')).map(project => project.name).sort());
     for (const project of Object.values(lock.projects)) assert.match(project.revision, /^[0-9a-f]{40}$/);
+    if (lock.engineering_tools) engineeringTools(directory);
   }
 }
 export function inspect(directory = root, codeOnly = true) {
@@ -86,6 +88,8 @@ export function verifyScenarios(directory, definition, checkout) {
 export function contracts(directory = root) {
   const records = inspect(directory);
   const definitions = readJSON(path.join(directory, 'architecture/modules.json')).modules;
+  const runtime = records.find(project => project.name === 'platform');
+  assert.deepEqual(readJSON(path.join(runtime.directory, 'internal/composition/platform.json')), descriptor('platform'), 'Runtime module descriptor differs from the architecture declaration');
   for (const definition of definitions.filter(module => module.scenario_tests)) {
     const project = records.find(project => project.url === `https://github.com/${definition.repository}.git`);
     assert(project, `Scenario provider checkout missing: ${definition.id}`);
@@ -122,26 +126,30 @@ export function toolchains(directory = root, write = false) {
       if (fs.existsSync(workflows)) for (const entry of fs.readdirSync(workflows).filter(name => name.endsWith('.yml'))) {
         const filename = path.join(workflows, entry);
         const before = fs.readFileSync(filename, 'utf8');
-        const workflow = YAML.parse(before);
+        const document = YAML.parseDocument(before);
+        if (document.errors.length) throw new Error(`${filename}: ${document.errors[0].message}`);
         let changed = false;
-        for (const job of Object.values(workflow.jobs)) for (const step of job.steps ?? []) {
-          if (step.uses?.startsWith('astral-sh/setup-uv@')) {
-            if (write && step.with?.version !== versions.uv) { step.with.version = versions.uv; changed = true; }
-            assert.equal(step.with?.version, versions.uv, `uv version: ${location}/${entry}`);
-          }
-          if (step.run?.match(/corepack@\d+\.\d+\.\d+/)) {
-            const updated = step.run.replace(/corepack@\d+\.\d+\.\d+/g, `corepack@${versions.corepack}`);
-            if (write && updated !== step.run) { step.run = updated; changed = true; }
-            assert.equal(step.run, updated, `Corepack version: ${location}/${entry}`);
+        for (const job of document.get('jobs')?.items ?? []) {
+          const jobName = job.key.value;
+          const steps = document.getIn(['jobs', jobName, 'steps']);
+          for (let index = 0; index < (steps?.items.length ?? 0); index++) {
+            const prefix = ['jobs', jobName, 'steps', index];
+            const uses = document.getIn([...prefix, 'uses']);
+            if (uses?.startsWith('astral-sh/setup-uv@')) {
+              const key = [...prefix, 'with', 'version'];
+              if (write && document.getIn(key) !== versions.uv) { document.setIn(key, versions.uv); changed = true; }
+              assert.equal(document.getIn(key), versions.uv, `uv version: ${location}/${entry}`);
+            }
+
           }
         }
-        if (changed) fs.writeFileSync(filename, YAML.stringify(workflow, { lineWidth: 0 }));
+        if (changed) fs.writeFileSync(filename, document.toString({ lineWidth: 0 }));
       }
     }
     if (write) fs.writeFileSync(nodeFile, `${versions.node}\n`);
     assert.equal(fs.readFileSync(nodeFile, 'utf8').trim(), versions.node, `Node version: ${location}`);
     const goMod = path.join(location, 'go.mod');
-    if (location === directory || fs.existsSync(goMod)) {
+    {
       if (write) fs.writeFileSync(path.join(location, '.go-version'), `${versions.go}\n`);
       assert.equal(fs.readFileSync(path.join(location, '.go-version'), 'utf8').trim(), versions.go);
     }
@@ -153,44 +161,98 @@ export function toolchains(directory = root, write = false) {
     if (fs.existsSync(packageFile)) {
       const pkg = readJSON(packageFile);
       if (write) {
-        pkg.engines = { ...pkg.engines, node: versions.node };
+        pkg.engines = { ...pkg.engines, node: versions.node, pnpm: versions.pnpm };
+        pkg.packageManager = `pnpm@${versions.pnpm}`;
         fs.writeFileSync(packageFile, `${JSON.stringify(pkg, null, 2)}\n`);
-        const lockFile = path.join(location, 'package-lock.json');
-        if (fs.existsSync(lockFile)) {
-          const lock = readJSON(lockFile);
-          lock.packages[''].engines = { ...lock.packages[''].engines, node: versions.node };
-          fs.writeFileSync(lockFile, `${JSON.stringify(lock, null, 2)}\n`);
+
+      }
+      const rootPackage = path.join(directory, 'package.json');
+      const overrides = fs.existsSync(rootPackage) ? readJSON(rootPackage).pnpm?.overrides ?? {} : {};
+      const workspaceFile = path.join(location, 'pnpm-workspace.yaml');
+      if (Object.keys(overrides).length && fs.existsSync(workspaceFile)) {
+        const workspace = YAML.parseDocument(fs.readFileSync(workspaceFile, 'utf8'));
+        if (workspace.errors.length) throw workspace.errors[0];
+        let changed = false;
+        for (const [name, value] of Object.entries(overrides)) {
+          if (write && workspace.getIn(['overrides', name]) !== value) { workspace.setIn(['overrides', name], value); changed = true; }
+          assert.equal(workspace.getIn(['overrides', name]), value, `Shared dependency override: ${location}/${name}`);
         }
+        if (changed) fs.writeFileSync(workspaceFile, workspace.toString({ lineWidth: 0 }));
+      } else if (Object.keys(overrides).length) {
+        if (write) {
+          pkg.pnpm = { ...pkg.pnpm, overrides: { ...pkg.pnpm?.overrides, ...overrides } };
+          fs.writeFileSync(packageFile, `${JSON.stringify(pkg, null, 2)}\n`);
+        }
+        for (const [name, value] of Object.entries(overrides)) assert.equal(pkg.pnpm?.overrides?.[name], value, `Shared dependency override: ${location}/${name}`);
       }
       assert.equal(pkg.engines?.node, versions.node, `Node engine: ${location}`);
+      assert.equal(pkg.packageManager, `pnpm@${versions.pnpm}`, `pnpm version: ${location}`);
+      assert.equal(pkg.engines?.pnpm, versions.pnpm, `pnpm engine: ${location}`);
     }
   }
+  const lockFile = path.join(directory, 'workspace.lock.json');
+  if (fs.existsSync(lockFile) && readJSON(lockFile).engineering_tools) engineeringTools(directory);
   console.log(`PASS: toolchains agree in ${directories.length} checked-out repositories`);
 }
+export function engineeringTools(directory = root, revision, write = false) {
+  const lockFile = path.join(directory, 'workspace.lock.json');
+  const lock = readJSON(lockFile);
+  const selected = revision ?? lock.engineering_tools?.revision;
+  assert.match(selected ?? '', /^[0-9a-f]{40}$/, 'Engineering tools require a full commit revision');
+  const pkg = readJSON(path.join(directory, 'package.json'));
+  const files = ['package.json', ...pkg.files];
+  // Compare only the installed package; coordination changes do not create a version cycle.
+  const changed = git(directory, 'diff', '--name-only', selected, '--', ...files);
+  const added = git(directory, 'ls-files', '--others', '--exclude-standard', '--', ...files);
+  assert(!changed && !added, `Engineering tools differ from ${selected}; commit the package changes and update its version first`);
+  const dependency = `git+https://github.com/StuHelper/stuhelper-next.git#${selected}`;
+  const consumers = projects(directory).filter(project => fs.existsSync(path.join(project.directory, 'package.json')));
+  for (const project of consumers) {
+    const filename = path.join(project.directory, 'package.json');
+    const consumer = readJSON(filename);
+    if (write) {
+      consumer.devDependencies = { ...consumer.devDependencies, '@stuhelper/engineering-tools': dependency };
+      fs.writeFileSync(filename, `${JSON.stringify(consumer, null, 2)}\n`);
+    }
+    assert.equal(consumer.devDependencies?.['@stuhelper/engineering-tools'], dependency, `Engineering tools version differs: ${project.name}`);
+  }
+  if (write) {
+    lock.engineering_tools = { revision: selected };
+    fs.writeFileSync(lockFile, `${JSON.stringify(lock, null, 2)}\n`);
+  }
+}
 export function goWorkspace(directory = root) {
-  const config = readJSON(path.join(directory, 'architecture/toolchains.json'));
-  const paths = projects(directory).filter(project => fs.existsSync(path.join(project.directory, 'go.mod'))).map(project => `\t./${project.path}`);
+  const versions = readJSON(path.join(directory, 'architecture/toolchains.json'));
+  const paths = projects(directory).filter(project => fs.existsSync(path.join(project.directory, 'go.mod'))).map(project => `./${project.path}`);
   assert(paths.length, 'Check out a Go repository with mani sync first');
   const destination = path.join(directory, 'go.work');
-  const content = `go ${config.go}\n\nuse (\n${paths.join('\n')}\n)\n`;
-  if (fs.existsSync(destination)) assert.equal(fs.readFileSync(destination, 'utf8'), content, 'Existing go.work has custom entries; update it with go work use');
-  else fs.writeFileSync(destination, content);
+  const options = { cwd: directory, env: { ...process.env, GOWORK: destination, GOTOOLCHAIN: `go${versions.go}` }, stdio: 'inherit' };
+  if (!fs.existsSync(destination)) execFileSync('go', ['work', 'init'], options);
+  execFileSync('go', ['work', 'use', ...paths], options);
 }
 export function snapshot(directory = root, write = false) {
   const records = inspect(directory);
   assert(records.every(record => !record.dirty), 'Commit code changes before recording an integration combination');
   contracts(directory);
   toolchains(directory);
-  const lock = { schema_version: 1, projects: Object.fromEntries(records.map(record => [record.name, { revision: record.revision }])) };
+  const previous = readJSON(path.join(directory, 'workspace.lock.json'));
+  const lock = { schema_version: 1, ...(previous.engineering_tools ? { engineering_tools: previous.engineering_tools } : {}), projects: Object.fromEntries(records.map(record => [record.name, { revision: record.revision }])) };
   const json = `${JSON.stringify(lock, null, 2)}\n`;
   if (write) fs.writeFileSync(path.join(directory, 'workspace.lock.json'), json);
   else process.stdout.write(json);
 }
-export function checkout(directory = root) {
+export function checkout(directory = root, latest = false) {
   const lock = readJSON(path.join(directory, 'workspace.lock.json'));
   assert.equal(lock.schema_version, 1);
   const configured = projects(directory).filter(project => project.tags.includes('code'));
   assert.deepEqual(Object.keys(lock.projects).sort(), configured.map(project => project.name).sort());
+  for (const project of configured) assert(!fs.existsSync(project.directory), `Existing checkout preserved: ${project.directory}`);
+  if (latest) for (const project of configured) {
+    const revision = execFileSync('git', ['ls-remote', '--heads', project.url, 'refs/heads/develop'], { encoding: 'utf8' }).trim().split(/\s+/)[0];
+    assert.match(revision, /^[0-9a-f]{40}$/);
+    lock.projects[project.name].revision = revision;
+  }
+  console.log(`Integration input (${latest ? 'latest develop resolved now' : 'recorded combination'}): ${JSON.stringify(lock.projects)}`);
   for (const project of configured) {
     const revision = lock.projects[project.name].revision;
     assert.match(revision, /^[0-9a-f]{40}$/);
@@ -202,18 +264,19 @@ export function checkout(directory = root) {
   }
 }
 export function needsIntegration(files) {
-  return files.some(file => /^(architecture\/|scripts\/|tests\/|\.github\/|mani\.yaml$|workspace\.lock\.json$|package(?:-lock)?\.json$|playwright\.config\.mjs$|Makefile$|\.node-version$|\.go-version$)/.test(file));
+  return files.some(file => /^(architecture\/|tooling\/|scripts\/|tests\/|\.github\/|docs\/spec\/terminology\.md$|mani\.yaml$|workspace\.lock\.json$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|playwright\.config\.mjs$|Makefile$|\.node-version$|\.go-version$)/.test(file));
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const [command, option] = process.argv.slice(2);
+    const [command, option, flag] = process.argv.slice(2);
     if (command === 'validate') validate();
     else if (command === 'contracts') contracts();
     else if (command === 'toolchains') toolchains(root, option === '--write');
+    else if (command === 'tooling') engineeringTools(root, option, flag === '--write');
     else if (command === 'go-work') goWorkspace();
     else if (command === 'snapshot') snapshot(root, option === '--write');
-    else if (command === 'checkout') checkout();
+    else if (command === 'checkout') checkout(root, option === '--latest');
     else if (command === 'affected') console.log(String(needsIntegration(git(root, 'diff', '--name-only', option, 'HEAD').split('\n'))));
-    else throw new Error('Use validate, contracts, toolchains [--write], go-work, snapshot [--write], checkout, or affected BASE');
+    else throw new Error('Use validate, contracts, toolchains [--write], tooling REVISION [--write], go-work, snapshot [--write], checkout [--latest], or affected BASE');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

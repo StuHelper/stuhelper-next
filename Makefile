@@ -1,15 +1,16 @@
 .PHONY: setup check
 
 setup:
-	npm ci --ignore-scripts
+	pnpm install --frozen-lockfile
 	uv sync --locked
 
 check:
+	node tooling/cli.mjs repository
 	python3 scripts/check.py
 	python3 -m unittest discover -s scripts -p 'test_*.py'
 	node scripts/workspace.mjs validate
 	node --test scripts/workspace.test.mjs
-	npm run check:docs
-	npm run test:docs
+	pnpm run check:docs
+	pnpm run test:tools
 	uv run --locked mkdocs build --strict
-	python3 scripts/lint_workflows.py
+	node tooling/cli.mjs workflows
