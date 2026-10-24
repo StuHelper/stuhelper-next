@@ -26,6 +26,8 @@ node scripts/workspace.mjs contracts
 pnpm run test:e2e
 ```
 
+Mani 0.32.1 的普通批量模式可能在子任务失败后返回 0。人工运行时必须检查各项目结果；CI 逐项目进入目录，使用显式配置和 `--tty` 传递失败退出码。安装模块前，CI 先运行失败用例，验证 `setup` 和 `check` 都会停止后续项目。
+
 ## 脚本与测试的职责
 
 | 入口 | 验证内容 |
@@ -37,6 +39,7 @@ pnpm run test:e2e
 | `tooling/i18n/` | 八语言键、占位符、复数和同英文消息例外 |
 | `tooling/check_repository.py` | 文档仓库的文件类型、语法与敏感文件名 |
 | `scripts/test_*.py`、`scripts/workspace.test.mjs` | 错误清单、优化模式、快照篡改与工作区保护等回归 |
+| `tests/ci/mani-exit.mjs` | 用原生 Mani 验证模块失败退出码，并确认后续模块停止执行 |
 | `tests/e2e/` | 实际 HTTP、客户端错误恢复、八语言页面与移动端布局 |
 
 这些共享检查以 `@stuhelper/engineering-tools` 安装到八个模块仓库。源码位于架构仓库的 `tooling/`，消费者通过同一发行 tag 固定版本；工作区与消费者检查验证 tag、锁定提交和来源，升级方法见[依赖维护](dependency-maintenance.md)。

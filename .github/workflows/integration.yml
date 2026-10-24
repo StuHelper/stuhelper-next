@@ -7,7 +7,7 @@ on:
         default: true
       coordinator_ref:
         type: string
-        default: tooling-v0.1.2
+        default: tooling-v0.1.3
       source:
         type: string
         default: latest
@@ -105,7 +105,7 @@ jobs:
         with:
           go-version-file: source/.go-version
           cache: false
-      - name: Install integration tools and recorded modules
+      - name: Install integration tools and check out recorded modules
         if: inputs.enabled
         working-directory: source
         run: |
@@ -113,12 +113,34 @@ jobs:
           GOBIN="$RUNNER_TEMP/bin" GOWORK=off go install github.com/alajmo/mani@v0.32.1
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
           node scripts/workspace.mjs checkout --replay "$RUNNER_TEMP/stuhelper-integration.json"
-          "$RUNNER_TEMP/bin/mani" run setup --tags code
+      - name: Verify native task failure propagation
+        if: inputs.enabled
+        working-directory: coordinator
+        run: node --test tests/ci/mani-exit.mjs
+      - name: Install the recorded combination
+        if: inputs.enabled
+        id: install-combination
+        working-directory: source
+        shell: bash
+        run: |
+          projects=$(node -p 'Object.keys(require("./workspace.lock.json").projects).join(" ")')
+          test -n "$projects"
+          config="$PWD/mani.yaml"
+          for project in $projects; do
+            (cd "workspace/$project" && mani --config "$config" run setup --projects "$project" --tty)
+          done
       - name: Check repositories, release references and contracts
         if: inputs.enabled
+        id: check-combination
         working-directory: source
+        shell: bash
         run: |
-          mani run check --tags code
+          projects=$(node -p 'Object.keys(require("./workspace.lock.json").projects).join(" ")')
+          test -n "$projects"
+          config="$PWD/mani.yaml"
+          for project in $projects; do
+            (cd "workspace/$project" && mani --config "$config" run check --projects "$project" --tty)
+          done
           node scripts/workspace.mjs toolchains --remote
           node scripts/workspace.mjs contracts
       - name: Install browser

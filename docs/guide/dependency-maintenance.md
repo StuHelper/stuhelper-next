@@ -27,7 +27,7 @@ Renovate 适合需要共享更新预设、更多版本文件识别和集中更�
 发行 tag 可访问后，在完整工作区更新消费者：
 
 ```bash
-node scripts/workspace.mjs tooling 0.1.2 --write --remote
+node scripts/workspace.mjs tooling 0.1.3 --write --remote
 mani exec --all 'GIT_SSH_COMMAND=false pnpm install'
 mani run check --all
 node scripts/workspace.mjs toolchains --remote
