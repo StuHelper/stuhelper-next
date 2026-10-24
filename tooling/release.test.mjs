@@ -21,6 +21,9 @@ test('release references require annotated version tags and the locked commit', 
   write();
   checkConsumerRelease(directory, '0.1.0', revision);
   assert.throws(() => checkConsumerRelease(directory, '0.1.0', 'c'.repeat(40)), /tag 与锁定提交不一致/);
+  delete lock.packages[`@stuhelper/engineering-tools@${archive}`].resolution.integrity;
+  write();
+  checkConsumerRelease(directory, '0.1.0', revision);
   const gitVersion = `git+https://github.com/StuHelper/stuhelper-next.git#${revision}`;
   lock.importers['.'].devDependencies['@stuhelper/engineering-tools'].version = gitVersion;
   lock.packages = { [`@stuhelper/engineering-tools@${gitVersion}`]: { resolution: { type: 'git', repo: 'https://github.com/StuHelper/stuhelper-next.git', commit: revision } } };

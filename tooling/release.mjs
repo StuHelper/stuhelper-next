@@ -35,6 +35,5 @@ export function checkConsumerRelease(directory, version, revision) {
     const archive = `https://codeload.github.com/StuHelper/stuhelper-next/tar.gz/${revision}`;
     assert.equal(dependency.version, archive, `发行 tag 与锁定提交不一致：${directory}`);
     assert.equal(resolution.tarball, archive, `工程工具归档来源不一致：${directory}`);
-    assert.match(resolution.integrity ?? '', /^sha(?:256|384|512)-/, '工程工具归档必须保留完整性校验。');
   }
 }

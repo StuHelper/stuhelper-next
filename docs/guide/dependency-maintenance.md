@@ -20,14 +20,14 @@ Renovate 适合需要共享更新预设、更多版本文件识别和集中更�
 
 ## 工程工具发行
 
-共享工具通过 `tooling-v<版本>` 这样的带注释 tag 分发。包声明使用明确版本，pnpm 锁文件保存解析后的提交和完整性。已发行 tag 不覆盖、不移动、不删除。发行前确认 owner 授权，先完成候选源码与工作流检查，再创建并推送 tag。
+共享工具通过 `tooling-v<版本>` 这样的带注释 tag 分发。包声明使用明确版本，pnpm 锁文件保存解析后的提交及安装元数据。已发行 tag 不覆盖、不移动、不删除。发行前确认 owner 授权，先完成候选源码与工作流检查，再创建并推送 tag。
 
 升级工具链或共享规则时，修改 `architecture/toolchains.json` 和工具包的 `package.json` 版本，然后执行 `toolchains --write` 同步版本文件及可复用工作流引用。提交候选后，为该提交创建新工具版本 tag。
 
 发行 tag 可访问后，在完整工作区更新消费者：
 
 ```bash
-node scripts/workspace.mjs tooling 0.1.1 --write --remote
+node scripts/workspace.mjs tooling 0.1.2 --write --remote
 mani exec --all 'GIT_SSH_COMMAND=false pnpm install'
 mani run check --all
 node scripts/workspace.mjs toolchains --remote
@@ -35,7 +35,7 @@ node scripts/workspace.mjs contracts
 pnpm run test:e2e
 ```
 
-示例版本替换为本次发行版本。更新命令同步八个消费者的版本声明，并将 tag 解析出的 SHA 写入架构记录。各消费者独立检查远端 tag 与 pnpm 锁文件一致性，接受 HTTPS Git 或带完整性校验的 GitHub 归档；源码检查同时核对包内容。tag 缺失或内容改变时，检查失败。
+示例版本替换为本次发行版本。更新命令同步八个消费者的版本声明，并将 tag 解析出的 SHA 写入架构记录。各消费者独立检查远端 tag 与 pnpm 锁文件一致性，接受 HTTPS Git 或 GitHub 归档。依赖安装与完整性由 pnpm 校验，锁文件中的完整性字段按 pnpm 生成结果保留。tag 缺失或内容改变时，检查失败。
 
 pnpm 10 在网络探测失败时可能记录本机可用的 SSH 来源。生成公共工具锁文件时临时关闭 SSH，避免依赖开发者私钥；CI 拒绝 SSH 来源，安装使用已锁定的 HTTPS 来源。
 
