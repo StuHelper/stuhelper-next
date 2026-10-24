@@ -1,17 +1,18 @@
 {
   "schema_version": 1,
   "engineering_tools": {
-    "version": "0.1.2"
+    "version": "0.1.2",
+    "revision": "240fd6e2dedad40aac8f211f6097dfef681c6cfa"
   },
   "projects": {
     "platform": {
-      "revision": "da6e25014b06ae09a13838bf0c003883fd7f3a2f"
+      "revision": "29912e3ac3a2467da518a3494e3d43afbec14378"
     },
     "web": {
-      "revision": "f2eb1b1657eca01bfc09132e92053dbd08df86a9"
+      "revision": "ee016bd8d87c95f7587c44efeca8faa7a4e9c52f"
     },
     "admin": {
-      "revision": "53ae269eb6f9a4f5286c57b3749057dc2f29f126"
+      "revision": "6a7cbc85a5baf55085517d65b199a7e9a0c92b32"
     }
   }
 }
