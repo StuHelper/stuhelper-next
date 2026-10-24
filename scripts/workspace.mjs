@@ -191,7 +191,7 @@ export function toolchains(directory = root, write = false) {
     }
   }
   const lockFile = path.join(directory, 'workspace.lock.json');
-  if (fs.existsSync(lockFile) && readJSON(lockFile).engineering_tools) engineeringTools(directory);
+  if (!write && fs.existsSync(lockFile) && readJSON(lockFile).engineering_tools) engineeringTools(directory);
   console.log(`PASS: toolchains agree in ${directories.length} checked-out repositories`);
 }
 export function engineeringTools(directory = root, revision, write = false) {
@@ -199,6 +199,8 @@ export function engineeringTools(directory = root, revision, write = false) {
   const lock = readJSON(lockFile);
   const selected = revision ?? lock.engineering_tools?.revision;
   assert.match(selected ?? '', /^[0-9a-f]{40}$/, 'Engineering tools require a full commit revision');
+  try { git(directory, 'cat-file', '-e', `${selected}^{commit}`); }
+  catch { execFileSync('git', ['-C', directory, 'fetch', 'origin', selected], { stdio: 'inherit' }); }
   const pkg = readJSON(path.join(directory, 'package.json'));
   const files = ['package.json', ...pkg.files];
   // Compare only the installed package; coordination changes do not create a version cycle.
