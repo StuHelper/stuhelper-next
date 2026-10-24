@@ -5,6 +5,9 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import YAML from 'yaml';
+import { parseArgs } from 'node:util';
+import { toolsRepository, toolsTag, remoteToolsRevision, checkConsumerRelease } from '../tooling/release.mjs';
+import { resolveIntegration, writeIntegrationRecord, checkoutRecord, integrationStatus } from './integration.mjs';
 import { descriptor } from '../tooling/modules.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -110,7 +113,7 @@ export function contracts(directory = root) {
   }
   console.log('PASS: client snapshots match their declared provider revision and remain compatible');
 }
-export function toolchains(directory = root, write = false) {
+export function toolchains(directory = root, write = false, remote = false) {
   const versions = readJSON(path.join(directory, 'architecture/toolchains.json'));
   const directories = [directory, ...projects(directory).map(project => project.directory).filter(location => fs.existsSync(path.join(location, '.git')))];
   for (const location of directories) {
@@ -129,8 +132,22 @@ export function toolchains(directory = root, write = false) {
         const document = YAML.parseDocument(before);
         if (document.errors.length) throw new Error(`${filename}: ${document.errors[0].message}`);
         let changed = false;
+        const rootPackageFile = path.join(directory, 'package.json');
+        const releaseVersion = fs.existsSync(rootPackageFile) ? readJSON(rootPackageFile).version : undefined;
+        const releaseTag = releaseVersion ? toolsTag(releaseVersion) : undefined;
+        const coordinatorKey = ['on', 'workflow_call', 'inputs', 'coordinator_ref', 'default'];
+        if (releaseTag && document.hasIn(coordinatorKey)) {
+          if (write && document.getIn(coordinatorKey) !== releaseTag) { document.setIn(coordinatorKey, releaseTag); changed = true; }
+          assert.equal(document.getIn(coordinatorKey), releaseTag, '协调器默认版本必须与工具版本一致。');
+        }
         for (const job of document.get('jobs')?.items ?? []) {
           const jobName = job.key.value;
+          const workflowKey = ['jobs', jobName, 'uses'];
+          if (releaseTag && document.getIn(workflowKey)?.startsWith('StuHelper/stuhelper-next/.github/workflows/integration.yml@')) {
+            const expected = `StuHelper/stuhelper-next/.github/workflows/integration.yml@${releaseTag}`;
+            if (write && document.getIn(workflowKey) !== expected) { document.setIn(workflowKey, expected); changed = true; }
+            assert.equal(document.getIn(workflowKey), expected, `跨仓检查版本不一致：${location}`);
+          }
           const steps = document.getIn(['jobs', jobName, 'steps']);
           for (let index = 0; index < (steps?.items.length ?? 0); index++) {
             const prefix = ['jobs', jobName, 'steps', index];
@@ -191,25 +208,28 @@ export function toolchains(directory = root, write = false) {
     }
   }
   const lockFile = path.join(directory, 'workspace.lock.json');
-  if (!write && fs.existsSync(lockFile) && readJSON(lockFile).engineering_tools) engineeringTools(directory);
+  if (!write && fs.existsSync(lockFile) && readJSON(lockFile).engineering_tools) engineeringTools(directory, undefined, false, { remote, locks: true });
   console.log(`PASS: toolchains agree in ${directories.length} checked-out repositories`);
 }
-export function engineeringTools(directory = root, revision, write = false) {
+export function engineeringTools(directory = root, version, write = false, { remote = false, locks = false } = {}) {
   const lockFile = path.join(directory, 'workspace.lock.json');
   const lock = readJSON(lockFile);
-  const selected = revision ?? lock.engineering_tools?.revision;
-  assert.match(selected ?? '', /^[0-9a-f]{40}$/, 'Engineering tools require a full commit revision');
-  try { git(directory, 'cat-file', '-e', `${selected}^{commit}`); }
-  catch { execFileSync('git', ['-C', directory, 'fetch', 'origin', selected], { stdio: 'inherit' }); }
+  const selected = version ?? lock.engineering_tools?.version;
+  const tag = toolsTag(selected);
+  try { git(directory, 'rev-parse', '--verify', `refs/tags/${tag}`); }
+  catch { execFileSync('git', ['-C', directory, 'fetch', 'origin', `refs/tags/${tag}:refs/tags/${tag}`], { stdio: 'inherit' }); }
+  assert.equal(git(directory, 'cat-file', '-t', `refs/tags/${tag}`), 'tag', '工程工具使用带注释的发行 tag。');
+  const revision = git(directory, 'rev-parse', `refs/tags/${tag}^{commit}`);
+  if (!write && lock.engineering_tools?.revision) assert.equal(revision, lock.engineering_tools.revision, '本地发行 tag 与记录提交不一致。');
+  if (remote) assert.equal(remoteToolsRevision(selected), revision, '远端发行 tag 缺失或已改变。');
   const pkg = readJSON(path.join(directory, 'package.json'));
+  assert.equal(pkg.version, selected, '工具包版本必须与发行 tag 一致。');
   const files = ['package.json', ...pkg.files];
-  // Compare only the installed package; coordination changes do not create a version cycle.
-  const changed = git(directory, 'diff', '--name-only', selected, '--', ...files);
+  const changed = git(directory, 'diff', '--name-only', revision, '--', ...files);
   const added = git(directory, 'ls-files', '--others', '--exclude-standard', '--', ...files);
-  assert(!changed && !added, `Engineering tools differ from ${selected}; commit the package changes and update its version first`);
-  const dependency = `git+https://github.com/StuHelper/stuhelper-next.git#${selected}`;
-  const consumers = projects(directory).filter(project => fs.existsSync(path.join(project.directory, 'package.json')));
-  for (const project of consumers) {
+  assert(!changed && !added, `Engineering tools differ from ${tag}; prepare a new tool release`);
+  const dependency = `git+${toolsRepository}#${tag}`;
+  for (const project of projects(directory).filter(project => fs.existsSync(path.join(project.directory, 'package.json')))) {
     const filename = path.join(project.directory, 'package.json');
     const consumer = readJSON(filename);
     if (write) {
@@ -217,9 +237,10 @@ export function engineeringTools(directory = root, revision, write = false) {
       fs.writeFileSync(filename, `${JSON.stringify(consumer, null, 2)}\n`);
     }
     assert.equal(consumer.devDependencies?.['@stuhelper/engineering-tools'], dependency, `Engineering tools version differs: ${project.name}`);
+    if (locks) checkConsumerRelease(project.directory, selected, revision);
   }
   if (write) {
-    lock.engineering_tools = { revision: selected };
+    lock.engineering_tools = { version: selected, revision };
     fs.writeFileSync(lockFile, `${JSON.stringify(lock, null, 2)}\n`);
   }
 }
@@ -243,42 +264,33 @@ export function snapshot(directory = root, write = false) {
   if (write) fs.writeFileSync(path.join(directory, 'workspace.lock.json'), json);
   else process.stdout.write(json);
 }
-export function checkout(directory = root, latest = false) {
-  const lock = readJSON(path.join(directory, 'workspace.lock.json'));
-  assert.equal(lock.schema_version, 1);
-  const configured = projects(directory).filter(project => project.tags.includes('code'));
-  assert.deepEqual(Object.keys(lock.projects).sort(), configured.map(project => project.name).sort());
-  for (const project of configured) assert(!fs.existsSync(project.directory), `Existing checkout preserved: ${project.directory}`);
-  if (latest) for (const project of configured) {
-    const revision = execFileSync('git', ['ls-remote', '--heads', project.url, 'refs/heads/develop'], { encoding: 'utf8' }).trim().split(/\s+/)[0];
-    assert.match(revision, /^[0-9a-f]{40}$/);
-    lock.projects[project.name].revision = revision;
-  }
-  console.log(`Integration input (${latest ? 'latest develop resolved now' : 'recorded combination'}): ${JSON.stringify(lock.projects)}`);
-  for (const project of configured) {
-    const revision = lock.projects[project.name].revision;
-    assert.match(revision, /^[0-9a-f]{40}$/);
-    assert(!fs.existsSync(project.directory), `Existing checkout preserved: ${project.directory}`);
-    execFileSync('git', ['clone', '--no-checkout', '--', project.url, project.directory], { stdio: 'inherit' });
-    try { git(project.directory, 'cat-file', '-e', `${revision}^{commit}`); }
-    catch { execFileSync('git', ['-C', project.directory, 'fetch', 'origin', revision], { stdio: 'inherit' }); }
-    execFileSync('git', ['-C', project.directory, 'checkout', '--detach', revision], { stdio: 'inherit' });
-  }
-}
 export function needsIntegration(files) {
   return files.some(file => /^(architecture\/|tooling\/|scripts\/|tests\/|\.github\/|docs\/spec\/terminology\.md$|mani\.yaml$|workspace\.lock\.json$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|playwright\.config\.mjs$|Makefile$|\.node-version$|\.go-version$)/.test(file));
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const [command, option, flag] = process.argv.slice(2);
+    const { positionals: [command, option], values } = parseArgs({ allowPositionals: true, options: {
+      write: { type: 'boolean' }, remote: { type: 'boolean' },
+      source: { type: 'string', default: 'latest' }, candidates: { type: 'string' },
+      replay: { type: 'string' }, 'replay-json': { type: 'string' }, output: { type: 'string' },
+      'candidate-repository': { type: 'string' }, 'candidate-revision': { type: 'string' },
+    } });
     if (command === 'validate') validate();
     else if (command === 'contracts') contracts();
-    else if (command === 'toolchains') toolchains(root, option === '--write');
-    else if (command === 'tooling') engineeringTools(root, option, flag === '--write');
+    else if (command === 'toolchains') toolchains(root, values.write, values.remote);
+    else if (command === 'tooling') engineeringTools(root, option, values.write, { remote: values.remote });
     else if (command === 'go-work') goWorkspace();
-    else if (command === 'snapshot') snapshot(root, option === '--write');
-    else if (command === 'checkout') checkout(root, option === '--latest');
+    else if (command === 'snapshot') snapshot(root, values.write);
+    else if (command === 'resolve') {
+      const record = await resolveIntegration(root, {
+        source: values.source, candidates: values.candidates ? JSON.parse(values.candidates) : {},
+        candidateRepository: values['candidate-repository'], candidateRevision: values['candidate-revision'],
+        replay: values['replay-json'] ? JSON.parse(values['replay-json']) : values.replay ? readJSON(values.replay) : undefined,
+      });
+      writeIntegrationRecord(record, values.output);
+    } else if (command === 'checkout') checkoutRecord(root, readJSON(values.replay));
+    else if (command === 'status') await integrationStatus(root, readJSON(values.replay));
     else if (command === 'affected') console.log(String(needsIntegration(git(root, 'diff', '--name-only', option, 'HEAD').split('\n'))));
-    else throw new Error('Use validate, contracts, toolchains [--write], tooling REVISION [--write], go-work, snapshot [--write], checkout [--latest], or affected BASE');
+    else throw new Error('Use validate, contracts, toolchains [--write|--remote], tooling VERSION [--write], go-work, snapshot [--write], resolve, checkout --replay FILE, status --replay FILE, or affected BASE.');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

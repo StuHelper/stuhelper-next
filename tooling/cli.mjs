@@ -8,6 +8,8 @@ import { checkDocs } from './docs/check-docs.mjs';
 import { lintMarkdown } from './docs/lint-markdown.mjs';
 import { descriptor } from './modules.mjs';
 import { check as checkI18n } from './i18n/check-i18n.mjs';
+import { integrationInputs } from './integration-inputs.mjs';
+import { checkConsumerRelease, remoteToolsRevision } from './release.mjs';
 
 const packageRoot = fileURLToPath(new URL('../', import.meta.url));
 const versions = JSON.parse(fs.readFileSync(path.join(packageRoot, 'architecture/toolchains.json'), 'utf8'));
@@ -29,8 +31,17 @@ try {
   else if (command === 'workflows') {
     run('go', ['run', `github.com/rhysd/actionlint/cmd/actionlint@v${versions.actionlint}`, '-color', '-shellcheck=', '-pyflakes='], { env: { ...process.env, GOWORK: 'off', GOTOOLCHAIN: `go${versions.go}` } });
     console.log(`PASS: actionlint ${versions.actionlint}`);
+  } else if (command === 'release') {
+    const version = JSON.parse(fs.readFileSync(path.join(packageRoot, 'package.json'), 'utf8')).version;
+    checkConsumerRelease(process.cwd(), version, remoteToolsRevision(version));
+    console.log(`PASS: engineering tools ${version}, release tag and locked commit`);
+  } else if (command === 'integration-inputs') {
+    const candidates = integrationInputs(process.cwd(), process.env.GITHUB_EVENT_NAME, process.env.PR_NUMBER);
+    const output = JSON.stringify(candidates);
+    if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT, `candidates=${output}\n`);
+    console.log(output);
   } else if (command === 'descriptor') process.stdout.write(`${JSON.stringify(descriptor(id), null, 2)}\n`);
-  else throw new Error('Use docs, i18n, repository, workflows, or descriptor MODULE.');
+  else throw new Error('Use docs, i18n, repository, workflows, release, integration-inputs, or descriptor MODULE.');
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

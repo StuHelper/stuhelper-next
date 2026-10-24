@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { test } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { checkout, engineeringTools, goWorkspace, needsIntegration, verifyScenarios, verifySource, toolchains } from './workspace.mjs';
+import { engineeringTools, goWorkspace, needsIntegration, verifyScenarios, verifySource, toolchains } from './workspace.mjs';
 
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -87,45 +87,18 @@ test('toolchain upgrades preserve workflow comments, expressions and multiline c
   assert.equal(fs.readFileSync(workflow, 'utf8'), actual, 'A second update is byte-stable');
 });
 
-test('latest integration resolves develop once without rewriting the recorded combination', t => {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-latest-'));
-  t.after(() => fs.rmSync(directory, { recursive: true }));
-  const origin = path.join(directory, 'origin');
-  fs.mkdirSync(origin);
-  const runGit = (...args) => execFileSync('git', ['-C', origin, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-  runGit('init', '-b', 'develop');
-  fs.writeFileSync(path.join(origin, 'version'), 'old');
-  runGit('add', '.');
-  runGit('-c', 'user.name=Test', '-c', 'user.email=test@example.test', 'commit', '-m', 'old');
-  const old = runGit('rev-parse', 'HEAD');
-  fs.writeFileSync(path.join(origin, 'version'), 'new');
-  runGit('add', '.');
-  runGit('-c', 'user.name=Test', '-c', 'user.email=test@example.test', 'commit', '-m', 'new');
-  for (const latest of [false, true]) {
-    const workspace = path.join(directory, String(latest));
-    fs.mkdirSync(workspace);
-    fs.writeFileSync(path.join(workspace, 'mani.yaml'), `projects:\n  platform:\n    path: workspace/platform\n    url: ${origin}\n    tags: [code]\n`);
-    const lock = path.join(workspace, 'workspace.lock.json');
-    const content = JSON.stringify({ schema_version: 1, projects: { platform: { revision: old } } });
-    fs.writeFileSync(lock, content);
-    checkout(workspace, latest);
-    assert.equal(fs.readFileSync(path.join(workspace, 'workspace/platform/version'), 'utf8'), latest ? 'new' : 'old');
-    assert.equal(fs.readFileSync(lock, 'utf8'), content);
-    assert.throws(() => checkout(workspace, latest), /Existing checkout preserved/);
-  }
-});
-
 test('shared tools pin all checked-out consumers and reject source or version drift', t => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-tools-pin-'));
   t.after(() => fs.rmSync(directory, { recursive: true }));
   const runGit = (...args) => execFileSync('git', ['-C', directory, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   runGit('init');
   fs.mkdirSync(path.join(directory, 'tooling'));
-  fs.writeFileSync(path.join(directory, 'package.json'), JSON.stringify({ files: ['tooling'] }));
+  fs.writeFileSync(path.join(directory, 'package.json'), JSON.stringify({ version: '0.1.0', files: ['tooling'] }));
   fs.writeFileSync(path.join(directory, 'tooling/check.mjs'), 'export const version = 1;');
   runGit('add', '.');
   runGit('-c', 'user.name=Test', '-c', 'user.email=test@example.test', 'commit', '-m', 'tools');
-  const revision = runGit('rev-parse', 'HEAD');
+  runGit('-c', 'user.name=Test', '-c', 'user.email=test@example.test', 'tag', '-a', 'tooling-v0.1.0', '-m', 'Release tools');
+  const revision = '0.1.0';
   fs.writeFileSync(path.join(directory, 'mani.yaml'), 'projects:\n  web:\n    path: workspace/web\n');
   fs.writeFileSync(path.join(directory, 'workspace.lock.json'), '{"schema_version":1,"projects":{}}');
   fs.mkdirSync(path.join(directory, 'workspace/web'), { recursive: true });

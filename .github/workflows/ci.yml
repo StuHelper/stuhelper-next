@@ -10,17 +10,29 @@ on:
       runner:
         description: Runner for this trusted branch check
         type: choice
-        options: [ github, stuhelper ]
+        options:
+          - github
+          - stuhelper
         default: github
         required: true
       combination:
         description: Integration source selection
         type: choice
         options:
-          - fixed
           - latest
-        default: fixed
+          - fixed
+        default: latest
         required: true
+      candidates:
+        description: Optional paired candidates as a JSON object
+        type: string
+        default: "{}"
+        required: false
+      replay:
+        description: Exact integration record copied from a previous summary
+        type: string
+        default: ""
+        required: false
 
 permissions:
   contents: read
@@ -45,6 +57,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       integration: ${{ steps.changes.outputs.integration }}
+      candidates: ${{ steps.candidates.outputs.candidates }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -101,64 +114,21 @@ jobs:
             result=$(node scripts/workspace.mjs affected "$BASE_REF")
             echo "integration=$result" >> "$GITHUB_OUTPUT"
           fi
+      - name: Read paired integration candidates
+        id: candidates
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: node tooling/cli.mjs integration-inputs
 
   integration:
-    name: Framework integration
+    name: Cross-repository checks
     needs: repository
-    runs-on: ubuntu-26.04
-    timeout-minutes: 25
-    steps:
-      - name: Record documentation-only scope
-        if: needs.repository.outputs.integration != 'true'
-        run: echo 'Framework integration is not applicable to this documentation-only change.'
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
-          fetch-depth: 0
-        if: needs.repository.outputs.integration == 'true'
-      - name: Set up Node.js
-        uses: actions/setup-node@v7.1.0
-        with:
-          node-version-file: .node-version
-          package-manager-cache: false
-        if: needs.repository.outputs.integration == 'true'
-      - name: Set up the declared pnpm version
-        uses: pnpm/action-setup@v6.1.0
-        with:
-          cache: false
-        if: needs.repository.outputs.integration == 'true'
-      - name: Set up Go for pinned tools
-        uses: actions/setup-go@v7.0.0
-        with:
-          go-version-file: .go-version
-          cache: false
-        if: needs.repository.outputs.integration == 'true'
-      - name: Install integration tools
-        if: needs.repository.outputs.integration == 'true'
-        run: |
-          pnpm install --frozen-lockfile
-          GOBIN="$RUNNER_TEMP/bin" GOWORK=off go install github.com/alajmo/mani@v0.32.1
-          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-      - name: Resolve and check out the integration combination
-        if: needs.repository.outputs.integration == 'true'
-        env:
-          INTEGRATION_SOURCE: ${{ inputs.combination || 'fixed' }}
-        run: |
-          if [[ "$INTEGRATION_SOURCE" == latest ]]; then
-            node scripts/workspace.mjs checkout --latest
-          else
-            node scripts/workspace.mjs checkout
-          fi
-          mani run setup --tags code
-      - name: Check repositories, toolchains and contracts
-        if: needs.repository.outputs.integration == 'true'
-        run: |
-          mani run check --tags code
-          node scripts/workspace.mjs toolchains
-          node scripts/workspace.mjs contracts
-      - name: Install browser
-        if: needs.repository.outputs.integration == 'true'
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Exercise all supported languages
-        if: needs.repository.outputs.integration == 'true'
-        run: pnpm run test:e2e
+    uses: ./.github/workflows/integration.yml
+    with:
+      source: ${{ inputs.combination || 'latest' }}
+      candidate_repository: ${{ github.repository }}
+      candidate_revision: ${{ github.sha }}
+      candidates: ${{ inputs.candidates || needs.repository.outputs.candidates || '{}' }}
+      replay: ${{ inputs.replay || '' }}
+      coordinator_ref: ${{ github.sha }}
+      enabled: ${{ needs.repository.outputs.integration == 'true' }}

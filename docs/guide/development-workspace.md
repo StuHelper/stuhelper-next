@@ -58,23 +58,57 @@ pnpm run test:e2e
 
 联调使用任务端口 18780—18782，在结束时停止自有服务。
 
-## 固定组合与契约
+## 集成来源
 
-`workspace.lock.json` 保存集成测试的精确源码组合与共享工程工具包版本。代码仓库提交并通过检查后，运行以下命令更新组合：
+架构仓库维护一份可复用 GitHub workflow。platform、Web 和 stuhelper-admin 在独立检查之后调用相同版本，执行生成、契约、工具版本和八语言浏览器联调。所有步骤使用 GitHub 标准 runner、读取权限和临时凭据，不启用 Actions cache 或 artifact。
+
+| 场景 | 源码选择 |
+| --- | --- |
+| 普通 PR | 当前 PR 的 GitHub 测试合并提交，加其余仓库最新 develop |
+| 多仓配套 PR | 当前候选优先，指定其他配套 PR，其余使用最新 develop |
+| develop 推送 | 当前触发提交，加其他仓库最新 develop |
+| fixed | 选定架构版本中 workspace.lock.json 记录的模块组合 |
+| replay | 完整使用此前记录的架构、模块、协调器和工具版本 |
+
+最新来源在运行开始时解析一次，随后按 SHA 检出。CI 的 Step Summary 和日志记录架构仓库、三个代码仓库、协调器及工具版本。普通源码变化无需更新固定组合。
+
+配套 PR 在本仓库 `.github/integration.json` 中登记所属 PR 编号和候选。配置只对该 PR 生效，后续 PR 和 develop 推送不继承该覆盖。例如 Web PR 2 与架构 PR 3、platform PR 2 配套：
+
+```json
+{
+  "pull_request": 2,
+  "candidates": {
+    "architecture": "pr:3",
+    "platform": "pr:2"
+  }
+}
+```
+
+候选也可以使用完整 SHA。配套 PR 必须指向声明仓库的 develop。已经合并的 PR 自动使用最新 develop；关闭且未合并的 PR 要求修正配置。当前 PR 自身的提交始终优先于配套配置。
+
+## 记录、重放与差异
+
+本地解析最新组合并保存记录：
 
 ```bash
+node scripts/workspace.mjs resolve --output /tmp/integration.json
+```
+
+在 CI 手动运行时，将 summary 中的 JSON 放入 `replay` 输入即可重放。工作流先检出记录中的协调器，再检出架构和模块，保持原始提交。手动候选覆盖放入 `candidates` JSON 输入。
+
+本地重放先在独立空工作区检出记录中的架构提交，安装依赖，再运行：
+
+```bash
+node scripts/workspace.mjs checkout --replay /tmp/integration.json
+mani run setup --tags code
+mani run check --tags code
+node scripts/workspace.mjs toolchains --remote
 node scripts/workspace.mjs contracts
-node scripts/workspace.mjs snapshot --write
+pnpm run test:e2e
 ```
 
-PR 集成 CI 在空目录中按记录的组合检出，因此失败可以用同一组源码重现。组合随经过验证的模块变更更新。
+重放要求模块目录不存在，保留已有工作树。记录文件使用独占创建，避免覆盖先前的输入。`status --replay /tmp/integration.json` 比较记录提交与最新 develop，输出相同、领先、落后或分叉及提交数，候选领先和分叉作为信息呈现。
 
-手动运行架构仓库的 CI 时，可将 `combination` 选择为 `latest`。该模式先解析各代码仓库的最新 `develop` 提交，在日志中记录整组 SHA，再按解析结果检出。它用于发现仓库间的兼容问题，保留已有锁文件。对应的本地命令要求代码仓库目录为空：
+固定候选需要各代码仓库提交并通过检查后执行 `snapshot --write`。完整重现一轮检查使用该轮记录；`workspace.lock.json` 只保存固定模块组合与工具发行版本。
 
-```bash
-node scripts/workspace.mjs checkout --latest
-```
-
-客户端的 `contracts/platform.source.json` 记录所消费的提供方版本、提交和摘要，检查器验证来源快照与当前提供方兼容性。兼容的提供方升级允许客户端继续使用已有版本。
-
-正式部署使用 ops 中的版本 tag 和镜像核验记录。源码组合记录用于开发验证。
+客户端的 `contracts/platform.source.json` 记录所消费的提供方版本、提交和摘要，检查器验证来源快照与当前提供方兼容性。正式部署使用 ops 中的版本 tag 和镜像核验记录。

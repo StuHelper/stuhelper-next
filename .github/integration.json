@@ -1,0 +1,8 @@
+{
+  "pull_request": 3,
+  "candidates": {
+    "platform": "pr:2",
+    "web": "pr:2",
+    "admin": "pr:2"
+  }
+}

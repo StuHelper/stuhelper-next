@@ -10,7 +10,7 @@
     "check:docs": "node tooling/cli.mjs docs",
     "test:docs": "node --test tooling/docs/check-docs.test.mjs",
     "test:e2e": "playwright test",
-    "test:tools": "node --test tooling/docs/check-docs.test.mjs tooling/i18n/check-i18n.test.mjs && python3 -m unittest discover -s tooling -p \"test_*.py\""
+    "test:tools": "node --test tooling/*.test.mjs tooling/docs/check-docs.test.mjs tooling/i18n/check-i18n.test.mjs && python3 -m unittest discover -s tooling -p \"test_*.py\""
   },
   "devDependencies": {
     "@playwright/test": "1.64.1"

@@ -31,7 +31,7 @@ pnpm run test:e2e
 | 入口 | 验证内容 |
 | --- | --- |
 | `scripts/check.py` | 模块归属、依赖图、能力声明与规格引用 |
-| `scripts/workspace.mjs` | Mani 清单、工具链、Go Workspace、固定源码组合与契约来源 |
+| `scripts/workspace.mjs` | Mani 清单、工具链、Go Workspace、候选组合与契约来源 |
 | `tooling/cli.mjs` | 共享检查入口，通过 Go 执行固定版本 actionlint |
 | `tooling/docs/` | Markdown 格式、元信息、链接、导航、术语和文档编号 |
 | `tooling/i18n/` | 八语言键、占位符、复数和同英文消息例外 |
@@ -39,7 +39,9 @@ pnpm run test:e2e
 | `scripts/test_*.py`、`scripts/workspace.test.mjs` | 错误清单、优化模式、快照篡改与工作区保护等回归 |
 | `tests/e2e/` | 实际 HTTP、客户端错误恢复、八语言页面与移动端布局 |
 
-这些共享检查以 `@stuhelper/engineering-tools` 安装到八个模块仓库。源码位于架构仓库的 `tooling/`，消费者通过同一 Git 提交固定版本；工作区检查验证来源和版本，升级方法见[依赖维护](dependency-maintenance.md)。Markdown 格式采用 markdownlint，文档站采用 MkDocs strict。共享检查另外覆盖站点之外的 README、AGENTS、本地链接和项目规则。
+这些共享检查以 `@stuhelper/engineering-tools` 安装到八个模块仓库。源码位于架构仓库的 `tooling/`，消费者通过同一发行 tag 固定版本；工作区与消费者检查验证 tag、锁定提交和来源，升级方法见[依赖维护](dependency-maintenance.md)。
+
+Markdown 格式采用 markdownlint，文档站采用 MkDocs strict。共享检查另外覆盖站点之外的 README、AGENTS、本地链接和项目规则。
 
 platform 的独立检查还覆盖 Go race、导入边界、OpenAPI 和生成一致性。Web 与 stuhelper-admin 的检查覆盖类型、lint、八语言键与占位符、复数和格式化、共享客户端行为及生产构建。
 

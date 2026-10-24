@@ -9,7 +9,7 @@ check:
 	python3 scripts/check.py
 	python3 -m unittest discover -s scripts -p 'test_*.py'
 	node scripts/workspace.mjs validate
-	node --test scripts/workspace.test.mjs
+	node --test scripts/*.test.mjs
 	pnpm run check:docs
 	pnpm run test:tools
 	uv run --locked mkdocs build --strict

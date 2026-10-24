@@ -50,6 +50,6 @@ Web 使用 Vue 3、TypeScript、Vite 和 Vue Router，类型与 ESLint 配置复
 
 ## 工作区与验证
 
-Mani 统一管理本地独立仓库。Go Workspace 按已检出的 Go 模块生成，各 Go 仓库保持独立构建。PR 集成 CI 按 `workspace.lock.json` 检出固定提交，手动兼容检查可解析最新 develop 组合。部署版本由 ops 的版本 tag 组合维护。
+Mani 统一管理本地独立仓库。Go Workspace 按已检出的 Go 模块生成，各 Go 仓库保持独立构建。PR 集成使用当前候选和其他仓库最新 develop，配套修改显式选择相关 PR。每轮记录完整提交组合，支持固定候选与精确重放。部署版本由 ops 的版本 tag 组合维护。
 
 验证覆盖依赖、能力降级、生命周期回退、远程恢复、身份拒绝、契约兼容、客户端共用用例和八语言浏览器联调。持久化、事件、真实会话和业务数据迁移在对应实现中增加专门验收。

@@ -1,0 +1,131 @@
+name: Reusable framework integration
+on:
+  workflow_call:
+    inputs:
+      enabled:
+        type: boolean
+        default: true
+      coordinator_ref:
+        type: string
+        default: tooling-v0.1.0
+      source:
+        type: string
+        default: latest
+      candidate_repository:
+        type: string
+        default: ''
+      candidate_revision:
+        type: string
+        default: ''
+      candidates:
+        type: string
+        default: '{}'
+      replay:
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  integration:
+    name: Framework integration
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    steps:
+      - name: Record documentation-only scope
+        if: ${{ !inputs.enabled }}
+        run: echo 'Framework integration is not applicable to this documentation-only change.'
+      - name: Check out the integration coordinator
+        if: inputs.enabled
+        uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-next
+          ref: ${{ inputs.replay != '' && fromJSON(inputs.replay).coordinator.revision || inputs.coordinator_ref }}
+          path: coordinator
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Set up coordinator Node.js
+        if: inputs.enabled
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: coordinator/.node-version
+          package-manager-cache: false
+      - name: Set up coordinator pnpm
+        if: inputs.enabled
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          package_json_file: coordinator/package.json
+          cache: false
+      - name: Install coordinator dependencies
+        if: inputs.enabled
+        working-directory: coordinator
+        run: pnpm install --frozen-lockfile
+      - name: Resolve and record integration sources
+        if: inputs.enabled
+        id: sources
+        working-directory: coordinator
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INTEGRATION_SOURCE: ${{ inputs.source }}
+          CANDIDATE_REPOSITORY: ${{ inputs.candidate_repository }}
+          CANDIDATE_REVISION: ${{ inputs.candidate_revision }}
+          CANDIDATES: ${{ inputs.candidates }}
+          REPLAY: ${{ inputs.replay }}
+        run: |
+          node scripts/workspace.mjs resolve \
+            --source "$INTEGRATION_SOURCE" \
+            --candidate-repository "$CANDIDATE_REPOSITORY" \
+            --candidate-revision "$CANDIDATE_REVISION" \
+            --candidates "$CANDIDATES" \
+            --replay-json "$REPLAY" \
+            --output "$RUNNER_TEMP/stuhelper-integration.json"
+      - name: Check out the recorded architecture
+        if: inputs.enabled
+        uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-next
+          ref: ${{ steps.sources.outputs.architecture_revision }}
+          path: source
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Set up source Node.js
+        if: inputs.enabled
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: source/.node-version
+          package-manager-cache: false
+      - name: Set up source pnpm
+        if: inputs.enabled
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          package_json_file: source/package.json
+          cache: false
+      - name: Set up source Go
+        if: inputs.enabled
+        uses: actions/setup-go@v7.0.0
+        with:
+          go-version-file: source/.go-version
+          cache: false
+      - name: Install integration tools and recorded modules
+        if: inputs.enabled
+        working-directory: source
+        run: |
+          pnpm install --frozen-lockfile
+          GOBIN="$RUNNER_TEMP/bin" GOWORK=off go install github.com/alajmo/mani@v0.32.1
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          node scripts/workspace.mjs checkout --replay "$RUNNER_TEMP/stuhelper-integration.json"
+          "$RUNNER_TEMP/bin/mani" run setup --tags code
+      - name: Check repositories, release references and contracts
+        if: inputs.enabled
+        working-directory: source
+        run: |
+          mani run check --tags code
+          node scripts/workspace.mjs toolchains --remote
+          node scripts/workspace.mjs contracts
+      - name: Install browser
+        if: inputs.enabled
+        working-directory: source
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Exercise all supported languages
+        if: inputs.enabled
+        working-directory: source
+        run: pnpm run test:e2e

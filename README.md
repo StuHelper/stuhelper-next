@@ -29,7 +29,7 @@ node scripts/workspace.mjs contracts
 pnpm run test:e2e
 ```
 
-根仓库 `make check` 检查架构、工具链清单、工作区配置、文档和 Actions。各代码仓库独立构建与检查。跨仓集成使用 `workspace.lock.json` 中的固定提交组合，客户端声明所消费的契约版本。
+根仓库 `make check` 检查架构、工具链清单、工作区配置、文档和 Actions。各代码仓库独立构建与检查。普通 PR 的跨仓集成使用自身候选和其他仓库的最新 develop，配套 PR 可以明确覆盖候选。每轮检查记录完整源码组合，发布候选与排障可以选择固定组合或重放。客户端声明所消费的契约版本。
 
 `mani.yaml` 统一登记八个模块仓库。公开与私有区分源码和文档的可见性，GitHub 管理仓库访问权限。任务工作树统一放在 `workspace/worktrees/<任务>/<仓库名>`，主检出位于 `workspace/<仓库名>`。
 
@@ -50,7 +50,7 @@ scripts/             架构与跨仓工作区检查
 tests/e2e/           跨仓浏览器联调
 tooling/             各仓库共用的工程工具包
 mani.yaml            统一工作区配置
-workspace.lock.json  集成测试源码组合
+workspace.lock.json  工具发行版本与固定候选组合
 ```
 
 文档组织参考 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0)。项目代码和文档使用 [AGPL-3.0-only](LICENSE)，第三方组件保留原许可证。沟通与写作遵循 [AGENTS.md](AGENTS.md)。

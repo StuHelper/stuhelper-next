@@ -26,7 +26,7 @@ Mani 更贴近当前日常操作，但 `mani sync` 主要克隆缺失仓库，�
 
 配置保留现有 remotes、工作树和 gitignore。开发者直接运行 Mani 命令，CI 在临时工具目录安装明确版本。
 
-`mani sync` 初始化工作区。`fetch` 任务只更新远端引用，保留当前分支与文件。固定源码组合、契约来源、独立构建和端到端检查共同验证工作区，操作见[开发工作区](../guide/development-workspace.md)。
+`mani sync` 初始化工作区。`fetch` 任务只更新远端引用，保留当前分支与文件。候选源码组合、契约来源、独立构建和端到端检查共同验证工作区，操作见[开发工作区](../guide/development-workspace.md)。
 
 ## 关联
 

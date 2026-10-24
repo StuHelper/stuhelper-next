@@ -18,31 +18,30 @@ Go、Node.js、uv、pnpm 和 actionlint 的项目版本维护在 `architecture/t
 
 Renovate 适合需要共享更新预设、更多版本文件识别和集中更新策略的阶段。采用时统一切换更新机器人，保留现有检查与人工合并流程。任何机器人都需要跨仓版本组合验证。
 
-## 统一升级
+## 工程工具发行
 
-在同一任务的模块工作树中修改版本清单，然后同步版本文件：
+共享工具通过 `tooling-v<版本>` 这样的带注释 tag 分发。包声明使用明确版本，pnpm 锁文件保存解析后的提交和完整性。已发行 tag 不覆盖、不移动、不删除。发行前确认 owner 授权，先完成候选源码与工作流检查，再创建并推送 tag。
 
-```bash
-node scripts/workspace.mjs toolchains --write
-```
+升级工具链或共享规则时，修改 `architecture/toolchains.json` 和工具包的 `package.json` 版本，然后执行 `toolchains --write` 同步版本文件及可复用工作流引用。提交候选后，为该提交创建新工具版本 tag。
 
-版本清单属于共享工程工具包。修改工具、模块声明、术语或语言规则后，先在架构仓库运行共享工具测试并提交、推送源码，然后将各消费者指向该提交：
+发行 tag 可访问后，在完整工作区更新消费者：
 
 ```bash
-pnpm run test:tools
-node scripts/workspace.mjs tooling FULL_COMMIT_SHA --write
+node scripts/workspace.mjs tooling 0.1.0 --write --remote
 mani exec --all 'pnpm install'
 mani run check --all
-node scripts/workspace.mjs toolchains
+node scripts/workspace.mjs toolchains --remote
 node scripts/workspace.mjs contracts
 pnpm run test:e2e
 ```
 
-`FULL_COMMIT_SHA` 使用刚推送的完整提交号。该命令更新八个消费者的 Git 依赖和 `workspace.lock.json` 中的工具版本。版本检查同时核对工具包源码与各仓库的依赖声明。共享工具只维护一份，pnpm 从公共 Git 仓库安装，私有模块的内容不进入工具包。
+示例版本替换为本次发行版本。更新命令同步八个消费者的版本声明，并将 tag 解析出的 SHA 写入架构记录。各消费者独立检查远端 tag 与 pnpm 锁文件一致性；源码检查同时核对包内容。tag 缺失或内容改变时，检查失败。
 
-首次升级时使用 `pnpm install` 更新各仓库锁文件，之后 `make setup` 与 CI 使用 `--frozen-lockfile`。代码仓库通过检查并提交、推送后，用 `snapshot --write` 更新联调组合，再提交架构仓库的组合记录。根仓库的组合记录没有打入工具包，因此不会产生相互引用的版本循环。
+工具初次提交时，架构记录可只包含版本名，避免提交引用自身。tag 建立后补记解析出的 SHA，消费者锁文件固定相同 SHA。包源码不包含工作区组合记录。
 
-新的 CVE 先确认受影响版本、调用路径和修复版本，再升级相应依赖及受影响阶段。共享工具的安全依赖覆盖规则也由工作区命令同步到消费者的 pnpm 配置。
+首次更新使用 `pnpm install` 写入锁文件，日常安装与 CI 使用 `--frozen-lockfile`。应用源码变更通常使用最新组合检查。配套 PR 通过候选配置参与联调，精确重放方法见[开发工作区](development-workspace.md)。
+
+新的 CVE 先确认受影响版本、调用路径和修复版本，再升级相应依赖及受影响阶段。共享工具的安全依赖覆盖规则由工作区命令同步到消费者的 pnpm 配置。
 
 ## Web 脚手架
 

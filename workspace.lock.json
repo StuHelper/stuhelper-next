@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "engineering_tools": {
-    "revision": "360f0e9c02738117d1aa8cdac090cf0bae11f217"
+    "version": "0.1.0"
   },
   "projects": {
     "platform": {
