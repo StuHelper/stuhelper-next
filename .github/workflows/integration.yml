@@ -28,14 +28,11 @@ permissions:
 jobs:
   integration:
     name: Framework integration
+    if: inputs.enabled
     runs-on: ubuntu-26.04
     timeout-minutes: 30
     steps:
-      - name: Record documentation-only scope
-        if: ${{ !inputs.enabled }}
-        run: echo 'Framework integration is not applicable to this documentation-only change.'
       - name: Check out the integration coordinator
-        if: inputs.enabled
         uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-next
@@ -44,23 +41,19 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Set up coordinator Node.js
-        if: inputs.enabled
         uses: actions/setup-node@v7.1.0
         with:
           node-version-file: coordinator/.node-version
           package-manager-cache: false
       - name: Set up coordinator pnpm
-        if: inputs.enabled
         uses: pnpm/action-setup@v6.1.0
         with:
           package_json_file: coordinator/package.json
           cache: false
       - name: Install coordinator dependencies
-        if: inputs.enabled
         working-directory: coordinator
         run: pnpm install --frozen-lockfile
       - name: Resolve and record integration sources
-        if: inputs.enabled
         id: sources
         working-directory: coordinator
         env:
@@ -79,7 +72,6 @@ jobs:
             --replay-json "$REPLAY" \
             --output "$RUNNER_TEMP/stuhelper-integration.json"
       - name: Check out the recorded architecture
-        if: inputs.enabled
         uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-next
@@ -88,37 +80,68 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
       - name: Set up source Node.js
-        if: inputs.enabled
         uses: actions/setup-node@v7.1.0
         with:
           node-version-file: source/.node-version
           package-manager-cache: false
       - name: Set up source pnpm
-        if: inputs.enabled
         uses: pnpm/action-setup@v6.1.0
         with:
           package_json_file: source/package.json
           cache: false
       - name: Set up source Go
-        if: inputs.enabled
         uses: actions/setup-go@v7.0.0
         with:
           go-version-file: source/.go-version
           cache: false
-      - name: Install integration tools and check out recorded modules
-        if: inputs.enabled
+      - name: Install source dependencies and check out recorded modules
         working-directory: source
         run: |
           pnpm install --frozen-lockfile
+          node scripts/workspace.mjs checkout --replay "$RUNNER_TEMP/stuhelper-integration.json"
+      - name: Configure integration dependency directories
+        id: cache-env
+        shell: bash
+        run: |
+          echo "PNPM_HOME=$RUNNER_TEMP/next-framework/pnpm" >> "$GITHUB_ENV"
+          echo "GOMODCACHE=$RUNNER_TEMP/next-go/gomod" >> "$GITHUB_ENV"
+          echo "GOCACHE=$RUNNER_TEMP/next-go/go-build" >> "$GITHUB_ENV"
+          source /etc/os-release
+          echo "platform=$ID-$VERSION_ID" >> "$GITHUB_OUTPUT"
+      - name: Restore frontend dependencies
+        id: framework-cache
+        uses: actions/cache/restore@v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/next-framework
+          key: next-framework-v2-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-env.outputs.platform }}-${{ hashFiles('source/architecture/toolchains.json', 'source/pnpm-lock.yaml', 'source/workspace/**/pnpm-lock.yaml', 'source/workspace/**/pnpm-workspace.yaml', 'source/workspace/**/package.json', 'source/workspace/**/.npmrc', 'source/workspace/**/.pnpmfile.cjs', 'source/workspace/**/patches/**') }}
+      - name: Restore Go dependencies and build cache
+        id: go-cache
+        uses: actions/cache/restore@v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/next-go
+          key: next-go-v2-${{ runner.os }}-${{ runner.arch }}-${{ steps.cache-env.outputs.platform }}-${{ hashFiles('source/architecture/toolchains.json', 'source/.go-version', 'source/workspace/**/go.mod', 'source/workspace/**/go.sum') }}
+      - name: Install native Mani
+        working-directory: source
+        run: |
           GOBIN="$RUNNER_TEMP/bin" GOWORK=off go install github.com/alajmo/mani@v0.32.1
           echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
-          node scripts/workspace.mjs checkout --replay "$RUNNER_TEMP/stuhelper-integration.json"
       - name: Verify native task failure propagation
-        if: inputs.enabled
         working-directory: coordinator
-        run: node --test tests/ci/mani-exit.mjs
+        shell: bash
+        run: |
+          if [[ -f tests/ci/mani-exit.mjs ]]; then
+            node --test tests/ci/mani-exit.mjs
+          else
+            fixture=$(mktemp -d)
+            trap 'rm -rf "$fixture"' EXIT
+            printf 'projects:\n  probe:\n    path: .\ntasks:\n  fail:\n    cmd: exit 37\n' > "$fixture/mani.yaml"
+            task_exit=0
+            (cd "$fixture" && mani --config "$fixture/mani.yaml" run fail --projects probe --tty) || task_exit=$?
+            test "$task_exit" -eq 37
+          fi
       - name: Install the recorded combination
-        if: inputs.enabled
         id: install-combination
         working-directory: source
         shell: bash
@@ -130,7 +153,6 @@ jobs:
             (cd "workspace/$project" && mani --config "$config" run setup --projects "$project" --tty)
           done
       - name: Check repositories, release references and contracts
-        if: inputs.enabled
         id: check-combination
         working-directory: source
         shell: bash
@@ -144,10 +166,48 @@ jobs:
           node scripts/workspace.mjs toolchains --remote
           node scripts/workspace.mjs contracts
       - name: Install browser
-        if: inputs.enabled
         working-directory: source
         run: pnpm exec playwright install --with-deps chromium
       - name: Exercise all supported languages
-        if: inputs.enabled
         working-directory: source
         run: pnpm run test:e2e
+      - name: Bound framework cache upload
+        id: framework-size
+        if: github.repository == 'StuHelper/stuhelper-next' && github.event_name != 'pull_request' && github.ref == 'refs/heads/develop' && steps.framework-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          bytes=0
+          if [[ -d "$RUNNER_TEMP/next-framework" ]]; then
+            bytes=$(find "$RUNNER_TEMP/next-framework" -type f -printf '%s\n' | awk '{sum += $1} END {printf "%.0f\n", sum}')
+          fi
+          save=false
+          if (( bytes > 0 && bytes <= 2147483648 )); then save=true; fi
+          echo "save=$save" >> "$GITHUB_OUTPUT"
+          echo "framework dependency cache: $bytes bytes; upload limit 2147483648 bytes; eligible: $save." >> "$GITHUB_STEP_SUMMARY"
+      - name: Save successful framework dependencies
+        if: steps.framework-size.outputs.save == 'true'
+        uses: actions/cache/save@v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/next-framework
+          key: ${{ steps.framework-cache.outputs.cache-primary-key }}
+      - name: Bound go cache upload
+        id: go-size
+        if: github.repository == 'StuHelper/stuhelper-next' && github.event_name != 'pull_request' && github.ref == 'refs/heads/develop' && steps.go-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          bytes=0
+          if [[ -d "$RUNNER_TEMP/next-go" ]]; then
+            bytes=$(find "$RUNNER_TEMP/next-go" -type f -printf '%s\n' | awk '{sum += $1} END {printf "%.0f\n", sum}')
+          fi
+          save=false
+          if (( bytes > 0 && bytes <= 2147483648 )); then save=true; fi
+          echo "save=$save" >> "$GITHUB_OUTPUT"
+          echo "go dependency cache: $bytes bytes; upload limit 2147483648 bytes; eligible: $save." >> "$GITHUB_STEP_SUMMARY"
+      - name: Save successful go dependencies
+        if: steps.go-size.outputs.save == 'true'
+        uses: actions/cache/save@v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/next-go
+          key: ${{ steps.go-cache.outputs.cache-primary-key }}

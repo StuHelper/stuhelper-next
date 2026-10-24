@@ -1,8 +1,11 @@
-.PHONY: setup check
+.PHONY: setup hooks check
 
 setup:
 	pnpm install --frozen-lockfile
 	uv sync --locked
+
+hooks:
+	node scripts/local-checks.mjs install
 
 check:
 	node tooling/cli.mjs repository

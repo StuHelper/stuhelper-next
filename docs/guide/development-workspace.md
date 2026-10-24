@@ -21,6 +21,8 @@ node scripts/workspace.mjs go-work
 
 `mani.yaml` 统一登记代码和文档仓库。GitHub 管理源码访问权限，业务系统管理运行时权限。工作区命令通过原生 `go work init/use` 加入当前已检出的 Go 模块，并保留已有自定义条目和注释。各模块同时保留自己的独立构建入口。
 
+架构仓库可通过 `make hooks` 启用本地提交与推送检查，安装范围和已有 hook 的处理见[检查指南](repository-checks.md#本地提交与推送检查)。模块仓库继续使用自己的检查入口。
+
 ## 日常操作
 
 ```bash
@@ -32,6 +34,16 @@ node scripts/workspace.mjs contracts
 ```
 
 Mani 的 `sync` 克隆缺失仓库，`fetch` 更新远端引用。分支选择和合并由各仓库的 Git 操作完成。配置保留现有 remotes、工作树和 gitignore。
+
+Mani 0.32.1 的普通批量命令需逐项查看输出，不能只以进程返回 0 判断通过。CI 使用以下原生命令逐个执行并保留失败退出码；`--tty` 本身不切换工作目录，因此必须先进入目标项目：
+
+```bash
+config="$PWD/mani.yaml"
+projects=$(node -p 'Object.keys(require("./workspace.lock.json").projects).join(" ")')
+for project in $projects; do
+  (cd "workspace/$project" && mani --config "$config" run check --projects "$project" --tty) || exit $?
+done
+```
 
 ## 任务工作树
 
@@ -60,7 +72,7 @@ pnpm run test:e2e
 
 ## 集成来源
 
-架构仓库维护一份可复用 GitHub workflow。platform、Web 和 stuhelper-admin 在独立检查之后调用相同版本，执行生成、契约、工具版本和八语言浏览器联调。所有步骤使用 GitHub 标准 runner、读取权限和临时凭据，不启用 Actions cache 或 artifact。
+架构仓库维护一份可复用 GitHub workflow。platform、Web 和 stuhelper-admin 在独立检查之后调用相同版本，执行生成、契约、工具版本和八语言浏览器联调。所有步骤使用 GitHub 标准 runner、读取权限和临时凭据。依赖缓存按 [CI 规格](../spec/ci-runners.md)限制大小和写入范围，不上传 artifact。
 
 | 场景 | 源码选择 |
 | --- | --- |

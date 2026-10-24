@@ -7,11 +7,12 @@
 * 项目按模块分仓。仓库可见性按代码与文档的保密范围确定，完整开发工作区统一由 `mani.yaml` 管理。运行时权限由服务端独立执行。
 * Git 和 Mani 使用开发者主机安装的版本。日常直接使用 Mani 命令。Go、Node.js 等项目工具链以 `architecture/toolchains.json` 为准。
 * 主检出位于 `workspace/<仓库名>`，任务工作树位于 `workspace/worktrees/<任务>/<仓库名>`。大功能使用专用短期分支和独立工作树，一个主要写入者，保留其他任务的改动。
-* 一个 PR 解决一个明确问题，跨仓改动在 PR 中列出依赖关系、合并顺序和验证组合。提交与 squash 标题使用 `type(scope): 简述`，scope 可省略。
+* 一个 PR 解决一个明确问题，可包含多次本地提交和批量推送。同一任务持续更新同一 PR，不要求每次提交都推送或新建 PR。跨仓改动列出依赖、合并顺序和验证组合。提交与 squash 标题使用 `type(scope): 简述`，scope 可省略。
 * 每次开发先刷新 `origin/develop`，短期分支通过 PR squash 合入 develop。正式发布采用 develop 到 main 的 merge commit。tag、镜像发行和生产晋级由 owner 授权。
 * 普通检查使用 GitHub `ubuntu-26.04`。Docker/OCI 与 BJ1 Registry 任务使用 StuHelper 自建 runner。runner 的操作系统升级由 owner 手动安排。规则见[runner 规格](docs/spec/ci-runners.md)。
 * Actions 与部署镜像使用明确版本 tag，源码提交、digest 和 checksum 用于核验。正式部署组合由 ops 管理，工具包使用带注释的版本 tag，已发行 tag 保持不变。普通集成默认解析最新源码，候选覆盖必须明确登记。每轮源码组合写入 CI summary，`workspace.lock.json` 保存固定候选。
-* 普通检查使用锁文件安装依赖，Actions 缓存和 artifact 保持关闭。新增缓存或 artifact 的 PR 说明用途、容量上限、保留期和清理方式。BuildKit 缓存使用任务专属 builder 或 BJ1 Registry。
+* CI 同时验证 develop/main push 和面向这两个分支的 PR，取消同一事件及分支或 PR 的旧运行。路径选择和最终必需检查见 [CI 规格](docs/spec/ci-runners.md)，本地 hooks 见[检查指南](docs/guide/repository-checks.md)。
+* 普通检查使用锁文件和有大小限制的公开依赖缓存。PR 只恢复，可信 develop 检查成功后保存，不上传 artifact。新增存储说明用途、上限、保留期和清理方式，不自动扩大付费额度。BuildKit 缓存使用任务专属 builder 或 BJ1 Registry。
 * Docker 测试使用任务专属名称、标签或 Compose project。完成、失败和中断时清理本任务的容器及闲置镜像，保留其他任务资源和持久数据。
 * 本仓库任务在 Next 工作区内完成。旧 StuHelper、AI、Store 工作树及生产系统分别按对应任务处理。
 

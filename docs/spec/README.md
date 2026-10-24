@@ -29,7 +29,7 @@ updated: 2026-10-24
 | [社交与内容治理](social-content.md) | 动态、互动、匿名、举报、审核和通知 |
 | [SSO 的公共兼容要求](sso-compatibility.md) | 数据保留、身份不变量、消费者验收矩阵 |
 | [原生客户端行为](native-clients.md) | 技术路线、共享边界、登录和平台限制 |
-| [CI runner 分工](ci-runners.md) | 普通检查、镜像任务与平台构建的调度规则 |
+| [CI 触发、runner 与缓存](ci-runners.md) | push/PR、路径选择、必需检查、runner 与免费缓存规则 |
 | [数据保留与删除](data-retention.md) | 数据分类、保存期限、删除与恢复 |
 | [国际化与本地化](internationalization.md) | 八种语言、复数、格式化与 RTL 检查 |
 | [文件与媒体模块](media.md) | 上传、文件引用、交付与存储状态 |

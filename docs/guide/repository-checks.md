@@ -28,6 +28,30 @@ pnpm run test:e2e
 
 Mani 0.32.1 的普通批量模式可能在子任务失败后返回 0。人工运行时必须检查各项目结果；CI 逐项目进入目录，使用显式配置和 `--tty` 传递失败退出码。安装模块前，CI 先运行失败用例，验证 `setup` 和 `check` 都会停止后续项目。
 
+## 本地提交与推送检查
+
+在架构仓库安装依赖后显式启用 hooks：
+
+```bash
+make setup
+make hooks
+```
+
+安装器设置当前克隆的 `core.hooksPath=.githooks`，也影响同一克隆的关联工作树。它不修改全局 Git 配置或独立模块仓库，发现其他 hook 路径或已有 hook 时停止，保留原配置。依赖安装不会自动设置 hook。
+
+| 时机 | 对象与检查 |
+| --- | --- |
+| pre-commit | 暂存区快照，执行语法、私有文件名、架构和文档检查 |
+| pre-push | Git 传入的实际提交，在临时检出中按 pnpm 锁文件安装后执行 `make check` |
+| PR CI | 当前 PR 的合并结果，根据完整差异选择跨仓集成 |
+| develop/main push 或手动 CI | 完整仓库与跨仓集成，默认解析最新源码并记录组合 |
+
+临时检出借用本地 Git 对象，保留真实 HEAD、提交日期和历史。暂存区检查不会混入未暂存或未跟踪内容，强制暂存的忽略文件仍参与检查。推送支持多个 ref 和非 HEAD 提交，删除 ref 无需源码检查。正常结束或检查失败后删除临时检出。
+
+每次提交只运行轻量检查。推送前的完整仓库检查需要 Go、uv 和依赖网络，不运行跨仓构建或浏览器测试。hook 仅在已安装的克隆生效，受保护分支仍以 CI 结果为准。修改依赖后先重新安装，避免暂存区检查使用旧工具。
+
+需要撤销本次安装时，先确认 `git config --local --get core.hooksPath` 返回 `.githooks`，再运行 `git config --local --unset core.hooksPath`。
+
 ## 脚本与测试的职责
 
 | 入口 | 验证内容 |
@@ -38,8 +62,9 @@ Mani 0.32.1 的普通批量模式可能在子任务失败后返回 0。人工运
 | `tooling/docs/` | Markdown 格式、元信息、链接、导航、术语和文档编号 |
 | `tooling/i18n/` | 八语言键、占位符、复数和同英文消息例外 |
 | `tooling/check_repository.py` | 文档仓库的文件类型、语法与敏感文件名 |
-| `scripts/test_*.py`、`scripts/workspace.test.mjs` | 错误清单、优化模式、快照篡改与工作区保护等回归 |
-| `tests/ci/mani-exit.mjs` | 用原生 Mani 验证模块失败退出码，并确认后续模块停止执行 |
+| `scripts/test_*.py`、`scripts/*.test.mjs` | 架构、固定组合、CI 路径、汇总结果、缓存上限与 hook 快照回归 |
+| `scripts/local-checks.mjs`、`scripts/ci-cache.mjs` | 本地快照检查和上传前的缓存大小限制 |
+| `tests/ci/mani-exit.mjs` | 原生 Mani 任务失败时传递退出码，并停止后续项目 |
 | `tests/e2e/` | 实际 HTTP、客户端错误恢复、八语言页面与移动端布局 |
 
 这些共享检查以 `@stuhelper/engineering-tools` 安装到八个模块仓库。源码位于架构仓库的 `tooling/`，消费者通过同一发行 tag 固定版本；工作区与消费者检查验证 tag、锁定提交和来源，升级方法见[依赖维护](dependency-maintenance.md)。
@@ -56,7 +81,7 @@ uv run --locked mkdocs serve --dev-addr 127.0.0.1:8000
 
 严格构建生成 `site/`。依赖目录、站点、工作区和测试输出由 Git 忽略。结果按命令退出码与实际范围记录在 PR、CI 和当前实施状态中。
 
-普通检查使用锁文件并关闭 Actions 缓存及 artifact。actionlint 的精确 runner 标签兼容配置只补充 `ubuntu-26.04`。
+普通检查使用锁文件和有大小限制的公开依赖缓存，不上传 artifact。缓存和 runner 分工见 [CI 规格](../spec/ci-runners.md)。actionlint 的精确 runner 标签兼容配置只补充 `ubuntu-26.04`。
 
 ## 故障处理
 

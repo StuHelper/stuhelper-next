@@ -38,12 +38,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.event_name }}-${{ github.ref }}-${{ inputs.runner || 'default' }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   repository:
-    name: Repository checks
+    name: Repository validation
     # PRs always use GitHub-hosted compute in this maintained workflow.
     # Ordinary checks only. Image builds and BJ1 Registry jobs must use ARC.
     # See docs/spec/ci-runners.md for the organization-level access boundary.
@@ -93,6 +93,23 @@ jobs:
         with:
           version: 0.12.18
           enable-cache: false
+      - name: Configure task-owned dependency directories
+        id: cache-env
+        shell: bash
+        run: |
+          echo "PNPM_HOME=$RUNNER_TEMP/next-repository/pnpm" >> "$GITHUB_ENV"
+          echo "UV_CACHE_DIR=$RUNNER_TEMP/next-repository/uv" >> "$GITHUB_ENV"
+          echo "GOMODCACHE=$RUNNER_TEMP/next-repository/gomod" >> "$GITHUB_ENV"
+          echo "GOCACHE=$RUNNER_TEMP/next-repository/go-build" >> "$GITHUB_ENV"
+          source /etc/os-release
+          echo "platform=$ID-$VERSION_ID-py$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')" >> "$GITHUB_OUTPUT"
+      - name: Restore public repository dependencies
+        id: repository-cache
+        uses: actions/cache/restore@v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/next-repository
+          key: next-repository-v2-${{ runner.os }}-${{ runner.arch }}-${{ runner.environment }}-${{ steps.cache-env.outputs.platform }}-${{ hashFiles('architecture/toolchains.json', '.node-version', '.go-version', 'pnpm-lock.yaml', 'uv.lock') }}
       - name: Install locked tools
         run: make setup
       - name: Run repository checks
@@ -101,28 +118,30 @@ jobs:
           DOCS_BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
         run: make check
 
-      - name: Select integration scope
+      - name: Select integration from the complete PR diff
         id: changes
-        env:
-          BASE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
-          EVENT_NAME: ${{ github.event_name }}
-        shell: bash
-        run: |
-          if [[ "$EVENT_NAME" == workflow_dispatch || -z "$BASE_REF" || "$BASE_REF" =~ ^0+$ ]]; then
-            echo 'integration=true' >> "$GITHUB_OUTPUT"
-          else
-            result=$(node scripts/workspace.mjs affected "$BASE_REF")
-            echo "integration=$result" >> "$GITHUB_OUTPUT"
-          fi
+        run: node scripts/workspace.mjs affected
       - name: Read paired integration candidates
         id: candidates
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: node tooling/cli.mjs integration-inputs
+      - name: Bound repository cache upload
+        id: repository-size
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/develop' && steps.repository-cache.outputs.cache-hit != 'true'
+        run: node scripts/ci-cache.mjs "$RUNNER_TEMP/next-repository" 1024
+      - name: Save successful repository dependencies
+        if: steps.repository-size.outputs.save == 'true'
+        uses: actions/cache/save@v6.1.0
+        continue-on-error: true
+        with:
+          path: ${{ runner.temp }}/next-repository
+          key: ${{ steps.repository-cache.outputs.cache-primary-key }}
 
   integration:
     name: Cross-repository checks
     needs: repository
+    if: needs.repository.outputs.integration == 'true'
     uses: ./.github/workflows/integration.yml
     with:
       source: ${{ inputs.combination || 'latest' }}
@@ -132,3 +151,24 @@ jobs:
       replay: ${{ inputs.replay || '' }}
       coordinator_ref: ${{ github.sha }}
       enabled: ${{ needs.repository.outputs.integration == 'true' }}
+
+  required:
+    name: Repository checks
+    needs: [repository, integration]
+    if: always()
+    runs-on: ubuntu-26.04
+    timeout-minutes: 2
+    steps:
+      - name: Require every selected check to succeed
+        env:
+          REPOSITORY_RESULT: ${{ needs.repository.result }}
+          INTEGRATION_SELECTED: ${{ needs.repository.outputs.integration }}
+          INTEGRATION_RESULT: ${{ needs.integration.result }}
+        shell: bash
+        run: |
+          test "$REPOSITORY_RESULT" = success
+          case "$INTEGRATION_SELECTED:$INTEGRATION_RESULT" in
+            true:success) echo 'Repository and framework integration passed.' ;;
+            false:skipped) echo 'Repository passed; documentation-only integration was not selected.' ;;
+            *) echo 'A required check failed, was cancelled, or did not run.' >&2; exit 1 ;;
+          esac
