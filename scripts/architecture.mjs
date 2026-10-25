@@ -21,9 +21,13 @@ export function validateModules(config) {
     assert(!repositories.has(module.repository), `Duplicate repository owner: ${module.repository}`);
     repositories.add(module.repository);
     assert(['public', 'private'].includes(module.visibility));
-    assert(['not-implemented', 'framework'].includes(module.implementation));
+    assert(['not-implemented', 'framework', 'library'].includes(module.implementation));
     assert.equal(module.interface_owner, module.id);
-    assert(['design-only', 'framework'].includes(module.contract_status));
+    assert(['design-only', 'framework', 'library'].includes(module.contract_status));
+    if (module.implementation === 'library') {
+      assert.equal(module.contract_status, 'library');
+      assert(!module.capabilities?.length, 'Libraries do not expose runtime capabilities');
+    }
     if (module.implementation === 'framework') {
       assert.equal(module.contract_status, 'framework');
       assert(Number.isInteger(module.api) && module.api > 0);

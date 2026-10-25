@@ -60,14 +60,14 @@ modules:
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
-    implementation: not-implemented
-    required:
-      - platform
+    implementation: library
+    required: []
     optional: []
     interface_owner: campus-adapters
-    contract_status: design-only
+    contract_status: library
     specifications:
       - docs/spec/catalog-operations.md
+      - docs/spec/storage-contribution.md
   - id: verification
     repository: StuHelper/stuhelper-verification
     visibility: private

@@ -10,7 +10,7 @@ updated: 2026-10-25
 
 platform 提供公共模块接口、依赖校验、能力降级、Fx 生命周期、HTTP 授权边界和可选远程连接。模块描述由其仓库的 `module.yaml` 生成，主仓库验证规格归属和公开能力一致性。
 
-私有 backend 承载正式程序入口，当前装配 platform 框架。公共示例位于 platform 的 `examples/server`。verification、campus-adapters、billing 的业务实现尚未接入，私有仓库不意味着必须独立运行 HTTP 服务。
+私有 backend 承载正式程序入口，当前装配 platform 框架。公共示例位于 platform 的 `examples/server`。verification、campus-adapters、billing 尚未装配到正式业务入口。campus-adapters 已提供独立 Go 适配库，具体能力与账号验证由私有仓库维护。
 
 Web 与 stuhelper-admin 提供状态展示、错误恢复和八语言入口。国际化检查覆盖消息键、占位符、复数、数字、金额、日期、时区、相对时间和 RTL。
 
@@ -24,6 +24,7 @@ Web 与 stuhelper-admin 提供状态展示、错误恢复和八语言入口。�
 | 架构 | 模块依赖、规格归属、工具链、文档与 Actions |
 | platform | Go race、vet、构建、生成一致性、契约和导入边界 |
 | backend | GOWORK=off 的正式依赖构建与检查 |
+| campus-adapters | 独立 Go 适配库、协议夹具、race、vet 与私有场景映射 |
 | Web/Admin | 类型、lint、国际化、客户端用例与应用构建 |
 | 公开组合 | 契约来源、兼容性与八语言桌面/移动浏览器测试 |
 | ops | Compose、镜像引用、官方 SSO 候选与部署工具测试 |

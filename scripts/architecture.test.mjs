@@ -9,6 +9,7 @@ test('declared architecture and all specification owners are valid', () => {
   validateSpecifications(load());
 });
 for (const [name, mutate, message] of [
+  ['adapter libraries do not claim runtime capabilities', modules => { modules.get('campus-adapters').capabilities = ['campus-adapters.runtime']; }, /runtime capabilities/],
   ['private implementation cannot become public', modules => { modules.get('verification').visibility = 'public'; }, /must remain private/],
   ['repositories have one module owner', modules => { modules.get('reviews').repository = modules.get('catalog').repository; }, /Duplicate repository/],
   ['required dependency cycle fails', modules => { modules.get('platform').required = ['reviews']; }, /cycle/],

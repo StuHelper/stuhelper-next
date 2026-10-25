@@ -22,7 +22,8 @@ updated: 2026-10-25
 | stuhelper-backend | Backend checks |
 | stuhelper-web | Web checks |
 | stuhelper-admin | Admin checks |
-| verification、campus-adapters、billing | Documents checks |
+| verification、billing | Documents checks |
+| campus-adapters | Documents checks，包含 Go 适配库检查 |
 | ops | Documents checks、Deployment configuration |
 
 GitHub 对 reusable workflow 显示调用 job 与实际 job 的组合名称，分支规则使用远端实际产生的 check 名称。当前 GitHub API 对五个私有仓库的分支保护返回套餐限制，无法启用强制门禁。它们仍执行独立 CI，合并前核对完整结果；公开仓库按实际 check 名称启用保护。

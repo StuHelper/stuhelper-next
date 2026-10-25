@@ -40,6 +40,9 @@ projects:
     branch: develop
     tags:
       - documents
+      - backend
+      - code
+      - private
   billing:
     path: workspace/billing
     url: https://github.com/StuHelper/stuhelper-billing.git
