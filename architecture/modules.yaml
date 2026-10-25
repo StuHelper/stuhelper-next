@@ -298,6 +298,7 @@ operations:
       CI-16:
         - scripts/registry-probe.test.mjs#registry probes are confined to unique temporary tags in Next application repositories
         - scripts/registry-probe.test.mjs#manifest deletion uses a digest verified against the returned bytes
+        - scripts/registry-probe.test.mjs#interruption during asynchronous cleanup waits for the same cleanup before exit
 shared_specifications:
   - docs/spec/terminology.md
   - docs/spec/native-clients.md
