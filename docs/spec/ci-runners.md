@@ -31,6 +31,8 @@ GitHub 对 reusable workflow 显示调用 job 与实际 job 的组合名称，�
 
 普通检查使用 GitHub `ubuntu-26.04`。Docker/OCI、镜像组合和 BJ1 Registry 任务使用 `stuhelper-arc` 组、`stuhelper-arc-sh-k8s` 标签。自建系统升级由 owner 手动安排，不随托管 runner 标签改变。
 
+Kubernetes runner 通过 `BUILDKIT_HOST` 提供远端 BuildKit。镜像发行使用 remote driver，不假设本地 Docker daemon 可用；部署连接使用明确的目标 Docker context。作业只清理自己的 builder 注册，远端服务和共享缓存由 runner 维护。
+
 默认权限为 `contents: read`。制品推送和部署工作流按任务增加最小权限，受保护环境控制晋级。跨私有仓库拉取优先使用按仓授权的 GitHub App 短期凭据，公开 PR 不接触这些凭据。
 
 Actions 使用明确版本 tag。共享 action 提供 Node、pnpm 与校验 checksum 的 actionlint 安装；完整 Go 与 Node 检查使用工具仓库的 reusable workflow。应用专用命令继续留在各仓。
@@ -60,3 +62,4 @@ Actions 使用明确版本 tag。共享 action 提供 Node、pnpm 与校验 chec
 | CI-13 | 新存储明确上限、保留期和清理方式 |
 | CI-14 | hook 只检查暂存快照，失败和中断不改动索引 |
 | CI-15 | 子命令非零退出码保留到检查结果 |
+| CI-16 | Registry 验证只使用 Next 应用命名空间的唯一临时 tag，核验 manifest digest 后清理本次制品 |
