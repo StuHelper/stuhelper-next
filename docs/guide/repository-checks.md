@@ -43,6 +43,8 @@ pre-commit 检查暂存区快照，包括文件安全、脚本权限、语法和
 
 应用联调使用 platform 公开示例、Web 和 Admin。先构建三者，运行 `node scripts/workspace.mjs contracts`，再运行 `pnpm run test:e2e`。浏览器覆盖八种语言与桌面、移动视口，不包含文档站。
 
+契约来源检查缺少声明提交时，按完整 SHA 从提供方 origin 补取 Git 对象，不切换分支或修改源码。客户端可以继续使用兼容的旧版契约。
+
 ## 文档预览
 
 本地安装 uv 后运行 `make docs`，命令使用 `uvx --with mkdocs-material --with mkdocs-mermaid-zoom mkdocs serve`。MkDocs 配置只服务开发预览，文档没有独立 uv 项目或锁文件。
