@@ -294,6 +294,10 @@ operations:
       - docs/spec/ci-runners.md
       - docs/spec/admin-operations.md
       - docs/spec/sso-compatibility.md
+    scenario_tests:
+      CI-16:
+        - scripts/registry-probe.test.mjs#registry probes are confined to unique temporary tags in Next application repositories
+        - scripts/registry-probe.test.mjs#manifest deletion uses a digest verified against the returned bytes
 shared_specifications:
   - docs/spec/terminology.md
   - docs/spec/native-clients.md

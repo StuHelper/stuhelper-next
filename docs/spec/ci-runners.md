@@ -60,3 +60,4 @@ Actions 使用明确版本 tag。共享 action 提供 Node、pnpm 与校验 chec
 | CI-13 | 新存储明确上限、保留期和清理方式 |
 | CI-14 | hook 只检查暂存快照，失败和中断不改动索引 |
 | CI-15 | 子命令非零退出码保留到检查结果 |
+| CI-16 | Registry 验证只使用 Next 应用命名空间的唯一临时 tag，核验 manifest digest 后清理本次制品 |
