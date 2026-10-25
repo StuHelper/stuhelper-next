@@ -139,7 +139,8 @@ export function snapshot(directory = root, write = false) {
   const record = { schema_version: 1, projects: {} };
   for (const project of projects(directory).filter(project => fs.existsSync(path.join(project.directory, '.git')))) {
     assert.equal(fs.realpathSync(git(project.directory, 'rev-parse', '--show-toplevel')), fs.realpathSync(project.directory));
-    assert.equal(git(project.directory, 'remote', 'get-url', 'origin').replace('git@github.com:', 'https://github.com/'), project.url);
+    const canonical = url => url.replace(/^git@github\.com:/, 'https://github.com/').replace(/\.git$/, '').toLowerCase();
+    assert.equal(canonical(git(project.directory, 'remote', 'get-url', 'origin')), canonical(project.url), `Unexpected origin: ${project.name}`);
     const dirty = Boolean(git(project.directory, 'status', '--porcelain'));
     assert(!write || !dirty, `Commit candidate changes before recording ${project.name}`);
     record.projects[project.name] = { repository: project.url, revision: git(project.directory, 'rev-parse', 'HEAD'), dirty };

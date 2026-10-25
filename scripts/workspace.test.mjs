@@ -84,3 +84,24 @@ test('standalone architecture validation is independent of stale sibling checkou
   assert.throws(() => toolchains(directory), /node-version/);
   assert.equal(fs.readFileSync(path.join(consumer, '.node-version'), 'utf8'), '22.0.0');
 });
+
+test('source records accept official checkout URLs but reject a different repository or dirty candidate', async t => {
+  const { snapshot } = await import('./workspace.mjs');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-source-record-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const checkout = path.join(directory, 'workspace/platform');
+  fs.mkdirSync(checkout, { recursive: true });
+  fs.writeFileSync(path.join(directory, 'mani.yaml'), 'projects:\n  platform:\n    path: workspace/platform\n    url: https://github.com/StuHelper/stuhelper-platform.git\n');
+  const git = (...args) => execFileSync('git', args, { cwd: checkout, encoding: 'utf8', stdio: 'pipe' }).trim();
+  git('init', '-q'); git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.test');
+  fs.writeFileSync(path.join(checkout, 'source.txt'), 'source\n'); git('add', '.'); git('commit', '-qm', 'fixture');
+  git('remote', 'add', 'origin', 'https://github.com/StuHelper/stuhelper-platform');
+  assert.equal(snapshot(directory, true).projects.platform.revision, git('rev-parse', 'HEAD'));
+  git('remote', 'set-url', 'origin', 'git@github.com:StuHelper/stuhelper-platform.git');
+  snapshot(directory, true);
+  git('remote', 'set-url', 'origin', 'https://github.com/other/stuhelper-platform.git');
+  assert.throws(() => snapshot(directory), /Unexpected origin/);
+  git('remote', 'set-url', 'origin', 'https://github.com/StuHelper/stuhelper-platform');
+  fs.writeFileSync(path.join(checkout, 'source.txt'), 'uncommitted\n');
+  assert.throws(() => snapshot(directory, true), /Commit candidate changes/);
+});
