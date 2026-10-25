@@ -1,0 +1,299 @@
+schema_version: 2
+status: framework
+repository_model: modular-multi-repo
+modules:
+  - id: platform
+    repository: StuHelper/stuhelper-platform
+    visibility: public
+    implementation: framework
+    required: []
+    optional: []
+    interface_owner: platform
+    contract_status: framework
+    specifications:
+      - docs/spec/module-lifecycle.md
+      - docs/spec/module-protocol.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/data-retention.md
+    scenario_tests:
+      MOD-06:
+        - module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness
+      MOD-07:
+        - module/remote_test.go#TestRemoteDegradedStartupRecoveryAndBoundedProbes
+        - module/remote_test.go#TestRemoteSlowStartupBudget
+      MOD-08:
+        - module/remote_test.go#TestRemoteCredentialRotationAndMissingConfiguration
+        - module/remote_test.go#TestRemoteDegradedStartupRecoveryAndBoundedProbes
+      MOD-09:
+        - module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness
+    api: 1
+    capabilities:
+      - platform.status
+      - platform.modules
+    capability_requires: {}
+    critical: true
+  - id: identity
+    repository: StuHelper/stuhelper-backend
+    visibility: private
+    implementation: not-implemented
+    required:
+      - platform
+    optional: []
+    interface_owner: identity
+    contract_status: design-only
+    specifications:
+      - docs/spec/sso-compatibility.md
+    in_application: backend
+  - id: profiles
+    repository: StuHelper/stuhelper-profiles
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - identity
+      - media
+    interface_owner: profiles
+    contract_status: design-only
+    specifications:
+      - docs/spec/personal-center.md
+  - id: campus-adapters
+    repository: StuHelper/stuhelper-campus-adapters
+    visibility: private
+    implementation: not-implemented
+    required:
+      - platform
+    optional: []
+    interface_owner: campus-adapters
+    contract_status: design-only
+    specifications:
+      - docs/spec/catalog-operations.md
+  - id: verification
+    repository: StuHelper/stuhelper-verification
+    visibility: private
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - identity
+      - campus-adapters
+    interface_owner: verification
+    contract_status: design-only
+    specifications:
+      - docs/spec/student-verification.md
+  - id: catalog
+    repository: StuHelper/stuhelper-catalog
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - campus-adapters
+    interface_owner: catalog
+    contract_status: design-only
+    specifications:
+      - docs/spec/catalog-operations.md
+      - docs/spec/my-courses.md
+      - docs/spec/academic-content.md
+  - id: moderation
+    repository: StuHelper/stuhelper-moderation
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional: []
+    interface_owner: moderation
+    contract_status: design-only
+    specifications:
+      - docs/spec/content-management.md
+  - id: media
+    repository: StuHelper/stuhelper-media
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - billing
+    interface_owner: media
+    contract_status: design-only
+    specifications:
+      - docs/spec/media.md
+      - docs/spec/storage-contribution.md
+  - id: reviews
+    repository: StuHelper/stuhelper-reviews
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+      - catalog
+      - moderation
+    optional:
+      - profiles
+      - verification
+      - identity
+    interface_owner: reviews
+    contract_status: design-only
+    specifications:
+      - docs/spec/academic-content.md
+    eligibility_facts:
+      campus_eligibility: verification
+      phone_bound: identity
+      identity_verified: verification
+      course_enrollment: catalog
+  - id: resources
+    repository: StuHelper/stuhelper-resources
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+      - catalog
+      - media
+      - moderation
+    optional:
+      - verification
+      - billing
+      - identity
+    interface_owner: resources
+    contract_status: design-only
+    specifications:
+      - docs/spec/resource-sharing.md
+    eligibility_facts:
+      campus_eligibility: verification
+      phone_bound: identity
+      identity_verified: verification
+  - id: billing
+    repository: StuHelper/stuhelper-billing
+    visibility: private
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - identity
+    interface_owner: billing
+    contract_status: design-only
+    specifications:
+      - docs/spec/wallet-and-points.md
+  - id: community
+    repository: StuHelper/stuhelper-community
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+      - moderation
+    optional:
+      - profiles
+      - catalog
+      - reviews
+      - resources
+      - media
+    interface_owner: community
+    contract_status: design-only
+    specifications:
+      - docs/spec/social-content.md
+  - id: groups
+    repository: StuHelper/stuhelper-groups
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - profiles
+      - verification
+      - moderation
+    interface_owner: groups
+    contract_status: design-only
+    specifications:
+      - docs/spec/qq-group-services.md
+      - docs/spec/bot-entertainment.md
+  - id: information-query
+    repository: StuHelper/stuhelper-information-query
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - profiles
+      - verification
+      - catalog
+      - reviews
+      - resources
+      - billing
+      - groups
+    interface_owner: information-query
+    contract_status: design-only
+    specifications:
+      - docs/spec/information-query.md
+  - id: open-platform
+    repository: StuHelper/stuhelper-open-platform
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - identity
+      - verification
+      - profiles
+      - groups
+    interface_owner: open-platform
+    contract_status: design-only
+    specifications:
+      - docs/spec/open-platform.md
+  - id: search
+    repository: StuHelper/stuhelper-search
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - catalog
+      - reviews
+      - resources
+      - community
+    interface_owner: search
+    contract_status: design-only
+    specifications:
+      - docs/spec/discovery-and-statistics.md
+  - id: notifications
+    repository: StuHelper/stuhelper-notifications
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - profiles
+    interface_owner: notifications
+    contract_status: design-only
+    specifications:
+      - docs/spec/notifications.md
+applications:
+  - id: backend
+    repository: StuHelper/stuhelper-backend
+    visibility: private
+    implementation: framework
+    specifications:
+      - docs/spec/module-lifecycle.md
+      - docs/spec/sso-compatibility.md
+  - id: web
+    repository: StuHelper/stuhelper-web
+    visibility: public
+    implementation: framework
+    specifications:
+      - docs/spec/internationalization.md
+  - id: admin
+    repository: StuHelper/stuhelper-admin
+    visibility: public
+    implementation: framework
+    specifications:
+      - docs/spec/internationalization.md
+operations:
+  - id: ops
+    repository: StuHelper/stuhelper-ops
+    visibility: private
+    kind: operations
+    specifications:
+      - docs/spec/ci-runners.md
+      - docs/spec/admin-operations.md
+      - docs/spec/sso-compatibility.md
+shared_specifications:
+  - docs/spec/terminology.md
+  - docs/spec/native-clients.md

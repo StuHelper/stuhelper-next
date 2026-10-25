@@ -1,0 +1,128 @@
+site_name: StuHelper Next
+site_description: StuHelper Next 的设计、规格、开发、指南与决策
+repo_url: https://github.com/StuHelper/stuhelper-next
+repo_name: StuHelper/stuhelper-next
+edit_uri: edit/develop/docs/
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+
+plugins:
+  - search
+  - mermaid-zoom
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js
+
+markdown_extensions:
+  - tables
+  - admonition
+  - attr_list
+  - md_in_html
+  - def_list
+  - footnotes
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - toc:
+      permalink: true
+      slugify: !!python/name:markdown.extensions.toc.slugify_unicode
+
+validation:
+  nav:
+    omitted_files: warn
+    not_found: warn
+  links:
+    not_found: warn
+    unrecognized_links: warn
+    anchors: warn
+
+nav:
+  - 文档:
+      - 总览: README.md
+      - 写作与维护: authoring.md
+  - 设计:
+      - 项目概览: design/README.md
+      - 重构定位与业务范围: design/business-scope.md
+      - 学生资格与实名身份: design/student-identity.md
+      - 积分与 Ivory 设计: design/wallet-and-points.md
+      - 平台架构: design/platform-architecture.md
+      - 框架运行: design/framework-runtime.md
+      - 按模块划分仓库: design/module-repositories.md
+      - 课程与内容关系: design/academic-content.md
+      - 独立 SSO: design/independent-sso.md
+      - 原生多端: design/native-clients.md
+      - 写作模板: design/TEMPLATE.md
+  - 规格:
+      - 规格导航: spec/README.md
+      - 模块生命周期: spec/module-lifecycle.md
+      - 动作资格配置: spec/action-eligibility.md
+      - 课程与评价: spec/academic-content.md
+      - 学生认证与实名: spec/student-verification.md
+      - 资料与访问权益: spec/resource-sharing.md
+      - 积分与 Ivory 余额: spec/wallet-and-points.md
+      - 个人中心: spec/personal-center.md
+      - 通知中心: spec/notifications.md
+      - 我的课程与课表: spec/my-courses.md
+      - QQ 入群与群管理: spec/qq-group-services.md
+      - 第三方开放平台: spec/open-platform.md
+      - 存储贡献: spec/storage-contribution.md
+      - 内容运营与审核: spec/content-management.md
+      - 管理角色与配置: spec/admin-operations.md
+      - 课程维护与教务导入: spec/catalog-operations.md
+      - 内容发现与统计: spec/discovery-and-statistics.md
+      - 全站信息查询: spec/information-query.md
+      - 机器人娱乐功能: spec/bot-entertainment.md
+      - 社交与内容治理: spec/social-content.md
+      - SSO 兼容: spec/sso-compatibility.md
+      - 原生客户端: spec/native-clients.md
+      - CI 触发与缓存: spec/ci-runners.md
+      - 数据保留与删除: spec/data-retention.md
+      - 国际化与本地化: spec/internationalization.md
+      - 文件与媒体模块: spec/media.md
+      - 模块通信与一致性: spec/module-protocol.md
+      - 统一业务术语: spec/terminology.md
+      - 写作模板: spec/TEMPLATE.md
+  - 开发:
+      - 工作导航: development/README.md
+      - 项目重写路线: development/rewrite-roadmap.md
+      - 框架状态: development/framework-bootstrap.md
+      - SSO 迁移: development/sso-migration.md
+      - 旧业务整理与确认: development/business-design-extraction.md
+      - 旧业务迁移覆盖: development/business-migration-coverage.md
+      - 确认结果与延期事项: development/business-decisions.md
+      - 写作模板: development/TEMPLATE.md
+  - 指南:
+      - 操作导航: guide/README.md
+      - 开发工作区: guide/development-workspace.md
+      - 检查与预览: guide/repository-checks.md
+      - CI 操作: guide/ci-runners.md
+      - SSO 候选解析: guide/sso-candidate.md
+      - 工具链与依赖维护: guide/dependency-maintenance.md
+      - 写作模板: guide/TEMPLATE.md
+  - 决策:
+      - 决策导航: adr/README.md
+      - 官方 Casdoor 镜像: adr/0001-official-casdoor-image.md
+      - Runner 分工: adr/0002-runner-placement.md
+      - 文档架构: adr/0003-documentation-architecture.md
+      - 模块多仓库: adr/0004-modular-multi-repository.md
+      - Mani 工作区: adr/0005-mani-workspace.md
+      - 写作模板: adr/TEMPLATE.md
