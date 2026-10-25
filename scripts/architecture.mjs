@@ -58,9 +58,10 @@ export function validateModules(config) {
       assert(dependencies.every(dependency => declared.has(dependency)), `Undeclared capability dependency: ${capability}`);
     }
   }
-  for (const id of ['identity', 'verification', 'campus-adapters', 'storage-bhpan', 'billing']) {
+  for (const id of ['identity', 'verification', 'campus-adapters', 'billing']) {
     assert.equal(byId.get(id)?.visibility, 'private', `${id} must remain private`);
   }
+  assert.equal(byId.get('storage-bhpan')?.visibility, 'public', 'storage-bhpan must remain public');
   const apps = new Map(config.applications.map(app => [app.id, app]));
   assert.equal(apps.size, config.applications.length, 'Duplicate application ID');
   for (const app of apps.values()) {

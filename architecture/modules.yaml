@@ -70,7 +70,7 @@ modules:
       - docs/spec/catalog-operations.md
   - id: storage-bhpan
     repository: StuHelper/stuhelper-storage-bhpan
-    visibility: private
+    visibility: public
     implementation: library
     required: []
     optional: []

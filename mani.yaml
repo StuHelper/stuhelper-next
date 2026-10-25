@@ -47,7 +47,7 @@ projects:
     tags:
       - backend
       - code
-      - private
+      - public
   billing:
     path: workspace/billing
     url: https://github.com/StuHelper/stuhelper-billing.git

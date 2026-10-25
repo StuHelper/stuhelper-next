@@ -9,9 +9,9 @@ test('declared architecture and all specification owners are valid', () => {
   validateSpecifications(load());
 });
 for (const [name, mutate, message] of [
-  ['adapter libraries do not claim runtime capabilities', modules => { modules.get('storage-bhpan').capabilities = ['campus-adapters.runtime']; }, /runtime capabilities/],
+  ['adapter libraries do not claim runtime capabilities', modules => { modules.get('storage-bhpan').capabilities = ['storage-bhpan.runtime']; }, /runtime capabilities/],
   ['private implementation cannot become public', modules => { modules.get('verification').visibility = 'public'; }, /must remain private/],
-  ['storage protocol implementation remains private', modules => { modules.get('storage-bhpan').visibility = 'public'; }, /must remain private/],
+  ['storage protocol implementation remains public', modules => { modules.get('storage-bhpan').visibility = 'private'; }, /must remain public/],
   ['repositories have one module owner', modules => { modules.get('reviews').repository = modules.get('catalog').repository; }, /Duplicate repository/],
   ['required dependency cycle fails', modules => { modules.get('platform').required = ['reviews']; }, /cycle/],
   ['unknown optional provider fails', modules => { modules.get('resources').optional.push('missing'); }, /Unknown dependency/],
