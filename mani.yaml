@@ -40,6 +40,14 @@ projects:
     branch: develop
     tags:
       - documents
+  storage-bhpan:
+    path: workspace/storage-bhpan
+    url: https://github.com/StuHelper/stuhelper-storage-bhpan.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
   billing:
     path: workspace/billing
     url: https://github.com/StuHelper/stuhelper-billing.git
