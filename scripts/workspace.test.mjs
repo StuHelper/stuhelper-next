@@ -105,3 +105,22 @@ test('source records accept official checkout URLs but reject a different reposi
   fs.writeFileSync(path.join(checkout, 'source.txt'), 'uncommitted\n');
   assert.throws(() => snapshot(directory, true), /Commit candidate changes/);
 });
+
+test('contract provenance retrieves the declared historical commit from a fresh checkout without switching it', async t => {
+  const { providerSource } = await import('./workspace.mjs');
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-provider-history-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const origin = path.join(directory, 'origin'); fs.mkdirSync(origin);
+  const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: 'pipe' }).trim();
+  git(origin, 'init', '-b', 'develop', '-q'); git(origin, 'config', 'user.name', 'Fixture'); git(origin, 'config', 'user.email', 'fixture@example.test');
+  fs.mkdirSync(path.join(origin, 'contracts'));
+  fs.writeFileSync(path.join(origin, 'contracts/api.yaml'), 'version: old\n'); git(origin, 'add', '.'); git(origin, 'commit', '-qm', 'original');
+  const declared = git(origin, 'rev-parse', 'HEAD');
+  fs.writeFileSync(path.join(origin, 'contracts/api.yaml'), 'version: current\n'); git(origin, 'add', '.'); git(origin, 'commit', '-qm', 'current');
+  const current = git(origin, 'rev-parse', 'HEAD'); const checkout = path.join(directory, 'checkout');
+  git(directory, 'clone', '--depth', '1', `file://${origin}`, checkout);
+  assert.throws(() => git(checkout, 'cat-file', '-e', `${declared}^{commit}`));
+  assert.equal(providerSource(checkout, declared, 'contracts/api.yaml'), 'version: old\n');
+  assert.equal(git(checkout, 'rev-parse', 'HEAD'), current);
+  assert.equal(git(checkout, 'status', '--porcelain'), '');
+});

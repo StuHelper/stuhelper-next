@@ -111,6 +111,15 @@ export function verifyScenarios(directory, definition, checkout) {
     }
   }
 }
+export function providerSource(checkout, revision, filename) {
+  assert.match(revision, /^[0-9a-f]{40}$/);
+  assert(!path.isAbsolute(filename) && !filename.split('/').includes('..'), 'Invalid snapshot path');
+  try { git(checkout, 'cat-file', '-e', `${revision}^{commit}`); }
+  catch {
+    execFileSync('git', ['-C', checkout, 'fetch', '--no-tags', 'origin', revision], { stdio: 'inherit' });
+  }
+  return execFileSync('git', ['-C', checkout, 'show', `${revision}:${filename}`], { encoding: 'utf8' });
+}
 export function contracts(directory = root) {
   const records = projects(directory).filter(project => ['platform', 'web', 'admin'].includes(project.name));
   const definitions = readYaml(path.join(directory, 'architecture/modules.yaml')).modules;
@@ -125,7 +134,7 @@ export function contracts(directory = root) {
   }
   for (const client of records.filter(project => project.tags.includes('frontend'))) {
     const source = readJSON(path.join(client.directory, 'contracts/platform.source.json'));
-    verifySource(provider, client, source, (revision, filename) => execFileSync('git', ['-C', provider.directory, 'show', `${revision}:${filename}`], { encoding: 'utf8' }));
+    verifySource(provider, client, source, (revision, filename) => providerSource(provider.directory, revision, filename));
     const prior = path.join(client.directory, 'contracts/platform.openapi.yaml');
     const current = path.join(provider.directory, 'contracts/platform.openapi.yaml');
     if (!fs.readFileSync(prior).equals(fs.readFileSync(current))) {
