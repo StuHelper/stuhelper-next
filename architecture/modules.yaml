@@ -60,13 +60,24 @@ modules:
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
+    implementation: not-implemented
+    required:
+      - platform
+    optional: []
+    interface_owner: campus-adapters
+    contract_status: design-only
+    specifications:
+      - docs/spec/catalog-operations.md
+  - id: storage-bhpan
+    repository: StuHelper/stuhelper-storage-bhpan
+    visibility: private
     implementation: library
     required: []
     optional: []
-    interface_owner: campus-adapters
+    interface_owner: storage-bhpan
     contract_status: library
     specifications:
-      - docs/spec/catalog-operations.md
+      - docs/spec/media.md
       - docs/spec/storage-contribution.md
   - id: verification
     repository: StuHelper/stuhelper-verification
@@ -114,6 +125,7 @@ modules:
       - platform
     optional:
       - billing
+      - storage-bhpan
     interface_owner: media
     contract_status: design-only
     specifications:

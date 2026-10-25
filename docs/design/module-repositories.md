@@ -29,6 +29,7 @@ updated: 2026-10-25
 | profiles | stuhelper-profiles | public | 昵称、头像引用、简介、隐私偏好与业务账号生命周期 |
 | verification | stuhelper-verification | private | 学生资格、独立实名、审核材料与具体认证流程 |
 | campus-adapters | stuhelper-campus-adapters | private | 学校认证协议、学校数据适配与来源映射 |
+| storage-bhpan | stuhelper-storage-bhpan | private | BHpan 存储协议、文件传输与供应商能力适配 |
 | catalog | stuhelper-catalog | public | 学校、院系、学期、课程、教师、开课与个人课表 |
 | reviews | stuhelper-reviews | public | 课程评价、导师评论、评分、回复、投票、收藏与草稿 |
 | resources | stuhelper-resources | public | 资料目录、版本、作品许可、访问授权与交付状态 |
@@ -42,6 +43,8 @@ updated: 2026-10-25
 | search | stuhelper-search | public | 可重建搜索索引、热度与发现查询 |
 | notifications | stuhelper-notifications | public | 站内通知、发送意图、渠道投递与偏好 |
 | 运维仓库 | stuhelper-ops | private | Compose、部署组合、官方 SSO/Koishi 运维与恢复 |
+
+campus-adapters 按学校认证与教务接入职责划分。学校提供的存储服务仍归存储领域：storage-bhpan 独立维护 Go module、接口、检查与版本，media 通过存储后端接口使用其能力。私有 backend 负责装配，公开 media 不导入私有实现。
 
 现有私有 `stuhelper-payment` 保留支付网关职责，账务模块通过其接口对接，不把积分、会员与资料业务塞入支付网关。现有 AI、Store 和 `stuhelper-docs` 均保留自己的用途，不因本次重构重新归属或被覆盖。
 

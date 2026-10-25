@@ -58,7 +58,7 @@ export function validateModules(config) {
       assert(dependencies.every(dependency => declared.has(dependency)), `Undeclared capability dependency: ${capability}`);
     }
   }
-  for (const id of ['identity', 'verification', 'campus-adapters', 'billing']) {
+  for (const id of ['identity', 'verification', 'campus-adapters', 'storage-bhpan', 'billing']) {
     assert.equal(byId.get(id)?.visibility, 'private', `${id} must remain private`);
   }
   const apps = new Map(config.applications.map(app => [app.id, app]));
