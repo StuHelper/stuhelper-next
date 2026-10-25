@@ -12,13 +12,20 @@ updated: 2026-10-25
 
 共享检查来自 [stuhelper-tooling](https://github.com/StuHelper/stuhelper-tooling)，通过明确版本 tag 安装。Go 正式检查使用 `GOWORK=off`。actionlint 由共享 setup action 安装并校验官方 checksum；本地使用相同版本，版本见工具链清单。
 
+本地将声明版本的 actionlint 加入 PATH。已有 Go 工具链时，可在工作区安装一次供各仓使用：
+
 ```bash
+mkdir -p .tools/bin
+GOBIN="$PWD/.tools/bin" go install github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
+export PATH="$PWD/.tools/bin:$PATH"
 make setup
 make check
 mani run check --tags code
 node scripts/workspace.mjs toolchains
 node scripts/workspace.mjs contracts
 ```
+
+本地工具安装目录被 Git 忽略。单仓检查只读取已安装工具，缺失时明确失败，不在检查过程中安装依赖。
 
 Mani 原生批量输出用于本地开发。CI 在各仓工作目录直接运行检查命令，以命令的非零退出码判断失败，不依赖 Mani 的批量汇总退出码。
 

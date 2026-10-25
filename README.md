@@ -17,7 +17,7 @@ StuHelper 的重构工程，采用 Go 平台、Vue Web、stuhelper-admin 和按�
 
 ## 本地开发
 
-主机安装 Git、Mani、Go、Node.js 和 pnpm。文档预览按需使用 uv。精确版本由 [toolchains.yaml](architecture/toolchains.yaml) 维护，当前统一 Go 1.27.3、Node.js 24.22.1 和 pnpm 10.33.4。JavaScript 依赖统一使用 pnpm-lock.yaml。
+主机安装 Git、Mani、Go、Node.js、pnpm 和 actionlint。文档预览按需使用 uv。精确版本由 [toolchains.yaml](architecture/toolchains.yaml) 维护，当前统一 Go 1.27.3、Node.js 24.22.1 和 pnpm 10.33.4。JavaScript 依赖统一使用 pnpm-lock.yaml。
 
 ```bash
 make setup
