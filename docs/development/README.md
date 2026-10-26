@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # 开发工作
@@ -14,5 +14,6 @@ updated: 2026-10-25
 | [SSO 迁移进度与私有文档](sso-migration.md) | 候选与消费者调查、演练准备、后续切换任务 |
 | [StuHelper Next 重写路线](rewrite-roadmap.md) | 已有工程基础、业务阶段、原生端和旧数据迁移 |
 | [框架实施状态](framework-bootstrap.md) | 平台和客户端的当前实施范围与检查入口 |
+| [存储模块实施准备](storage-module.md) | 当前只保存设计，记录 BHpan 证据、待评审参数及未来存储和阅读器启动条件 |
 
 新增主题使用[分类模板](TEMPLATE.md)，并同步维护[文档导航](../README.md)。

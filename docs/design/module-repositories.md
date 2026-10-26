@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # 按模块划分仓库
@@ -29,6 +29,8 @@ updated: 2026-10-25
 | profiles | stuhelper-profiles | public | 昵称、头像引用、简介、隐私偏好与业务账号生命周期 |
 | verification | stuhelper-verification | private | 学生资格、独立实名、审核材料与具体认证流程 |
 | campus-adapters | stuhelper-campus-adapters | private | 学校认证协议、学校数据适配与来源映射 |
+| storage | stuhelper-storage | public | 实例准入、容量预占、完整副本、内容校验、可靠任务与清理 |
+| storage-contribution | stuhelper-storage-contribution | public | 贡献同意、额度与保留空间、期限、暂停退出及核验统计；尚未建仓实现 |
 | storage-bhpan | stuhelper-storage-bhpan | public | BHpan 存储协议、文件传输与供应商能力适配 |
 | catalog | stuhelper-catalog | public | 学校、院系、学期、课程、教师、开课与个人课表 |
 | reviews | stuhelper-reviews | public | 课程评价、导师评论、评分、回复、投票、收藏与草稿 |
@@ -36,7 +38,7 @@ updated: 2026-10-25
 | billing | stuhelper-billing | private | 积分、Ivory、收费、会员售卖、奖励、退款与交易权益凭据 |
 | moderation | stuhelper-moderation | public | 内容审核、举报、申诉与处置决定，内容模块执行状态变化 |
 | community | stuhelper-community | public | 动态、分区、关注、屏蔽及动态内互动 |
-| media | stuhelper-media | public | 文件上传、可用状态、存储适配与存储贡献 |
+| media | stuhelper-media | public | 通用文件入口、逻辑版本、可用状态和业务引用；后续存储与扩展拆分见下文 |
 | groups | stuhelper-groups | public | QQ 绑定业务接入、群准入、名片、消息治理与娱乐命令 |
 | information-query | stuhelper-information-query | public | 授权范围内的跨模块关联查询、批量与导出 |
 | open-platform | stuhelper-open-platform | public | 开发者应用审批、业务授权与撤回 |
@@ -45,6 +47,10 @@ updated: 2026-10-25
 | 运维仓库 | stuhelper-ops | private | Compose、部署组合、官方 SSO/Koishi 运维与恢复 |
 
 campus-adapters 按学校认证与教务接入职责划分。学校提供的存储服务仍归存储领域：storage-bhpan 独立维护 Go module、接口、检查与版本，media 通过存储后端接口使用其能力。backend 负责装配，media 通过约定接口隔离供应商数据模型。
+
+文件服务、存储核心、用户贡献、保护交付与激励的职责按[通用存储设计](storage-architecture.md)解耦。课程资料是使用方，账号可来自平台或用户，协议可为 BHpan、S3 等。storage 已按实际实现独立建仓，作为库等待 backend 装配。贡献与保护交付扩展的仓库在有实现内容时再建立，当前不登记未实现运行能力。
+
+未来在线阅读器、加密容器与溯源见[文件保护设计](file-protection-and-delivery.md)，明确暂不实现。media、storage 和 storage-contribution 分别拥有文件、放置与贡献规格，不共用模块内数据表。
 
 现有私有 `stuhelper-payment` 保留支付网关职责，账务模块通过其接口对接，不把积分、会员与资料业务塞入支付网关。现有 AI、Store 和 `stuhelper-docs` 均保留自己的用途，不因本次重构重新归属或被覆盖。
 

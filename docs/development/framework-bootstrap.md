@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # 框架实施状态
@@ -11,6 +11,8 @@ updated: 2026-10-25
 platform 提供公共模块接口、依赖校验、能力降级、Fx 生命周期、HTTP 授权边界和可选远程连接。模块描述由其仓库的 `module.yaml` 生成，主仓库验证规格归属和公开能力一致性。
 
 私有 backend 承载正式程序入口，当前装配 platform 框架。公共示例位于 platform 的 `examples/server`。verification、campus-adapters、billing 尚未装配到正式业务入口。storage-bhpan 独立提供 BHpan Go 存储适配库，其公开协议与脱敏验证记录由本仓维护；正式业务装配尚未实现。
+
+通用存储已有独立库，实现多账号准入、三副本、两份发布门槛、恢复与清理，见[实施状态](storage-module.md)。media、resources 与贡献管理仍未实现；backend 尚未装配存储库，不将局部验证计为正式业务上线。
 
 Web 与 stuhelper-admin 提供状态展示、错误恢复和八语言入口。国际化检查覆盖消息键、占位符、复数、数字、金额、日期、时区、相对时间和 RTL。
 

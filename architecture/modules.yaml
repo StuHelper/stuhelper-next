@@ -68,6 +68,17 @@ modules:
     contract_status: design-only
     specifications:
       - docs/spec/catalog-operations.md
+  - id: storage
+    repository: StuHelper/stuhelper-storage
+    visibility: public
+    implementation: library
+    required: []
+    optional:
+      - storage-bhpan
+    interface_owner: storage
+    contract_status: library
+    specifications:
+      - docs/spec/storage-placement.md
   - id: storage-bhpan
     repository: StuHelper/stuhelper-storage-bhpan
     visibility: public
@@ -123,13 +134,23 @@ modules:
     implementation: not-implemented
     required:
       - platform
-    optional:
-      - billing
-      - storage-bhpan
+      - storage
+    optional: []
     interface_owner: media
     contract_status: design-only
     specifications:
       - docs/spec/media.md
+  - id: storage-contribution
+    repository: StuHelper/stuhelper-storage-contribution
+    visibility: public
+    implementation: not-implemented
+    required:
+      - storage
+    optional:
+      - billing
+    interface_owner: storage-contribution
+    contract_status: design-only
+    specifications:
       - docs/spec/storage-contribution.md
   - id: reviews
     repository: StuHelper/stuhelper-reviews

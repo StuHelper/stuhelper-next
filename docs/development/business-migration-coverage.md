@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # 旧业务文档迁移覆盖
@@ -44,7 +44,7 @@ updated: 2026-10-25
 | [群操作结果](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/governance-execution-convergence.md)、[保留与清理](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/governance-retention-lifecycle.md) | 举报处理、人工决定、执行结果、历史查看和成员限制 | 提取可见行为。重试、消息队列和清理算法由新技术设计决定 |
 | [举报图片证据](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/koishi-case-image-evidence.md) | 管理员查看并保存与举报有关的图片 | 查看与留存规则已确认，不新增撤回查看审计，不直接复制存储实现 |
 | [管理配置](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/admin-configuration-concurrency.md) | 管理员改配置、查看影响和处理别人同时修改的情况 | 配置范围、来源、并发冲突与操作记录已确认，不复制旧实现 |
-| [存储架构](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/storage-architecture.md)、[分布式存储](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/distributed-storage-fabric.md) | 上传、扫描、审核、文件与目录下载、容量和管理员面板 | 补查资料及存储规格中的用户可见行为。副本调度和驱动实现单独设计 |
+| [存储架构](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/storage-architecture.md)、[分布式存储](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/distributed-storage-fabric.md) | 上传、扫描、审核、文件与目录下载、容量和管理员面板 | 用户行为由资料与贡献规格承接；[新存储设计](../design/storage-architecture.md)补充密级、冗余与混合 adapter，具体方案待评审，未移植旧实现 |
 | [机器人说明](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/bots/koishi/README.md) | 群聊管理、信息查询、娱乐命令与管理入口 | 三个业务菜单已确认，具体规则在相应规格维护 |
 
 ## 历史与技术文档的处理
@@ -72,4 +72,4 @@ updated: 2026-10-25
 
 各仓库的提交与远端验证结果记录在对应 PR，最终核对以精确提交的完整 CI 为准。
 
-全部业务选择均已确认或明确延期，结果见[确认清单](business-decisions.md)。私有模块细节在相应仓库维护。当前没有待回答的业务问题。
+旧业务抽取范围的选择均已确认或明确延期，结果见[确认清单](business-decisions.md)。私有模块细节在相应仓库维护。后续新增的存储方案评审项集中于[存储实施准备](storage-module.md)，不改变旧来源覆盖结果。
