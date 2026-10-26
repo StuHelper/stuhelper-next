@@ -2,7 +2,7 @@
 
 StuHelper 的重构工程，采用 Go 平台、Vue Web、stuhelper-admin 和按业务划分的独立仓库。Next 是过渡名称。Casdoor 使用官方发行版本，各业务通过 OIDC 和官方 API 接入。
 
-**当前阶段：框架可运行，业务按规格实施。** platform 提供模块依赖、生命周期、能力发现、HTTP 访问边界和远程服务降级。Web 与 stuhelper-admin 提供八语言应用入口和服务状态。storage-bhpan 提供独立公开存储适配库。真实身份、数据库、校园业务装配与生产迁移仍在后续实施范围，见[框架状态](docs/development/framework-bootstrap.md)。
+**当前阶段：框架可运行，业务按规格实施。** platform 提供模块依赖、生命周期、能力发现、HTTP 访问边界和远程服务降级。Web 与 stuhelper-admin 提供八语言应用入口和服务状态。storage-bhpan 提供独立公开存储适配库。课程目录、评价、审核与 Web 页面已有任务分支实现，真实身份接线与长期教务同步仍待完成。详见[评课社区状态](docs/development/academic-community.md)和[框架状态](docs/development/framework-bootstrap.md)。
 
 ## 工程入口
 
@@ -33,7 +33,7 @@ pnpm run test:e2e
 
 各代码仓库独立构建与检查，通用工具由 stuhelper-tooling 发行。公开应用联调使用 platform 示例与 Web/Admin，候选输入采用完整提交 SHA，并记录实际组合。私有 backend 按 go.mod 单独构建正式应用。
 
-`mani.yaml` 统一登记十个仓库，包括公共工具库和私有 backend。公开与私有区分源码和文档的可见性，GitHub 管理仓库访问权限。任务工作树统一放在 `workspace/worktrees/<任务>/<仓库名>`，主检出位于 `workspace/<仓库名>`。
+`mani.yaml` 统一登记十三个仓库，包括公共工具库和私有 backend。公开与私有区分源码和文档的可见性，GitHub 管理仓库访问权限。任务工作树统一放在 `workspace/worktrees/<任务>/<仓库名>`，主检出位于 `workspace/<仓库名>`。
 
 ## 技术约定
 

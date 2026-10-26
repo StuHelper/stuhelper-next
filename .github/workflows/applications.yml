@@ -2,10 +2,10 @@ name: Public application integration
 on:
   pull_request:
     branches: [develop, main]
-    paths: [architecture/**, scripts/workspace*, tests/e2e/**, playwright.config.mjs, .github/workflows/applications.yml]
+    paths: [architecture/**, scripts/workspace*, scripts/integration-*, tests/e2e/**, tests/academic/**, playwright*.mjs, workspace.lock.json, .github/workflows/applications.yml]
   push:
     branches: [develop, main]
-    paths: [architecture/**, scripts/workspace*, tests/e2e/**, playwright.config.mjs, .github/workflows/applications.yml]
+    paths: [architecture/**, scripts/workspace*, scripts/integration-*, tests/e2e/**, tests/academic/**, playwright*.mjs, workspace.lock.json, .github/workflows/applications.yml]
   workflow_dispatch:
     inputs:
       platform_commit:
@@ -15,6 +15,15 @@ on:
         description: Full candidate SHA, or empty for develop
         type: string
       admin_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      catalog_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      reviews_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      moderation_commit:
         description: Full candidate SHA, or empty for develop
         type: string
 permissions:
@@ -31,36 +40,58 @@ jobs:
       LEFTHOOK: '0'
       GOWORK: 'off'
     steps:
-      - name: Validate explicit candidates
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Resolve source refs
+        id: refs
         env:
           PLATFORM: ${{ inputs.platform_commit }}
           WEB: ${{ inputs.web_commit }}
           ADMIN: ${{ inputs.admin_commit }}
-        run: |
-          for revision in "$PLATFORM" "$WEB" "$ADMIN"; do
-            [[ -z "$revision" || "$revision" =~ ^[a-f0-9]{40}$ ]] || exit 1
-          done
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
+          CATALOG: ${{ inputs.catalog_commit }}
+          REVIEWS: ${{ inputs.reviews_commit }}
+          MODERATION: ${{ inputs.moderation_commit }}
+        run: node scripts/integration-refs.mjs
       - uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-platform
-          ref: ${{ inputs.platform_commit || 'develop' }}
+          ref: ${{ steps.refs.outputs.platform }}
           path: workspace/platform
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-web
-          ref: ${{ inputs.web_commit || 'develop' }}
+          ref: ${{ steps.refs.outputs.web }}
           path: workspace/web
           persist-credentials: false
       - uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-admin
-          ref: ${{ inputs.admin_commit || 'develop' }}
+          ref: ${{ steps.refs.outputs.admin }}
           path: workspace/admin
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-catalog
+          ref: ${{ steps.refs.outputs.catalog }}
+          path: workspace/catalog
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-reviews
+          ref: ${{ steps.refs.outputs.reviews }}
+          path: workspace/reviews
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-moderation
+          ref: ${{ steps.refs.outputs.moderation }}
+          path: workspace/moderation
+          fetch-depth: 0
           persist-credentials: false
       - uses: StuHelper/stuhelper-tooling/actions/setup@v0.1.0
       - uses: actions/setup-go@v7.0.0
@@ -83,3 +114,4 @@ jobs:
           pnpm --dir workspace/admin run build
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run test:e2e
+      - run: pnpm exec playwright test --config playwright.academic.config.mjs

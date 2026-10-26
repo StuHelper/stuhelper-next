@@ -95,28 +95,56 @@ modules:
   - id: catalog
     repository: StuHelper/stuhelper-catalog
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - campus-adapters
     interface_owner: catalog
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/catalog-operations.md
       - docs/spec/my-courses.md
       - docs/spec/academic-content.md
+    api: 1
+    capabilities:
+      - catalog.read
+      - catalog.import
+      - catalog.enrollments
+    capability_requires: {}
+    scenario_tests:
+      CO-02:
+        - integration_test.go#TestImportRelationsClassificationAndMissingCredits
+      CO-04:
+        - integration_test.go#TestImportIdempotencyConcurrencyAndRollback
+      CO-05:
+        - integration_test.go#TestCourseTeacherJoinsAndEnrollmentAssignments
+      CO-07:
+        - integration_test.go#TestSchoolScopePublicProjectionAndBoundedHTTP
+      ACAD-33:
+        - integration_test.go#TestImportRelationsClassificationAndMissingCredits
   - id: moderation
     repository: StuHelper/stuhelper-moderation
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional: []
     interface_owner: moderation
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/content-management.md
+    api: 1
+    capabilities:
+      - moderation.tasks
+    capability_requires: {}
+    scenario_tests:
+      CM-01:
+        - integration_test.go#TestPendingReportMergesEvidenceAndAuthorRequestsAreScoped
+      CM-02:
+        - integration_test.go#TestDecisionDeliveryRecoversUnknownResultAndRejectsStaleRevision
+      CM-05:
+        - integration_test.go#TestPolicyScopeReplayAndPrivateDecisionProjection
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
@@ -134,7 +162,7 @@ modules:
   - id: reviews
     repository: StuHelper/stuhelper-reviews
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
       - catalog
@@ -144,7 +172,7 @@ modules:
       - verification
       - identity
     interface_owner: reviews
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/academic-content.md
     eligibility_facts:
@@ -152,6 +180,26 @@ modules:
       phone_bound: identity
       identity_verified: verification
       course_enrollment: catalog
+    api: 1
+    capabilities:
+      - reviews.read
+      - reviews.write
+    capability_requires: {}
+    scenario_tests:
+      ACAD-04:
+        - integration_test.go#TestAnonymousPreviewAndCurrentAccessCannotLeakIdentity
+      ACAD-05:
+        - integration_test.go#TestCourseTermEligibilityAndImmutableTeacherAttribution
+      ACAD-13:
+        - integration_test.go#TestConcurrentCreateReplayAndNewReviewsRemainAllowed
+      ACAD-19:
+        - integration_test.go#TestDiscussionIdentityVotingDraftConflictsAndModeration
+      ACAD-30:
+        - integration_test.go#TestWithdrawalWindowExpiryVotesAndPermanentDeletion
+      ACAD-32:
+        - integration_test.go#TestTeacherEqualCourseWeightsAndBandBoundaries
+      ACAD-34:
+        - integration_test.go#TestCourseTermEligibilityAndImmutableTeacherAttribution
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public

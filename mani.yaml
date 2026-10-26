@@ -76,6 +76,30 @@ projects:
       - tooling
       - code
       - public
+  catalog:
+    path: workspace/catalog
+    url: https://github.com/StuHelper/stuhelper-catalog.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  reviews:
+    path: workspace/reviews
+    url: https://github.com/StuHelper/stuhelper-reviews.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  moderation:
+    path: workspace/moderation
+    url: https://github.com/StuHelper/stuhelper-moderation.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
 specs:
   default:
     parallel: false

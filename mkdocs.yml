@@ -105,6 +105,7 @@ nav:
       - 工作导航: development/README.md
       - 项目重写路线: development/rewrite-roadmap.md
       - 框架状态: development/framework-bootstrap.md
+      - 课程与评课社区: development/academic-community.md
       - SSO 迁移: development/sso-migration.md
       - 旧业务整理与确认: development/business-design-extraction.md
       - 旧业务迁移覆盖: development/business-migration-coverage.md
