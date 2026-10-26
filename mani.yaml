@@ -56,6 +56,14 @@ projects:
       - backend
       - code
       - public
+  storage-contribution:
+    path: workspace/storage-contribution
+    url: https://github.com/StuHelper/stuhelper-storage-contribution.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
   storage-bhpan:
     path: workspace/storage-bhpan
     url: https://github.com/StuHelper/stuhelper-storage-bhpan.git

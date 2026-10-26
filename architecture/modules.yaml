@@ -142,13 +142,13 @@ modules:
   - id: storage-contribution
     repository: StuHelper/stuhelper-storage-contribution
     visibility: public
-    implementation: not-implemented
+    implementation: library
     required:
       - storage
     optional:
       - billing
     interface_owner: storage-contribution
-    contract_status: design-only
+    contract_status: library
     specifications:
       - docs/spec/storage-contribution.md
   - id: reviews

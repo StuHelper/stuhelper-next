@@ -4,7 +4,7 @@ StuHelper 的重构工程，采用 Go 平台、Vue Web、stuhelper-admin 和按�
 
 **当前阶段：框架可运行，业务按规格实施。** platform 提供模块依赖、生命周期、能力发现、HTTP 访问边界和远程服务降级。Web 与 stuhelper-admin 提供八语言应用入口和服务状态。真实身份、校园业务装配与生产迁移仍在后续实施范围，见[框架状态](docs/development/framework-bootstrap.md)。
 
-storage-bhpan 提供独立协议库，storage 管理副本、容量与恢复，media 提供上传、不可变版本、业务引用和受控下载。backend 配置装配已通过隔离数据库联调，贡献生命周期与生产接入仍待完成，见[存储实施状态](docs/development/storage-module.md)。
+storage-bhpan 提供独立协议库，storage 管理副本、容量与恢复，media 提供上传、不可变版本、业务引用和受控下载。backend 配置装配已通过隔离数据库联调，storage-contribution 已实现贡献同意、期限、暂停、退出与汇总，真实用户入口和生产接入待完成，见[存储实施状态](docs/development/storage-module.md)。
 
 ## 工程入口
 
@@ -35,7 +35,7 @@ pnpm run test:e2e
 
 各代码仓库独立构建与检查，通用工具由 stuhelper-tooling 发行。公开应用联调使用 platform 示例与 Web/Admin，候选输入采用完整提交 SHA，并记录实际组合。私有 backend 按 go.mod 单独构建正式应用。
 
-`mani.yaml` 统一登记十二个仓库，包括公共工具库、存储核心、通用文件与私有 backend。公开与私有区分源码和文档的可见性，GitHub 管理仓库访问权限。任务工作树统一放在 `workspace/worktrees/<任务>/<仓库名>`，主检出位于 `workspace/<仓库名>`。
+`mani.yaml` 统一登记十三个仓库，包括公共工具库、存储核心、通用文件、存储贡献与私有 backend。公开与私有区分源码和文档的可见性，GitHub 管理仓库访问权限。任务工作树统一放在 `workspace/worktrees/<任务>/<仓库名>`，主检出位于 `workspace/<仓库名>`。
 
 ## 技术约定
 
