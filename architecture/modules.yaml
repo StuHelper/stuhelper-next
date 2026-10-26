@@ -309,13 +309,18 @@ applications:
     repository: StuHelper/stuhelper-web
     visibility: public
     implementation: framework
-    optional: [storage-contribution]
+    optional: [storage, storage-contribution]
     capability_requires:
+      storage.custody: [storage]
       contributions.manage: [storage-contribution]
     specifications:
       - docs/spec/internationalization.md
       - docs/spec/storage-contribution.md
     scenario_tests:
+      ST-10:
+        - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets and preserves the binding on renewal
+        - tests/e2e/custody.spec.mjs#uncertain custody submission recovers by ID without retaining or resending a password
+        - tests/e2e/custody.spec.mjs#an existing blocked custody request resumes without new credentials
       ST-01:
         - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment and renewal retain distinct request state
       ST-03:
@@ -329,6 +334,7 @@ applications:
     optional: [storage, storage-contribution]
     capability_requires:
       storage.operations: [storage]
+      storage.custody.operations: [storage]
       contributions.operations: [storage-contribution]
     specifications:
       - docs/spec/internationalization.md
@@ -336,6 +342,9 @@ applications:
       - docs/spec/storage-placement.md
       - docs/spec/storage-contribution.md
     scenario_tests:
+      ST-11:
+        - tests/e2e/custody.spec.mjs#custody administration resumes original consent without credential access
+        - tests/e2e/custody.spec.mjs#custody administration handles unauthenticated and empty states
       ST-09:
         - tests/e2e/contributions.spec.mjs#operator retry preserves conditions, retains uncertain request and clears revoked inventory
         - tests/e2e/contributions.spec.mjs#operator login boundary recovers to an empty page
