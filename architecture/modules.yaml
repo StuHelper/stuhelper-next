@@ -309,19 +309,36 @@ applications:
     repository: StuHelper/stuhelper-web
     visibility: public
     implementation: framework
+    optional: [storage-contribution]
+    capability_requires:
+      contributions.manage: [storage-contribution]
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/storage-contribution.md
+    scenario_tests:
+      ST-01:
+        - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment and renewal retain distinct request state
+      ST-03:
+        - tests/e2e/contributions.spec.mjs#exit remains pending while replicas remain
+      ST-08:
+        - tests/e2e/contributions.spec.mjs#lost response retries original mutation, paginates and clears revoked data
   - id: admin
     repository: StuHelper/stuhelper-admin
     visibility: public
     implementation: framework
-    optional: [storage]
+    optional: [storage, storage-contribution]
     capability_requires:
       storage.operations: [storage]
+      contributions.operations: [storage-contribution]
     specifications:
       - docs/spec/internationalization.md
       - docs/spec/admin-operations.md
       - docs/spec/storage-placement.md
+      - docs/spec/storage-contribution.md
+    scenario_tests:
+      ST-09:
+        - tests/e2e/contributions.spec.mjs#operator retry preserves conditions, retains uncertain request and clears revoked inventory
+        - tests/e2e/contributions.spec.mjs#operator login boundary recovers to an empty page
 operations:
   - id: ops
     repository: StuHelper/stuhelper-ops

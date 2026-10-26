@@ -1,7 +1,7 @@
 ---
 type: development
 status: InReview
-updated: 2026-10-26
+updated: 2026-10-27
 ---
 
 # 存储模块实施状态
@@ -21,7 +21,7 @@ updated: 2026-10-26
 | BHpan adapter | 已验证稳定账号与文件身份、两类登录方式、文件生命周期，以及三个真实账号的存储集成 |
 | 通用文件 | media 已实现上传、不可变版本、隔离批准、业务引用、网关下载与清理；真实数据库及后台配置联调通过 |
 | 存储运营管理 | 已实现脱敏状态、实例命令、额度调整与任务人工重试；Admin 八语言及桌面/移动浏览器检查通过，真实应用登录尚未接入 |
-| 存储贡献 | 已实现同意、容量与期限、暂停、续期、退出、撤权、持久化协调及汇总 API；真实入口、面板、贡献榜和奖励待实施 |
+| 存储贡献 | 已实现同意、容量与期限、暂停、续期、退出、撤权、持久化协调及汇总 API；Web/Admin 八语言管理面板已实现；真实入口、贡献榜和奖励待实施 |
 | 下游业务 | resources 课程资料权益、审核与目录业务仍待实施；基础文件能力不代替业务权益 |
 | 保护交付与阅读器 | 已记录[溯源、加密包及在线阅读参考](../design/file-protection-and-delivery.md)，明确暂不实现，未确定默认启用方式 |
 | 正式装配 | backend 已接入 storage/media/contribution API、独立 worker、在线令牌检查与 BHpan 凭据恢复；media 使用独立服务和数据库身份，Next SSO 尚未部署或配置 |
@@ -37,7 +37,7 @@ updated: 2026-10-26
 | [旧分布式存储设计](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/distributed-storage-fabric.md) | 数据分类、存储策略、三 lane、故障域、容量预占和任务代次 | 以完整副本简化首期实现；旧默认值仅作为候选 |
 | [旧存储贡献业务](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/storage-contribution.md) | 申请、续期、退出、贡献榜、透明度与多包下载 | 用户流程由 Next 现有规格承接，补上撤权和清理状态边界 |
 | [Next 资料共享](../spec/resource-sharing.md) | 校园资格、原创与转载、审核、购买权益、目录下载 | 继续作为业务依据，不使用旧版免费或版权规则替换 |
-| [Next 存储贡献](../spec/storage-contribution.md) | 自愿贡献、容量与期限、迁走后退出、公开统计 | 扩展适用于通过验证的多种存储；用户实例可按分类与范围审批，生命周期及汇总 API 已实现，真实入口与界面待实施 |
+| [Next 存储贡献](../spec/storage-contribution.md) | 自愿贡献、容量与期限、迁走后退出、公开统计 | 扩展适用于通过验证的多种存储；用户实例可按分类与范围审批，生命周期及汇总 API 已实现，管理界面已实现，真实入口待实施 |
 
 旧方案把受限主副本放在机构 S3/COS，并存在私密第二副本和加密的剩余工作。当前按文件保护要求与实例准入判断放置，协议和账号来源不自动决定密级；旧物理存储结论不直接成为新方案的限制。
 
@@ -120,7 +120,7 @@ backend 已实现加密托管凭据及重启后重新登录，随后由连接层
 
 storage、media 与 storage-contribution 已建立有实现内容的独立仓库并登记 Mani；其余职责在有实际实现时按相同约定建仓。架构规格、提供方契约、模块实现与使用方接入分别交付；跨仓 PR 列出依赖、合并顺序和实际验证组合。
 
-storage 自有清单登记二十五组场景，media 登记七组，storage-contribution 登记六组，backend 登记十四组。backend 两组需显式启用真实账号，普通 CI 只编译入口。SP-01—SP-26 包含更广的跨模块验收，未全部完成；贡献前端、真实用户授权与阅读器场景未完成。
+storage 自有清单登记二十六组场景，media 登记七组，storage-contribution 登记七组，backend 登记十四组。backend 两组需显式启用真实账号，普通 CI 只编译入口。SP-01—SP-26 包含更广的跨模块验收，未全部完成；真实用户授权与阅读器场景未完成。
 
 ## 执行器部署实施计划
 
@@ -142,6 +142,8 @@ Next 的 Casdoor 尚未部署或配置，腾讯云仍运行旧 SSO。本轮以�
 同进程提供 HTTP 时，后台 worker 数必须小于总传输并发，至少为前台保留一个传输名额；无 HTTP 的 worker 也不能超出总传输并发。该约束在装配时检查，各进程的预算仍需部署配置分别分配。
 
 ## 本轮验证
+
+2026-10-27，新增本人已授权存储选项、管理员贡献列表及原条件重试。真实 PostgreSQL 验证权限分离、撤销即时生效、并发幂等与绑定排除；查询不触发供应商探测。提供方和消费方记录精确源码及契约摘要。
 
 2026-10-26，storage 在 GOWORK=off 下通过生成契约、真实 PostgreSQL、race、vet、构建、文档和工作流本地检查。测试使用独立 schema 及受限运行身份，数据库自行建立并清理；普通检查缺少测试数据库时直接失败。
 
@@ -179,19 +181,21 @@ backend 已验证 media 配置入口、独立服务身份、上传至清理全�
 
 失效计数仅在供应商协议返回会话失效分类时增加，网络故障和普通权限拒绝不增加该计数。本轮平台授权截止时间尚未到达。原始响应未保留，因此精确令牌寿命和自然到期原因仍不确定；现有证据支持失效后的托管凭据重登恢复。
 
-当前草稿 PR 按 [BHpan #2](https://github.com/StuHelper/stuhelper-storage-bhpan/pull/2)、[Storage #1](https://github.com/StuHelper/stuhelper-storage/pull/1)、[Media #1](https://github.com/StuHelper/stuhelper-media/pull/1)、[Contribution #1](https://github.com/StuHelper/stuhelper-storage-contribution/pull/1)、[Backend #5](https://github.com/StuHelper/stuhelper-backend/pull/5)、[Admin #11](https://github.com/StuHelper/stuhelper-admin/pull/11)、[Next #8](https://github.com/StuHelper/stuhelper-next/pull/8) 顺序合并。源码依赖已固定，合并后须更新组合记录；当前未发行或部署。
+当前草稿 PR 按 [BHpan #2](https://github.com/StuHelper/stuhelper-storage-bhpan/pull/2)、[Storage #1](https://github.com/StuHelper/stuhelper-storage/pull/1)、[Media #1](https://github.com/StuHelper/stuhelper-media/pull/1)、[Contribution #1](https://github.com/StuHelper/stuhelper-storage-contribution/pull/1)、[Backend #5](https://github.com/StuHelper/stuhelper-backend/pull/5)、[Web #9](https://github.com/StuHelper/stuhelper-web/pull/9)、[Admin #11](https://github.com/StuHelper/stuhelper-admin/pull/11)、[Next #8](https://github.com/StuHelper/stuhelper-next/pull/8) 顺序合并。源码依赖已固定，合并后须更新组合记录；当前未发行或部署。
 
-workspace.lock.json 固定 storage、storage-bhpan、media、storage-contribution、backend 与 admin 候选，其他模块保留已有组合。backend 使用新增贡献控制的 storage 候选，Admin 保持既有兼容接口快照，未新增贡献界面。
+workspace.lock.json 固定 storage、storage-bhpan、media、storage-contribution、backend、web 与 admin 候选，其他模块保留已有组合。backend 使用新增贡献控制的 storage 候选，Web/Admin 使用同一固定贡献契约及浏览器 SDK，Admin 的既有存储快照继续兼容。
 
-存储管理新增暂停/恢复新写、排空、撤销、额度调整和阻塞任务重试。服务端按当前权限、修订或代次及队列预算执行，未知写入仍查证原远端标识。25 组存储场景、真实 PostgreSQL、race、vet、生成一致性及接口兼容性检查通过。
+存储管理新增暂停/恢复新写、排空、撤销、额度调整和阻塞任务重试。服务端按当前权限、修订或代次及队列预算执行，未知写入仍查证原远端标识。26 组存储场景、真实 PostgreSQL、race、vet、生成一致性及接口兼容性检查通过。
 
-storage-contribution 的六组场景通过真实 PostgreSQL、race、vet、构建、OpenAPI/SDK 一致性和 HTTP 行为检查。覆盖同意与归属、并发幂等、续期与退出清理、丢失响应恢复、旧任务拒绝、到期和过期统计、重试上限与数据库隔离。
+storage-contribution 的七组场景通过真实 PostgreSQL、race、vet、构建、OpenAPI/SDK 一致性和 HTTP 行为检查。覆盖同意与归属、并发幂等、续期与退出清理、丢失响应恢复、旧任务拒绝、到期和过期统计、重试上限与数据库隔离。
 
 backend 已接入默认关闭的贡献模块、独立数据库与服务身份。隔离 TLS 和供应商夹具验证公开/私有路由、后台生效、重启保留及当前授权。贡献服务不能读取文件、管理凭据或放宽密级。该轮不访问正在观测的真实账号。
 
-Admin 通过 348 项单元测试和 32 项浏览器用例，覆盖八语言、桌面/移动、键盘操作、分页、原请求重试和撤权清空。中文桌面及阿拉伯语移动截图已检查，八语言语义仍待人工母语审阅。
+Web 通过 37 项单元测试及 64 项浏览器用例，覆盖八语言、桌面/移动、同意、条件调整、续期、退出、原请求重试和撤权清空。Admin 通过 359 项单元测试及 64 项浏览器用例，其中存储和贡献各 32 项。
 
-浏览器验收使用明确 HTTP 夹具，不连接真实 BHpan。/storage 页面已实现，但实际浏览器登录与向 backend 传递访问令牌尚未装配，默认返回未登录或不可用。该工作不改变 Next SSO。
+中文桌面及阿拉伯语移动截图已检查。表单下拉框具有明确可访问名称；请求目标与处理状态分别显示。八语言翻译语义仍待人工母语审阅。
+
+浏览器验收使用明确 HTTP 夹具，不连接真实 BHpan。/storage 与 /contributions 页面已实现，但实际浏览器登录与向 backend 传递访问令牌尚未装配，默认返回未登录或不可用。该工作不改变 Next SSO。
 
 正在执行的二十四小时观测继续使用启动时冻结的 backend 4ed8887 与 storage 84fbb86，不因新增业务候选而重启或升级。终点报告须按观测清单核对该组合；两个测试阶段的结果分别归档。
 
@@ -199,6 +203,6 @@ Admin 通过 348 项单元测试和 32 项浏览器用例，覆盖八语言、�
 
 新候选已过滤不满足当前准入的定期校验，并覆盖撤销、未授权、到期及重新授权恢复。修复只通过隔离 PostgreSQL 验证，不热更新观测程序、不修改实测账本；原试次继续收集会话寿命和终点恢复证据。
 
-剩余业务包括实例首次登记与重新授权界面、贡献同意和退出管理面板、课程资料权益、完整应用身份与会话、目录授权选集及 S3/COS adapter。Next SSO 按当前安排保持不动；生产前还需真实跨期、审计归档、生产备份与撤销恢复、保留清理、多进程预算和压力基准。
+剩余业务包括实例首次登记与重新授权界面、课程资料权益、完整应用身份与会话、目录授权选集及 S3/COS adapter。Next SSO 按当前安排保持不动；生产前还需真实跨期、审计归档、生产备份与撤销恢复、保留清理、多进程预算和压力基准。
 
 未来在线阅读、加密容器和溯源继续明确延期，只保留参考设计。上述已完成测试不能代替未完成业务、真实长期授权或生产验收。
