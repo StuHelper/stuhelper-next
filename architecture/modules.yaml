@@ -315,8 +315,13 @@ applications:
     repository: StuHelper/stuhelper-admin
     visibility: public
     implementation: framework
+    optional: [storage]
+    capability_requires:
+      storage.operations: [storage]
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/admin-operations.md
+      - docs/spec/storage-placement.md
 operations:
   - id: ops
     repository: StuHelper/stuhelper-ops

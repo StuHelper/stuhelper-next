@@ -21,7 +21,7 @@ updated: 2026-10-26
 | stuhelper-platform | Platform checks |
 | stuhelper-backend | Backend checks |
 | stuhelper-web | Web checks |
-| stuhelper-admin | Admin checks |
+| stuhelper-admin | Admin checks、Storage browser checks |
 | verification、campus-adapters、billing | Documents checks |
 | storage-bhpan | BHpan checks |
 | storage | Storage checks |

@@ -20,6 +20,7 @@ updated: 2026-10-26
 | 存储核心 | 已实现副本账本、OpenAPI/SDK、有界执行器、传输与暂存预算、停止恢复和数据库身份检查；生产验收未完成 |
 | BHpan adapter | 已验证稳定账号与文件身份、两类登录方式、文件生命周期，以及三个真实账号的存储集成 |
 | 通用文件 | media 已实现上传、不可变版本、隔离批准、业务引用、网关下载与清理；真实数据库及后台配置联调通过 |
+| 存储运营管理 | 已实现脱敏状态、实例命令、额度调整与任务人工重试；Admin 八语言及桌面/移动浏览器检查通过，真实应用登录尚未接入 |
 | 下游业务与贡献 | resources、贡献同意、退出生命周期、奖励和界面仍待实施；基础文件能力不代替业务权益 |
 | 保护交付与阅读器 | 已记录[溯源、加密包及在线阅读参考](../design/file-protection-and-delivery.md)，明确暂不实现，未确定默认启用方式 |
 | 正式装配 | backend 已接入 storage/media API、独立 worker、在线令牌检查与 BHpan 凭据恢复；media 使用独立服务和数据库身份，Next SSO 尚未部署或配置 |
@@ -147,7 +148,7 @@ Next 的 Casdoor 尚未部署或配置，腾讯云仍运行旧 SSO。本轮以�
 
 新增真实演练永久删除一份账本内测试文件，由独立 storage-worker 自动发现、清理和重建。远端标识与写入意图均变化，重新达到三份健康副本，内容与容量统计通过校验。换代后已失效的旧任务正常结束，不再误报为待处理阻塞。
 
-运维 API 展示实例容量、对象缺口及失败任务分页；托管层补充退避、授权到期和待重新授权。会话失效按可重试不可用处理，真正撤权继续停止任务。worker 每十秒替换私有状态文件，命令区分异常、过期和停止，不读取或暴露供应商凭据。
+运维 API 展示实例容量、对象缺口及失败任务分页，并支持按修订、幂等键执行实例命令和人工重试；托管层补充退避、授权到期和待重新授权。会话失效按可重试不可用处理，真正撤权继续停止任务。worker 每十秒替换私有状态文件，命令区分异常、过期和停止，不读取或暴露供应商凭据。
 
 backend 在独立 PostgreSQL 下通过运行身份检查、HTTP 401/403/200、后台补齐三副本、配置化 API/worker 启停及凭据库释放，并通过 race、vet 和正式构建。常规认证与供应商测试使用显式夹具，真实 BHpan 另行验收，两类证据分别记录。
 
@@ -177,9 +178,15 @@ backend 已验证 media 配置入口、独立服务身份、上传至清理全�
 
 失效计数仅在供应商协议返回会话失效分类时增加，网络故障和普通权限拒绝不增加该计数。本轮平台授权截止时间尚未到达。原始响应未保留，因此精确令牌寿命和自然到期原因仍不确定；现有证据支持失效后的托管凭据重登恢复。
 
-当前草稿 PR 按 [BHpan #2](https://github.com/StuHelper/stuhelper-storage-bhpan/pull/2)、[Storage #1](https://github.com/StuHelper/stuhelper-storage/pull/1)、[Media #1](https://github.com/StuHelper/stuhelper-media/pull/1)、[Backend #5](https://github.com/StuHelper/stuhelper-backend/pull/5)、[Next #8](https://github.com/StuHelper/stuhelper-next/pull/8) 顺序合并。源码依赖已固定，合并后须更新组合记录；当前未发行或部署。
+当前草稿 PR 按 [BHpan #2](https://github.com/StuHelper/stuhelper-storage-bhpan/pull/2)、[Storage #1](https://github.com/StuHelper/stuhelper-storage/pull/1)、[Media #1](https://github.com/StuHelper/stuhelper-media/pull/1)、[Backend #5](https://github.com/StuHelper/stuhelper-backend/pull/5)、[Admin #11](https://github.com/StuHelper/stuhelper-admin/pull/11)、[Next #8](https://github.com/StuHelper/stuhelper-next/pull/8) 顺序合并。源码依赖已固定，合并后须更新组合记录；当前未发行或部署。
 
-workspace.lock.json 固定本轮 storage、storage-bhpan、media 与 backend 候选，其他模块保留已有组合。backend 验证使用 go.mod 中相同源码；Web/Admin 尚未进行文件或存储业务联调。
+workspace.lock.json 固定 storage、storage-bhpan、media、backend 与 admin 候选，其他模块保留已有组合。backend 固定依赖和 Admin 接口快照使用同一 storage 提交，并已核对提供方源码、生成类型与共享样例。
+
+存储管理新增暂停/恢复新写、排空、撤销、额度调整和阻塞任务重试。服务端按当前权限、修订或代次及队列预算执行，未知写入仍查证原远端标识。24 组存储场景、真实 PostgreSQL、race、vet、生成一致性及接口兼容性检查通过。
+
+Admin 通过 348 项单元测试和 32 项浏览器用例，覆盖八语言、桌面/移动、键盘操作、分页、原请求重试和撤权清空。中文桌面及阿拉伯语移动截图已检查，八语言语义仍待人工母语审阅。
+
+浏览器验收使用明确 HTTP 夹具，不连接真实 BHpan。/storage 页面已实现，但实际浏览器登录与向 backend 传递访问令牌尚未装配，默认返回未登录或不可用。该工作不改变 Next SSO。
 
 正在执行的二十四小时观测继续使用启动时冻结的 backend 4ed8887 与 storage 84fbb86，不因新增 media 候选而重启或升级。终点报告须按观测清单核对该组合；两个测试阶段的结果分别归档。
 
@@ -187,6 +194,6 @@ workspace.lock.json 固定本轮 storage、storage-bhpan、media 与 backend 候
 
 新候选已过滤不满足当前准入的定期校验，并覆盖撤销、未授权、到期及重新授权恢复。修复只通过隔离 PostgreSQL 验证，不热更新观测程序、不修改实测账本；原试次继续收集会话寿命和终点恢复证据。
 
-剩余业务包括存储管理界面、贡献同意和退出管理、课程资料权益、完整应用身份与会话、目录授权选集及 S3/COS adapter。Next SSO 按当前安排保持不动；生产前还需真实跨期、审计归档、生产备份与撤销恢复、保留清理、多进程预算和压力基准。
+剩余业务包括实例首次登记与重新授权界面、贡献同意和退出管理、课程资料权益、完整应用身份与会话、目录授权选集及 S3/COS adapter。Next SSO 按当前安排保持不动；生产前还需真实跨期、审计归档、生产备份与撤销恢复、保留清理、多进程预算和压力基准。
 
 未来在线阅读、加密容器和溯源继续明确延期，只保留参考设计。上述已完成测试不能代替未完成业务、真实长期授权或生产验收。
