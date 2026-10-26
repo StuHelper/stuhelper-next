@@ -33,6 +33,7 @@ updated: 2026-10-26
 | 存储贡献 | 实际接入服务商，退出先迁走文件，自愿上榜，公开透明度 | [存储贡献](../spec/storage-contribution.md) |
 | 通用文件与存储 | 全系统能力，课程资料是使用方；贡献和激励独立，账号来源与协议分开，实例按分类与范围准入；不考虑 BHpan 整体服务故障 | [存储设计](../design/storage-architecture.md) |
 | 存储冗余目标 | 首期总计三份完整副本，跨独立账号；首次发布门槛为两份，第三份异步补齐 | [放置与恢复](../spec/storage-placement.md) |
+| 存储执行器部署 | 首期同进程装配并设置后台任务与资源预算，执行器保留独立启动入口；按实测和运维需求启用独立进程或容器 | [部署规划](../design/storage-architecture.md#执行器部署与资源预算)、[实施计划](storage-module.md#执行器部署实施计划) |
 | 管理后台 | 可配置角色模板、对象范围、独立敏感权限及并发配置提示 | [管理操作](../spec/admin-operations.md) |
 | 客户端与迁移 | 当前仅 Web/Admin；保留 SSO 与学生认证数据，不迁移独立实名及其他旧业务数据 | [重写路线](rewrite-roadmap.md) |
 | 品牌与产品边界 | 沿用 StuHelper 和纸飞机品牌，不建设作业实验系统或学校教务写入功能 | [业务范围](../design/business-scope.md) |
