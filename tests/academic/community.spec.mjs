@@ -51,6 +51,9 @@ test('review semester limits teacher choices and unknown submission retries once
     return fulfill(route,{id:'new-review',state:'pending',revision:1});
   });
   await page.goto(`/courses/course?lang=${locale}`);
+  const card=page.locator('.review-card').first();
+  for(const key of ['recommendation','quality','difficulty','workload','grading'])await expect(card.getByText(a.ratings[key].label,{exact:true})).toBeVisible();
+  expect(await card.locator('.rating-bands dd').allTextContents()).toHaveLength(5);
   await page.getByRole('button',{name:a.writeReview,exact:true}).click();
   await page.getByRole('combobox',{name:a.reviewTerm,exact:true}).selectOption('fall');
   const teachers=page.getByRole('combobox',{name:a.taughtBy,exact:true});
