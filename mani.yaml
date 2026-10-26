@@ -48,6 +48,14 @@ projects:
       - backend
       - code
       - public
+  media:
+    path: workspace/media
+    url: https://github.com/StuHelper/stuhelper-media.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
   storage-bhpan:
     path: workspace/storage-bhpan
     url: https://github.com/StuHelper/stuhelper-storage-bhpan.git

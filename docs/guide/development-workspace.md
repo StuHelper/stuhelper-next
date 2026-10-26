@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # 开发工作区
@@ -10,7 +10,7 @@ updated: 2026-10-25
 
 主机安装 Git 与 Mani，项目 Node.js、pnpm 和 Go 版本见 `architecture/toolchains.yaml`。在主仓库运行 `make setup`、`mani sync`，再按需要运行 `mani run setup --tags code`。私有仓库使用开发者已有的 GitHub 授权。
 
-主检出位于 `workspace/<仓库名>`，任务工作树位于 `workspace/worktrees/<任务>/<仓库名>`。Mani 登记十个仓库，包括公共工具库和私有 backend；尚无源码的业务模块不预建空仓库。
+主检出位于 `workspace/<仓库名>`，任务工作树位于 `workspace/worktrees/<任务>/<仓库名>`。Mani 登记十二个仓库，包括公共工具库、storage、media 和私有 backend；尚无源码的业务模块不预建空仓库。
 
 ## 日常操作
 

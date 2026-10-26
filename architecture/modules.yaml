@@ -131,13 +131,12 @@ modules:
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
-    implementation: not-implemented
+    implementation: library
     required:
-      - platform
       - storage
     optional: []
     interface_owner: media
-    contract_status: design-only
+    contract_status: library
     specifications:
       - docs/spec/media.md
   - id: storage-contribution
