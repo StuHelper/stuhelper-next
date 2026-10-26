@@ -3,12 +3,12 @@
   "projects": {
     "storage": {
       "repository": "https://github.com/StuHelper/stuhelper-storage.git",
-      "revision": "d6a194d974cfd533c4ce97eaf3a9320c843945a1",
+      "revision": "5169ec45f6d5194fdf508389c468a315d8ec1376",
       "dirty": false
     },
     "media": {
       "repository": "https://github.com/StuHelper/stuhelper-media.git",
-      "revision": "b42a454a2c8a62d8d35e48f15d2957b83d1594d5",
+      "revision": "013904e1bccd389baa64f237e8383b83ff6d2ace",
       "dirty": false
     },
     "storage-bhpan": {
@@ -53,7 +53,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "93d5508530ed70492ffb0eead0cb48b8dab10c2c",
+      "revision": "88cc434792465a1a8c4a1a2c58e1c6d97714f8d4",
       "dirty": false
     },
     "tooling": {
