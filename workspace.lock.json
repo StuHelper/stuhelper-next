@@ -3,7 +3,7 @@
   "projects": {
     "storage": {
       "repository": "https://github.com/StuHelper/stuhelper-storage.git",
-      "revision": "d9a0a7c1b0c82695712cdf95e22643dba666414e",
+      "revision": "84fbb86037bf5ee747715d0310d66c1e701a4fa4",
       "dirty": false
     },
     "storage-bhpan": {
@@ -48,7 +48,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "9009f9c8b7568f3377e89c5dbd564732e765928b",
+      "revision": "c73b50c8811bf19afdf1da745a7894d30e835966",
       "dirty": false
     },
     "tooling": {
