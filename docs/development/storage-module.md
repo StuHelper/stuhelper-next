@@ -120,7 +120,7 @@ backend 已实现加密托管凭据及重启后重新登录，随后由连接层
 
 storage、media 与 storage-contribution 已建立有实现内容的独立仓库并登记 Mani；其余职责在有实际实现时按相同约定建仓。架构规格、提供方契约、模块实现与使用方接入分别交付；跨仓 PR 列出依赖、合并顺序和实际验证组合。
 
-storage 自有清单登记二十九组场景，media 登记七组，storage-contribution 登记七组，backend 登记十五组。backend 两组需显式启用真实账号，普通 CI 只编译入口。SP-01—SP-26 包含更广的跨模块验收，未全部完成；真实用户授权与阅读器场景未完成。
+storage 自有清单登记三十组场景，media 登记七组，storage-contribution 登记七组，backend 登记十五组。backend 两组需显式启用真实账号，普通 CI 只编译入口。SP-01—SP-26 包含更广的跨模块验收，未全部完成；真实用户授权与阅读器场景未完成。
 
 ## 执行器部署实施计划
 
@@ -185,9 +185,11 @@ backend 已验证 media 配置入口、独立服务身份、上传至清理全�
 
 当前草稿 PR 按 [BHpan #2](https://github.com/StuHelper/stuhelper-storage-bhpan/pull/2)、[Storage #1](https://github.com/StuHelper/stuhelper-storage/pull/1)、[Media #1](https://github.com/StuHelper/stuhelper-media/pull/1)、[Contribution #1](https://github.com/StuHelper/stuhelper-storage-contribution/pull/1)、[Backend #5](https://github.com/StuHelper/stuhelper-backend/pull/5)、[Web #9](https://github.com/StuHelper/stuhelper-web/pull/9)、[Admin #11](https://github.com/StuHelper/stuhelper-admin/pull/11)、[Next #8](https://github.com/StuHelper/stuhelper-next/pull/8) 顺序合并。源码依赖已固定，合并后须更新组合记录；当前未发行或部署。
 
-workspace.lock.json 固定 storage、storage-bhpan、media、storage-contribution、backend、web 与 admin 候选，其他模块保留已有组合。backend 使用同一 storage 候选，Web/Admin 分别固定 storage 和 contribution 契约及浏览器 SDK；提供方源码、摘要与生成结果一致。
+workspace.lock.json 固定 storage、storage-bhpan、media、storage-contribution、backend、web 与 admin 候选，其他模块保留已有组合。
 
-存储管理新增暂停/恢复新写、排空、撤销、额度调整和阻塞任务重试。服务端按当前权限、修订或代次及队列预算执行，未知写入仍查证原远端标识。29 组存储场景、真实 PostgreSQL、race、vet、构建与生成一致性检查通过。
+backend 使用当前 storage 候选；Web/Admin 保留兼容的 storage d0f8661 与 contribution 822b6ff 契约快照。周期配置未改变 HTTP 契约、生成类型或浏览器 SDK，来源与摘要继续核验。
+
+存储管理新增暂停/恢复新写、排空、撤销、额度调整和阻塞任务重试。服务端按当前权限、修订或代次及队列预算执行，未知写入仍查证原远端标识。30 组存储场景、真实 PostgreSQL、race、vet、构建与生成一致性检查通过。
 
 storage-contribution 的七组场景通过真实 PostgreSQL、race、vet、构建、OpenAPI/SDK 一致性和 HTTP 行为检查。覆盖同意与归属、并发幂等、续期与退出清理、丢失响应恢复、旧任务拒绝、到期和过期统计、重试上限与数据库隔离。
 
@@ -217,7 +219,9 @@ Windows 系统日志记录 2026-10-27 09:44 进入待机、12:36 退出待机，
 
 新候选已过滤不满足当前准入的定期校验，并覆盖撤销、未授权、到期及重新授权恢复。调度修复通过隔离 PostgreSQL 验证，未热更新原观测进程。关机后的获准恢复使用新候选与独立恢复数据库，原阻塞和中断记录保留。
 
-既有实现已经保存对象与副本索引，并在远端访问时建立或复用会话。待评估优化是减少无任务账号的容量采样，独立配置巡检触发策略；当前周期刷新仍会产生远端访问。本轮停止观察没有变更架构或调度代码。
+既有对象与副本索引、会话复用以及定期容量刷新和巡检均保留。新增容量刷新目标间隔、明确巡检间隔和维护扫描间隔配置，默认行为不变；原核验有效期字段继续兼容，冲突或无效周期拒绝启用。
+
+隔离 PostgreSQL 和可控时钟验证容量有效期、过期拒绝上传、失败采样不延期，以及巡检到期才入队。执行器验证提前刷新窗口与授权边界，backend 验证配置默认值、兼容性和实际装配。未重新启用真实账号观察。
 
 剩余业务包括课程资料权益、完整应用身份与会话、目录授权选集及 S3/COS adapter。Next SSO 按当前安排保持不动；生产前还需真实跨期、审计归档、生产备份与撤销恢复、保留清理、多进程预算和压力基准。
 
