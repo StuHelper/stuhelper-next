@@ -327,6 +327,7 @@ applications:
         - tests/e2e/contributions.spec.mjs#exit remains pending while replicas remain
       ST-08:
         - tests/e2e/contributions.spec.mjs#lost response retries original mutation, paginates and clears revoked data
+        - src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
   - id: admin
     repository: StuHelper/stuhelper-admin
     visibility: public
@@ -348,6 +349,7 @@ applications:
       ST-09:
         - tests/e2e/contributions.spec.mjs#operator retry preserves conditions, retains uncertain request and clears revoked inventory
         - tests/e2e/contributions.spec.mjs#operator login boundary recovers to an empty page
+        - apps/web-antd/src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
 operations:
   - id: ops
     repository: StuHelper/stuhelper-ops
