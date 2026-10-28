@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-29
 ---
 
 # CI 与 runner 约定
@@ -22,7 +22,9 @@ updated: 2026-10-25
 | stuhelper-backend | Backend checks |
 | stuhelper-web | Web checks |
 | stuhelper-admin | Admin checks |
-| verification、campus-adapters、billing | Documents checks |
+| verification | Verification checks |
+| campus-adapters | Campus adapter checks |
+| billing | Documents checks |
 | storage-bhpan | BHpan checks |
 | ops | Documents checks、Deployment configuration |
 

@@ -60,14 +60,18 @@ modules:
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional: []
     interface_owner: campus-adapters
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/catalog-operations.md
+    api: 1
+    capabilities:
+      - campus-adapters.verify
+    capability_requires: {}
   - id: storage-bhpan
     repository: StuHelper/stuhelper-storage-bhpan
     visibility: public
@@ -82,16 +86,23 @@ modules:
   - id: verification
     repository: StuHelper/stuhelper-verification
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - identity
       - campus-adapters
     interface_owner: verification
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/student-verification.md
+    api: 1
+    capabilities:
+      - verification.read
+      - verification.write
+      - verification.admin
+      - verification.capture
+    capability_requires: {}
   - id: catalog
     repository: StuHelper/stuhelper-catalog
     visibility: public

@@ -2,7 +2,7 @@
 
 StuHelper 的重构工程，采用 Go 平台、Vue Web、stuhelper-admin 和按业务划分的独立仓库。Next 是过渡名称。Casdoor 使用官方发行版本，各业务通过 OIDC 和官方 API 接入。
 
-**当前阶段：框架可运行，业务按规格实施。** platform 提供模块依赖、生命周期、能力发现、HTTP 访问边界和远程服务降级。Web 与 stuhelper-admin 提供八语言应用入口和服务状态。storage-bhpan 提供独立公开存储适配库。真实身份、数据库、校园业务装配与生产迁移仍在后续实施范围，见[框架状态](docs/development/framework-bootstrap.md)。
+**当前阶段：框架可运行，业务按规格实施。** platform 提供模块依赖、生命周期、能力发现、HTTP 访问边界和远程服务降级。Web 与 stuhelper-admin 提供八语言应用入口和服务状态。storage-bhpan 提供独立公开存储适配库。verification 已提供数据库实现、backend 装配和 Web/Admin 候选。真实身份、学校服务与生产迁移仍待接入验收，见[框架状态](docs/development/framework-bootstrap.md)。
 
 ## 工程入口
 
