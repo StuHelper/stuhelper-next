@@ -53,7 +53,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "536b41ef675dfc927b680b91c373f13b7e069e50",
+      "revision": "04a400c9b5c93b6c5fd09d2993a759bf683636ef",
       "dirty": false
     },
     "tooling": {
