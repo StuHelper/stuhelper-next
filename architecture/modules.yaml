@@ -123,6 +123,12 @@ modules:
         - integration_test.go#TestSchoolScopePublicProjectionAndBoundedHTTP
       ACAD-33:
         - integration_test.go#TestImportRelationsClassificationAndMissingCredits
+      ACAD-01:
+        - directory_test.go#TestDirectorySummaryLookupAndOfferingContext
+      ACAD-02:
+        - directory_test.go#TestDirectorySummaryLookupAndOfferingContext
+      ACAD-24:
+        - directory_test.go#TestDirectorySummaryLookupAndOfferingContext
   - id: moderation
     repository: StuHelper/stuhelper-moderation
     visibility: public
@@ -145,6 +151,7 @@ modules:
         - integration_test.go#TestDecisionDeliveryRecoversUnknownResultAndRejectsStaleRevision
       CM-05:
         - integration_test.go#TestPolicyScopeReplayAndPrivateDecisionProjection
+        - policies_test.go#TestEffectivePolicyAndAdminInitiatedReviewAreScoped
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
@@ -194,12 +201,22 @@ modules:
         - integration_test.go#TestConcurrentCreateReplayAndNewReviewsRemainAllowed
       ACAD-19:
         - integration_test.go#TestDiscussionIdentityVotingDraftConflictsAndModeration
+        - community_test.go#TestComposerUsesCurrentFactsAndDiscussionIdentity
       ACAD-30:
         - integration_test.go#TestWithdrawalWindowExpiryVotesAndPermanentDeletion
       ACAD-32:
         - integration_test.go#TestTeacherEqualCourseWeightsAndBandBoundaries
       ACAD-34:
         - integration_test.go#TestCourseTermEligibilityAndImmutableTeacherAttribution
+      ACAD-08:
+        - community_test.go#TestDraftPublicationIsAtomicAndRecoverable
+        - community_test.go#TestChronologicalPaginationTeacherFilterAndPrivateDetails
+      ACAD-21:
+        - community_test.go#TestPrivateReplyListRespectsWithdrawnRoot
+      ACAD-23:
+        - administration_test.go#TestModerationReadIsScopedAuditedAndUsesDiscussionHandles
+      ACAD-31:
+        - community_test.go#TestWithdrawnDraftSaveKeepsExpiryAndAttribution
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public

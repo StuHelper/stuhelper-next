@@ -144,4 +144,10 @@ test('academic snapshots reject forged digests, provider revisions and missing m
   assert.throws(() => verifyAcademicSource(provider, client, { ...source, revision: 'branch' }, load));
   assert.throws(() => verifyAcademicSource(provider, client, { ...source, sha256: {} }, load), /digest/);
   assert.throws(() => verifyAcademicSource(provider, client, source, () => 'different source'), /Snapshot differs/);
+  const adminGenerated = 'apps/web-antd/src/api/catalog.gen.ts';
+  fs.mkdirSync(path.dirname(path.join(directory, adminGenerated)), { recursive: true });
+  fs.writeFileSync(path.join(directory, adminGenerated), generated);
+  const adminSource = { ...source, files: { ...source.files, 'sdk/catalog.gen.ts': adminGenerated }, sha256: { 'contracts/catalog.openapi.json': digest(contract), [adminGenerated]: digest(generated) } };
+  verifyAcademicSource(provider, { ...client, name: 'admin' }, adminSource, load);
+  assert.throws(() => verifyAcademicSource(provider, { ...client, name: 'admin' }, source, load));
 });

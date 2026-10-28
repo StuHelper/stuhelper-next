@@ -118,7 +118,7 @@ export function verifyAcademicSource(provider, client, source, loadSource) {
   assert.equal(source.repository, `StuHelper/stuhelper-${module}`);
   assert.match(source.revision, /^[0-9a-f]{40}$/);
   const contract = `contracts/${module}.openapi.json`;
-  const generated = `src/api/${module}.gen.ts`;
+  const generated = client.name === 'admin' ? `apps/web-antd/src/api/${module}.gen.ts` : `src/api/${module}.gen.ts`;
   assert.deepEqual(source.files, { [contract]: contract, [`sdk/${module}.gen.ts`]: generated });
   for (const [providerFile, clientFile] of Object.entries(source.files)) {
     const content = fs.readFileSync(path.join(client.directory, clientFile), 'utf8');

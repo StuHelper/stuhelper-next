@@ -1,25 +1,34 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-27
+updated: 2026-10-28
 ---
 
 # 课程目录与评课社区实施
 
 ## 当前范围
 
-catalog 表示课程目录模块，reviews 表示课程评价与导师评论模块。业务规格已确认，核心服务与 Web 页面已在任务分支实现。模块清单使用 in-progress，表示仍有真实服务接入与运营功能待完成。
+catalog 表示课程目录模块，reviews 表示课程评价与导师评论模块。业务规格已确认，社区、课程主页、教师主页、讨论、个人内容和管理页面已在任务分支实现。模块清单使用 in-progress，表示正式身份、学校同步和部分目录运营功能仍待接入。
 
 课程列表按长期课程去重，支持学校、开课学院、课程类别与性质，不展示或筛选学期。课程评价保存所选学期，任课教师候选来自本人该课程、该学期的可信选课记录。
 
 | 模块 | 已实现 |
 | --- | --- |
-| catalog | 目录对象、关联查询、分页导入、来源修订、人工更正、本人选课查询 |
-| reviews | 五维评课、导师文字评论、匿名预览、回复身份、投票、收藏、草稿、撤回与到期删除 |
-| moderation | 发布检查、待审交接、举报合并、作者申请、审核决定、修订检查与失败重试 |
+| catalog | 目录对象、摘要、批量引用查询、开课与教学班上下文、分页导入、人工更正、本人选课查询 |
+| reviews | 五维评课、导师评论、资格提示、匿名与回复身份、时间分页、草稿冲突与原子发布、撤回和到期删除 |
+| moderation | 发布检查、待审交接、举报与作者申请、规则继承、管理员任务、审核决定及失败重试 |
 | platform | 无外部依赖的动作资格求值，缺失事实和不满足条件分别返回 |
 | backend | 三个独立运行身份、公开接口装配、HTTP 路由、审核工作循环与隔离联调 |
-| Web | 课程目录、教师主页、讨论、评课编辑器、导师模板、个人内容和八语言界面 |
+| Web | 社区首页、课程与教师主页、开课与教学班、评价筛选、统计范围、讨论、个人内容和八语言界面 |
+| stuhelper-admin | 审核队列、原文查看、内容处置、匿名切换、审核规则和课程教师资料更正 |
+
+社区入口为 `/community`，课程与教师目录为 `/courses`、`/teachers`，个人内容为 `/community/me`。课程主页提供分类、相关教师和历次开课，教师主页分别展示课程评价与导师评论。教学班页面仅展示本班教师及课表。
+
+个人内容包括评价、草稿、课程收藏、投票和申请状态。普通草稿发布与草稿移除一起提交。版本冲突展示另一端保存的内容，由作者选择采用或保留本地输入。刷新讨论不会清空正在输入的回复。
+
+管理端入口为 `/academic/reviews` 和 `/academic/catalog`。管理员可以查看待审原文，处理隐藏、恢复、删除、正文修改与讨论身份。页面分别展示决定已保存、已执行和投递失败，未知结果按原请求重试。
+
+管理原文和列表使用 `reviews.moderate` 学校权限并记录查看审计。审核决定、策略与重试使用各自 `moderation` 权限。公开响应只使用讨论内作者标识；目录更正由 `catalog.maintain` 学校范围限制。
 
 教师评分使用各课程等权平均，单门课评价多不会增加该课程权重。分课程统计与总体统计均返回展示等级和样本量，不显示精确均值。导师评论不参与评分。
 
@@ -47,13 +56,14 @@ catalog 表示课程目录模块，reviews 表示课程评价与导师评论模�
 
 | 范围 | 已执行结果 |
 | --- | --- |
-| catalog | PostgreSQL 导入回滚、来源更正、学院分类、本人记录、任课关联、并发幂等通过 |
-| reviews | PostgreSQL 资格、匿名、统计、撤回、到期、身份、草稿分页与并发测试通过 |
-| moderation | PostgreSQL 举报合并、学校范围、未知结果重试、旧修订拒绝通过 |
-| backend | 三个 schema 与独立运行身份下的 HTTP 导入、发布、举报、审核和资格撤销通过 |
+| catalog | PostgreSQL 导入回滚、来源更正、分类、开课摘要、批量引用、同班任课关联和并发幂等通过 |
+| reviews | PostgreSQL 资格、匿名、统计、撤回、到期、草稿并发发布、时间分页、管理原文与迁移保留数据通过 |
+| moderation | PostgreSQL 举报合并、规则继承、管理员发起任务、学校范围、未知结果重试与旧修订拒绝通过 |
+| backend | 三个 schema 与独立运行身份下的 HTTP 导入、草稿发布、资格提示、审核、身份切换和资格撤销通过 |
 | Go 工程 | 三个新模块的生成一致性、vet、race、构建与工作流检查通过 |
 | Web | 29 项单元测试、类型、lint、八语言消息和构建通过 |
-| 浏览器 | 64 项八语言桌面与移动检查通过，覆盖分类、学期教师、导师模板和错误恢复 |
+| stuhelper-admin | 类型、lint、八语言消息、333 项单元测试和构建通过 |
+| 浏览器 | 208 项八语言桌面与移动检查通过，覆盖学生端和管理端流程、版本冲突、权限变化及未知结果重试 |
 
 浏览器测试使用明确的合成 API 响应。数据库联调另外验证真实事务与运行身份。真实账号、制品发行、部署与恢复演练分别验收。
 
@@ -61,15 +71,15 @@ catalog 表示课程目录模块，reviews 表示课程评价与导师评论模�
 
 真实身份、校园资格、手机号和公开昵称尚未在正式命令入口接线。未提供 Authority 时，只能访问无需身份的目录与匿名预览；带身份的写入明确返回依赖不可用。
 
-长期学校同步命令、导入预览和管理任务、目录合并与停用、教师资料维护、管理员审核界面仍需完成。当前已保存审核与导入 outbox，通用通知和外部事件订阅尚未接入。
+长期学校同步、导入预览与管理任务、目录合并及停用仍需完成。课程与教师资料更正、管理员审核和审核规则页面已有实现。审核与导入 outbox 已保存，通用通知、处置复核和外部事件订阅尚未接入。
 
 备份与恢复、存量数据迁移、压力基准和真实账号验收尚未执行。资料与文件业务由对应任务实施，本轮只保留公开接口边界。
 
 ## 本地检查入口
 
-新模块执行 `bash scripts/check-with-postgres.sh`，使用本任务独立的 PostgreSQL 18 集群。Web 执行 `pnpm run check`。架构仓库中的 `playwright.academic.config.mjs` 使用 WEB_PATH 选择已构建的 Web 候选。
+新模块执行 `bash scripts/check-with-postgres.sh`，使用本任务独立的 PostgreSQL 18 集群。Web 执行 `pnpm run check`。管理端执行 `make check`。架构仓库中的 `playwright.academic.config.mjs` 使用 WEB_PATH 和 ADMIN_PATH 选择已构建候选。
 
-跨仓依赖按 platform、catalog/moderation/reviews、backend/Web、架构记录顺序评审。正式 backend 构建必须固定源码版本并使用 GOWORK=off，工作区联调不能替代独立构建。
+跨仓依赖按 platform、catalog/moderation/reviews、backend/Web/stuhelper-admin、架构记录顺序评审。正式 backend 构建必须固定源码版本并使用 GOWORK=off，工作区联调不能替代独立构建。
 
 ## 候选组合与评审
 
@@ -83,5 +93,6 @@ workspace.lock.json 固定本轮源码组合。提供方接口快照已按实际
 | moderation | [#1](https://github.com/StuHelper/stuhelper-moderation/pull/1) |
 | backend | [#6](https://github.com/StuHelper/stuhelper-backend/pull/6) |
 | Web | [#10](https://github.com/StuHelper/stuhelper-web/pull/10) |
+| stuhelper-admin | [#12](https://github.com/StuHelper/stuhelper-admin/pull/12) |
 
 学校适配核对单独保存在私有仓库的配套 PR。上述 PR 均处于草稿评审阶段，尚未合并、发行或部署。
