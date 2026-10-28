@@ -129,6 +129,12 @@ modules:
         - directory_test.go#TestDirectorySummaryLookupAndOfferingContext
       ACAD-24:
         - directory_test.go#TestDirectorySummaryLookupAndOfferingContext
+      CO-08:
+        - operations_test.go#TestMergeKeepsOldLinksOfferingsAndEnrollmentsAndSupportsDeactivation
+      CO-09:
+        - operations_test.go#TestMergeKeepsOldLinksOfferingsAndEnrollmentsAndSupportsDeactivation
+      CO-10:
+        - operations_test.go#TestImportPreviewRollsBackAndRejectsChangedConfirmation
   - id: moderation
     repository: StuHelper/stuhelper-moderation
     visibility: public
@@ -152,6 +158,12 @@ modules:
       CM-05:
         - integration_test.go#TestPolicyScopeReplayAndPrivateDecisionProjection
         - policies_test.go#TestEffectivePolicyAndAdminInitiatedReviewAreScoped
+      CM-10:
+        - operations_test.go#TestAppealRequiresContentOwnerAndAnotherReviewer
+      CM-12:
+        - operations_test.go#TestBatchPreviewAndRetryPreservePerItemResults
+      CM-13:
+        - operations_test.go#TestAffectedAuthorSeesDecisionWithoutReportersPrivateEvidence
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
@@ -182,6 +194,7 @@ modules:
     contract_status: implemented
     specifications:
       - docs/spec/academic-content.md
+      - docs/spec/content-management.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
@@ -212,11 +225,29 @@ modules:
         - community_test.go#TestDraftPublicationIsAtomicAndRecoverable
         - community_test.go#TestChronologicalPaginationTeacherFilterAndPrivateDetails
       ACAD-21:
+        - management_test.go#TestWithdrawnContentCannotExposeEarlierBodiesThroughHistory
         - community_test.go#TestPrivateReplyListRespectsWithdrawnRoot
       ACAD-23:
         - administration_test.go#TestModerationReadIsScopedAuditedAndUsesDiscussionHandles
       ACAD-31:
         - community_test.go#TestWithdrawnDraftSaveKeepsExpiryAndAttribution
+      ACAD-35:
+        - disclosures_test.go#TestVoluntaryDisclosuresRequireFreshAuthorizedFacts
+      ACAD-36:
+        - disclosures_test.go#TestVoluntaryDisclosuresRequireFreshAuthorizedFacts
+        - disclosures_test.go#TestTeacherReplyRequiresRealNameAcrossTermsAndAllowsIndependentTagsElsewhere
+      ACAD-37:
+        - disclosures_test.go#TestTeacherReplyRequiresRealNameAcrossTermsAndAllowsIndependentTagsElsewhere
+      ACAD-38:
+        - disclosures_test.go#TestTeacherReplyRequiresRealNameAcrossTermsAndAllowsIndependentTagsElsewhere
+      ACAD-39:
+        - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+      ACAD-40:
+        - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+      CM-09:
+        - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+      CM-14:
+        - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public

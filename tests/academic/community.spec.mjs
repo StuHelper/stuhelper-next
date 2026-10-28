@@ -32,6 +32,7 @@ export async function fixture(page){
       const needsTerm=u.searchParams.get('kind')==='course'&&!u.searchParams.get('term_id');
       return fulfill(route,{allowed:!needsTerm,state:needsTerm?'choose_term':'ready',requirements:[{key:'login',state:'satisfied'},{key:'campus_eligibility',state:'satisfied'},{key:'phone_bound',state:'satisfied'}],teacher_ids:u.searchParams.get('kind')==='course'&&u.searchParams.get('term_id')?[u.searchParams.get('term_id')==='fall'?'teacher-a':'teacher-b']:[],identity:'choice',rule_version:'fixture'});
     }
+    if(p==='/api/v1/reviews/presentation')return fulfill(route,{effective:{school_id:'school',revision:0,guest_preview:80,member_preview:160,preview_ratio:0.3,rating_texts:{}},configured:null,source:'default'});
     if(p==='/api/v1/reviews/statistics')return fulfill(route,{dimensions,courses:[{course_id:'course',dimensions}],next:'',from:u.searchParams.get('from'),until:u.searchParams.get('until')});
     if(p==='/api/v1/reviews'&&route.request().method()==='GET')return fulfill(route,{items:u.searchParams.get('kind')==='course'?[review]:[],next:''});
     if(p==='/api/v1/reviews/review')return fulfill(route,review);
@@ -211,4 +212,37 @@ test('missing enrollment explains the blocked publication and keeps draft access
   await expect(page.getByText(a.noEnrollmentHint,{exact:true})).toBeVisible();
   await expect(page.getByRole('button',{name:a.publish,exact:true})).toBeDisabled();
   await expect(page.getByRole('button',{name:a.saveDraft,exact:true})).toBeEnabled();
+});
+
+test('student selects authoritative real name independently and sends no attribute values',async({page},info)=>{
+ const a=messages(info);let posted;
+ await page.route('**/api/v1/reviews/compose?*',route=>fulfill(route,{allowed:true,state:'ready',requirements:[],teacher_ids:[],identity:'choice',rule_version:'fixture',disclosures:[{key:'real_name',value:'Synthetic Student',required:false},{key:'gender',value:'Synthetic gender',required:false},{key:'department',value:'Synthetic College',required:false}]}));
+ await page.route('**/api/v1/reviews',route=>{if(route.request().method()!=='POST')return route.fallback();posted=route.request().postDataJSON();return fulfill(route,{id:'named-student',state:'published',revision:1})});
+ await page.goto(`/teachers/teacher-a?lang=${info.project.metadata.locale}`);await page.getByRole('button',{name:a.writeMentor,exact:true}).click();const editor=page.locator('form.academic-editor');
+ const name=editor.getByRole('checkbox',{name:new RegExp(a.labels.real_name)});await expect(name).not.toBeChecked();await name.check();await expect(editor.getByRole('checkbox',{name:new RegExp(a.labels.teacher)})).toHaveCount(0);await expect(editor.getByRole('checkbox',{name:new RegExp(a.labels.enrollment)})).toHaveCount(0);
+ await editor.getByLabel(a.title,{exact:true}).fill('Student experience');await editor.getByLabel(a.body,{exact:true}).fill('Voluntary real-name comment.');await editor.getByRole('button',{name:a.publish,exact:true}).click();await expect(page.getByText(a.published,{exact:true})).toBeVisible();
+ expect(posted.disclosures).toEqual(['real_name']);expect(JSON.stringify(posted)).not.toContain('Synthetic Student');expect(posted.signed).toBe(false);
+});
+
+test('own-course teacher reply visibly requires authorized name and teacher badge',async({page},info)=>{
+ const a=messages(info);let posted;
+ await page.route('**/api/v1/reviews/compose?*',route=>fulfill(route,{allowed:true,state:'ready',requirements:[],teacher_ids:[],identity:'anonymous',rule_version:'fixture',teacher_reply:true,disclosures:[{key:'real_name',value:'Synthetic Teacher',required:true},{key:'teacher',value:'verified',required:true},{key:'organization',value:'Synthetic Faculty',required:false}]}));
+ await page.route('**/api/v1/reviews/review/replies',route=>{posted=route.request().postDataJSON();return fulfill(route,{id:'teacher-reply',state:'published',revision:1})});
+ await page.goto(`/reviews/review?lang=${info.project.metadata.locale}`);const editor=page.locator('form.academic-editor');await expect(editor.getByText(a.teacherRequired,{exact:true})).toBeVisible();
+ for(const key of ['real_name','teacher']){const box=editor.getByRole('checkbox',{name:new RegExp(a.labels[key])});await expect(box).toBeChecked();await expect(box).toBeDisabled()}
+ await editor.getByLabel(a.body,{exact:true}).fill('Response from the verified teacher.');await editor.getByRole('button',{name:a.publish,exact:true}).click();await expect(page.getByText(a.published,{exact:true})).toBeVisible();expect(posted.disclosures.sort()).toEqual(['real_name','teacher']);expect(JSON.stringify(posted)).not.toContain('Synthetic Teacher');
+});
+
+test('teacher replying elsewhere can disclose only the verification badge',async({page},info)=>{
+ const a=messages(info);let posted;
+ await page.route('**/api/v1/reviews/compose?*',route=>fulfill(route,{allowed:true,state:'ready',requirements:[],teacher_ids:[],identity:'choice',rule_version:'fixture',teacher_reply:false,disclosures:[{key:'real_name',value:'Synthetic Teacher',required:false},{key:'teacher',value:'verified',required:false},{key:'organization',value:'Synthetic Faculty',required:false}]}));
+ await page.route('**/api/v1/reviews/review/replies',route=>{posted=route.request().postDataJSON();return fulfill(route,{id:'teacher-reply',state:'published',revision:1})});
+ await page.goto(`/reviews/review?lang=${info.project.metadata.locale}`);const editor=page.locator('form.academic-editor');await editor.getByRole('checkbox',{name:new RegExp(a.labels.teacher)}).check();await expect(editor.getByRole('checkbox',{name:new RegExp(a.labels.real_name)})).not.toBeChecked();await editor.getByLabel(a.body,{exact:true}).fill('Reply with badge only.');await editor.getByRole('button',{name:a.publish,exact:true}).click();await expect(page.getByText(a.published,{exact:true})).toBeVisible();expect(posted.disclosures).toEqual(['teacher']);
+});
+
+test('author can request reconsideration of an eligible decision',async({page},info)=>{
+ const a=messages(info);let posted;
+ const task={id:'handled',school_id:'school',can_appeal:true,submission:{object_id:'review',kind:'delete_request',reason:'Author request',evidence:[]},object_revision:1,revision:2,state:'applied',created_at:'2026-10-28T00:00:00Z',updated_at:'2026-10-28T00:00:00Z',decision:{id:'decision',object_id:'review',revision:1,action:'dismiss',reason:'Previous decision'}};
+ await page.route('**/api/v1/moderation/tasks*',route=>{if(route.request().method()==='GET')return fulfill(route,[task]);posted=route.request().postDataJSON();return fulfill(route,{...task,id:'appeal',state:'waiting',can_appeal:false,submission:posted})});
+ await page.goto(`/community/me?tab=reports&lang=${info.project.metadata.locale}`);await page.getByRole('button',{name:a.appeal,exact:true}).click();await page.getByLabel(a.reason,{exact:true}).fill('Additional evidence for reconsideration.');await page.getByRole('button',{name:a.confirm,exact:true}).click();await expect(page.locator('form.academic-editor')).toHaveCount(0);expect(posted).toMatchObject({kind:'appeal',previous_task_id:'handled',object_id:'review'});
 });
