@@ -13,7 +13,7 @@
     },
     "admin": {
       "repository": "https://github.com/StuHelper/stuhelper-admin.git",
-      "revision": "0fe4170f2db42d2b96e0e4c0b56af77e7ea571c6",
+      "revision": "86e1ece978c24aaa706e983f98c2864bf1edb9da",
       "dirty": false
     },
     "campus-adapters": {
