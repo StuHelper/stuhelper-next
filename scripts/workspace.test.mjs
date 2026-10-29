@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { test } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { goWorkspace, verifyWorkspaceScenarios, verifyScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
+import { goWorkspace, parseCommand, verifyWorkspaceScenarios, verifyScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
 
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -166,4 +166,11 @@ test('scenario verification obeys the explicit integration checkout scope', t =>
   assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records, ['typo']), /Unknown scenario checkout/);
   fs.rmSync(path.join(directory,'public','module_test.go'));
   assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records, ['platform']), /ENOENT|Missing scenario test/);
+});
+
+
+test('CLI accepts an explicit contract scope without relaxing other commands', () => {
+  assert.deepEqual(parseCommand(['contracts','--scope=platform,web,admin']), {command:'contracts',scope:['platform','web','admin'],write:false});
+  assert.equal(parseCommand(['snapshot','--write']).write,true);
+  for (const args of [['contracts','--write'],['contracts','--scope='],['validate','--scope=platform'],['snapshot','--scope=platform'],['contracts','--scope=platform','extra']]) assert.throws(()=>parseCommand(args));
 });
