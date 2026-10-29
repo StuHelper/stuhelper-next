@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # 框架实施状态
@@ -10,9 +10,11 @@ updated: 2026-10-25
 
 platform 提供公共模块接口、依赖校验、能力降级、Fx 生命周期、HTTP 授权边界和可选远程连接。模块描述由其仓库的 `module.yaml` 生成，主仓库验证规格归属和公开能力一致性。
 
-私有 backend 承载正式程序入口，当前装配 platform 框架。公共示例位于 platform 的 `examples/server`。verification、campus-adapters、billing 尚未装配到正式业务入口。storage-bhpan 独立提供 BHpan Go 存储适配库，其公开协议与脱敏验证记录由本仓维护；正式业务装配尚未实现。
+私有 backend 承载正式程序入口，已装配 platform 与存储、通用文件服务。公共示例位于 platform 的 `examples/server`。verification、campus-adapters、billing 尚未装配到正式业务入口。storage-bhpan 独立提供 BHpan Go 存储适配库，其公开协议与脱敏验证记录由适配器仓库维护，真实存储集成见存储主题。
 
-Web 与 stuhelper-admin 提供状态展示、错误恢复和八语言入口。国际化检查覆盖消息键、占位符、复数、数字、金额、日期、时区、相对时间和 RTL。
+通用存储已有独立库，实现多账号准入、三副本、两份发布门槛、恢复与清理，见[实施状态](storage-module.md)。media 已实现文件上传、批准、引用与下载，backend 固定依赖联调通过。resources 与贡献管理仍待实施，生产环境未开放。
+
+Web 与 stuhelper-admin 提供状态展示、错误恢复和八语言入口。Admin 另有存储运营页面，接口、权限和验收范围见[存储实施状态](storage-module.md)。国际化检查覆盖消息键、占位符、复数、数字、金额、日期、时区、相对时间和 RTL。
 
 共享检查器、GitHub action、reusable workflow 与 Lefthook 预设已迁至 stuhelper-tooling。主仓库保留架构、Mani、工作区工具和应用联调。SSO 官方制品资料归 ops，后端身份实现归 backend。
 

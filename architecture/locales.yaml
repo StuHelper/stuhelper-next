@@ -40,7 +40,11 @@ same_text_exceptions:
       notFound.code:
         value: "404"
         reason: 品牌名称或通用格式标记保持原文。
-    languages: {}
+    languages:
+      es-ES:
+        contribution.bytes:
+          value: "{value} bytes"
+          reason: 西班牙语的字节单位使用 bytes，与英文写法相同。
   admin:
     shared:
       authentication.qq:
@@ -106,6 +110,9 @@ same_text_exceptions:
           value: Administration
           reason: 本语言的正确词语与英文拼写相同。
       es-ES:
+        page.contribution.bytes:
+          value: "{value} bytes"
+          reason: 西班牙语的字节单位使用 bytes，与英文写法相同。
         preferences.vertical:
           value: Vertical
           reason: 本语言的正确词语与英文拼写相同。

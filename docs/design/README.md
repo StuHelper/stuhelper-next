@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # 项目设计
@@ -14,6 +14,8 @@ updated: 2026-10-25
 | [按模块划分仓库](module-repositories.md) | 模块职责、公开与私有范围、数据与接口归属 |
 | [平台架构](platform-architecture.md) | 模块职责、数据所有权、协作与部署单元 |
 | [课程、教师与内容关系](academic-content.md) | 课程、开课、教师、评价、资料和社交引用 |
+| [通用文件与分布式存储](storage-architecture.md) | 文件、存储、贡献和激励的解耦，实例准入、混合后端与副本恢复 |
+| [文件保护与受控阅读](file-protection-and-delivery.md) | 暂不实现的溯源、水印、加密容器、授权及未来在线阅读参考 |
 | [独立 SSO 与应用边界](independent-sso.md) | 官方镜像、独立运维、迁移和恢复机制 |
 | [原生多端设计](native-clients.md) | 技术路线、共享边界、登录和平台限制 |
 | [框架运行与应用入口](framework-runtime.md) | 模块、能力、健康与应用入口 |

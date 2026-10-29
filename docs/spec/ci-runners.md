@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-27
 ---
 
 # CI 与 runner 约定
@@ -20,10 +20,13 @@ updated: 2026-10-25
 | stuhelper-tooling | Tooling checks |
 | stuhelper-platform | Platform checks |
 | stuhelper-backend | Backend checks |
-| stuhelper-web | Web checks |
-| stuhelper-admin | Admin checks |
+| stuhelper-web | Web checks、Contribution browser checks |
+| stuhelper-admin | Admin checks、Storage browser checks |
 | verification、campus-adapters、billing | Documents checks |
 | storage-bhpan | BHpan checks |
+| storage | Storage checks |
+| media | Media checks |
+| storage-contribution | Contribution checks |
 | ops | Documents checks、Deployment configuration |
 
 GitHub 对 reusable workflow 显示调用 job 与实际 job 的组合名称，分支规则使用远端实际产生的 check 名称。当前 GitHub API 对五个私有仓库的分支保护返回套餐限制，无法启用强制门禁。它们仍执行独立 CI，合并前核对完整结果；公开仓库按实际 check 名称启用保护。

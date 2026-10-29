@@ -68,6 +68,17 @@ modules:
     contract_status: design-only
     specifications:
       - docs/spec/catalog-operations.md
+  - id: storage
+    repository: StuHelper/stuhelper-storage
+    visibility: public
+    implementation: library
+    required: []
+    optional:
+      - storage-bhpan
+    interface_owner: storage
+    contract_status: library
+    specifications:
+      - docs/spec/storage-placement.md
   - id: storage-bhpan
     repository: StuHelper/stuhelper-storage-bhpan
     visibility: public
@@ -120,16 +131,25 @@ modules:
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
-    implementation: not-implemented
+    implementation: library
     required:
-      - platform
-    optional:
-      - billing
-      - storage-bhpan
+      - storage
+    optional: []
     interface_owner: media
-    contract_status: design-only
+    contract_status: library
     specifications:
       - docs/spec/media.md
+  - id: storage-contribution
+    repository: StuHelper/stuhelper-storage-contribution
+    visibility: public
+    implementation: library
+    required:
+      - storage
+    optional:
+      - billing
+    interface_owner: storage-contribution
+    contract_status: library
+    specifications:
       - docs/spec/storage-contribution.md
   - id: reviews
     repository: StuHelper/stuhelper-reviews
@@ -289,14 +309,47 @@ applications:
     repository: StuHelper/stuhelper-web
     visibility: public
     implementation: framework
+    optional: [storage, storage-contribution]
+    capability_requires:
+      storage.custody: [storage]
+      contributions.manage: [storage-contribution]
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/storage-contribution.md
+    scenario_tests:
+      ST-10:
+        - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets and preserves the binding on renewal
+        - tests/e2e/custody.spec.mjs#uncertain custody submission recovers by ID without retaining or resending a password
+        - tests/e2e/custody.spec.mjs#an existing blocked custody request resumes without new credentials
+      ST-01:
+        - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment and renewal retain distinct request state
+      ST-03:
+        - tests/e2e/contributions.spec.mjs#exit remains pending while replicas remain
+      ST-08:
+        - tests/e2e/contributions.spec.mjs#lost response retries original mutation, paginates and clears revoked data
+        - src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
   - id: admin
     repository: StuHelper/stuhelper-admin
     visibility: public
     implementation: framework
+    optional: [storage, storage-contribution]
+    capability_requires:
+      storage.operations: [storage]
+      storage.custody.operations: [storage]
+      contributions.operations: [storage-contribution]
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/admin-operations.md
+      - docs/spec/storage-placement.md
+      - docs/spec/storage-contribution.md
+    scenario_tests:
+      ST-11:
+        - tests/e2e/custody.spec.mjs#custody administration resumes original consent without credential access
+        - tests/e2e/custody.spec.mjs#custody administration handles unauthenticated and empty states
+      ST-09:
+        - tests/e2e/contributions.spec.mjs#operator retry preserves conditions, retains uncertain request and clears revoked inventory
+        - tests/e2e/contributions.spec.mjs#operator login boundary recovers to an empty page
+        - apps/web-antd/src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
 operations:
   - id: ops
     repository: StuHelper/stuhelper-ops
