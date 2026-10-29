@@ -2,7 +2,7 @@ import YAML from 'yaml';
 import path from 'node:path';
 import fs from 'node:fs';
 import { mkdir } from 'node:fs/promises';
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../session-fixture.mjs';
 
 const root = process.cwd();
 const policy = YAML.parse(fs.readFileSync(path.join(root, 'architecture/locales.yaml'), 'utf8'));

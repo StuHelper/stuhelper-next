@@ -10,6 +10,7 @@ const web = process.env.WEB_PATH || path.join(root, 'workspace/web');
 const admin = process.env.ADMIN_PATH || path.join(root, 'workspace/admin');
 
 export default defineConfig({
+  outputDir: '.tools/playwright.config-results',
   testDir: './tests/e2e',
   timeout: 30_000,
   workers: 2,

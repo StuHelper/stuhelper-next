@@ -32,13 +32,17 @@ projects:
     url: https://github.com/StuHelper/stuhelper-verification.git
     branch: develop
     tags:
-      - documents
+      - backend
+      - code
+      - private
   campus-adapters:
     path: workspace/campus-adapters
     url: https://github.com/StuHelper/stuhelper-campus-adapters.git
     branch: develop
     tags:
-      - documents
+      - backend
+      - code
+      - private
   storage:
     path: workspace/storage
     url: https://github.com/StuHelper/stuhelper-storage.git
@@ -126,6 +130,14 @@ projects:
   resources:
     path: workspace/resources
     url: https://github.com/StuHelper/stuhelper-resources.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  profiles:
+    path: workspace/profiles
+    url: https://github.com/StuHelper/stuhelper-profiles.git
     branch: develop
     tags:
       - backend

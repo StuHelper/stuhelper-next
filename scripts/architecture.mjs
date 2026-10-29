@@ -29,8 +29,8 @@ export function validateModules(config) {
       assert(!module.capabilities?.length, 'Libraries do not expose runtime capabilities');
     }
     if (['framework','in-progress'].includes(module.implementation)) {
-      assert.equal(module.contract_status, module.implementation === 'framework' ? 'framework' : 'implemented');
-      assert(Number.isInteger(module.api) && module.api > 0);
+      assert.equal(module.contract_status, module.implementation === 'framework' ? 'framework' : 'implemented', 'Candidates must declare their implemented contract');
+      assert(Number.isInteger(module.api) && module.api > 0, 'Candidates must declare an API version');
       assert(Array.isArray(module.capabilities));
       assert(module.capability_requires && typeof module.capability_requires === 'object');
     }
