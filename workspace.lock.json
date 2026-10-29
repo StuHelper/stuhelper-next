@@ -8,27 +8,27 @@
     },
     "web": {
       "repository": "https://github.com/StuHelper/stuhelper-web.git",
-      "revision": "f6e4d24ad98f6d75698c7c3ee68fbf30923fd8d6",
+      "revision": "44d1b3855bf572eae244807db36c7aaa12baa55b",
       "dirty": false
     },
     "admin": {
       "repository": "https://github.com/StuHelper/stuhelper-admin.git",
-      "revision": "ab95ebe4bad0c9df7f7ea2f9353e470b1ef60785",
+      "revision": "8491970d94711acb82bcb3652aa42455cb18ccac",
       "dirty": false
     },
     "verification": {
       "repository": "https://github.com/StuHelper/stuhelper-verification.git",
-      "revision": "2097d41e922fcfccdcd58e443d0f9fc0b51eb126",
+      "revision": "936c83cda359d75e9ff04bb5b731ec29de3ea7c9",
       "dirty": false
     },
     "campus-adapters": {
       "repository": "https://github.com/StuHelper/stuhelper-campus-adapters.git",
-      "revision": "993bc0fc0f605da306951290cf6ff2d72ae8a73e",
+      "revision": "b26e79dc579d9d956f2b2b47db2f6aa81e284099",
       "dirty": false
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "e599d793f0157acf189c19fcac8006c1ba4d6272",
+      "revision": "1cb2637df7e365ec4fb1a9273a715482a1fbf12f",
       "dirty": false
     },
     "tooling": {
