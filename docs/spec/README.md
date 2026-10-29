@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-26
+updated: 2026-10-29
 ---
 
 # 功能与模块规格

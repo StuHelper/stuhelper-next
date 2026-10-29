@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 # 按模块划分仓库
@@ -34,7 +34,7 @@ updated: 2026-10-28
 | storage-bhpan | stuhelper-storage-bhpan | public | BHpan 登录、稳定身份、目录与文件传输协议；由 storage 的 adapter 桥接使用 |
 | catalog | stuhelper-catalog | public | 学校、院系、学期、课程、教师、开课与个人课表 |
 | reviews | stuhelper-reviews | public | 课程评价、导师评论、评分、回复、投票、收藏与草稿 |
-| resources | stuhelper-resources | public | 资料目录、版本、作品许可、访问授权与交付状态 |
+| resources | stuhelper-resources | public | 统一分类及字段、课程关联、资料版本、作品许可、审核、访问授权、目录与交付状态 |
 | billing | stuhelper-billing | private | 积分、Ivory、收费、会员售卖、奖励、退款与交易权益凭据 |
 | moderation | stuhelper-moderation | public | 内容审核、举报、申诉与处置决定，内容模块执行状态变化 |
 | community | stuhelper-community | public | 动态、分区、关注、屏蔽及动态内互动 |

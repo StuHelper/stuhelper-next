@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-27
+updated: 2026-10-29
 ---
 
 # CI 与 runner 约定
@@ -26,10 +26,14 @@ updated: 2026-10-27
 | storage-bhpan | BHpan checks |
 | storage | Storage checks |
 | media | Media checks |
+| resources | Resources checks |
 | storage-contribution | Contribution checks |
+| catalog、reviews、moderation | Catalog checks、Reviews checks、Moderation checks |
 | ops | Documents checks、Deployment configuration |
 
 GitHub 对 reusable workflow 显示调用 job 与实际 job 的组合名称，分支规则使用远端实际产生的 check 名称。当前 GitHub API 对五个私有仓库的分支保护返回套餐限制，无法启用强制门禁。它们仍执行独立 CI，合并前核对完整结果；公开仓库按实际 check 名称启用保护。
+
+公开应用联调默认使用各仓 develop。首次跨仓实现的 academic-community PR 使用 workspace.lock.json 中显式登记的提交，push 到 develop/main 后仍使用 develop。手动运行可通过完整 SHA 指定候选，实际组合写入 CI summary。
 
 ## runner 与权限
 

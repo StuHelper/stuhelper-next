@@ -1,7 +1,7 @@
 ---
 type: spec
 status: InReview
-updated: 2026-10-26
+updated: 2026-10-29
 ---
 
 # 存储放置与恢复

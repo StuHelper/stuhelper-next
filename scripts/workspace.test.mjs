@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { test } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { goWorkspace, verifyScenarios, verifySource } from './workspace.mjs';
+import { goWorkspace, verifyScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
 
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -56,6 +56,8 @@ test('implemented scenarios reference an existing specification and executable t
   fs.writeFileSync(path.join(directory, 'spec.md'), '| MOD-06 | condition | result |');
   fs.writeFileSync(path.join(directory, 'module_test.go'), 'func TestOptional(t *testing.T) {}');
   const definition = { specifications: ['spec.md'], scenario_tests: { 'MOD-06': ['module_test.go#TestOptional'] } };
+  verifyScenarios(directory, definition, directory);
+  fs.writeFileSync(path.join(directory, 'spec.md'), '| MOD-06：condition | result |');
   verifyScenarios(directory, definition, directory);
   assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-99': ['module_test.go#TestOptional'] } }, directory), /Unknown implemented scenario/);
   fs.writeFileSync(path.join(directory, 'module_test.go'), '');
@@ -123,4 +125,29 @@ test('contract provenance retrieves the declared historical commit from a fresh 
   assert.equal(providerSource(checkout, declared, 'contracts/api.yaml'), 'version: old\n');
   assert.equal(git(checkout, 'rev-parse', 'HEAD'), current);
   assert.equal(git(checkout, 'status', '--porcelain'), '');
+});
+
+test('academic snapshots reject forged digests, provider revisions and missing mappings', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-academic-contract-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(directory, 'contracts'));
+  fs.mkdirSync(path.join(directory, 'src/api'), { recursive: true });
+  const contract = JSON.stringify({ openapi: '3.1.0', info: { version: '0.1.0' } });
+  const generated = 'export interface paths {}';
+  fs.writeFileSync(path.join(directory, 'contracts/catalog.openapi.json'), contract);
+  fs.writeFileSync(path.join(directory, 'src/api/catalog.gen.ts'), generated);
+  const source = { repository: 'StuHelper/stuhelper-catalog', revision: 'a'.repeat(40), version: '0.1.0', files: { 'contracts/catalog.openapi.json': 'contracts/catalog.openapi.json', 'sdk/catalog.gen.ts': 'src/api/catalog.gen.ts' }, sha256: { 'contracts/catalog.openapi.json': digest(contract), 'src/api/catalog.gen.ts': digest(generated) } };
+  const provider = { name: 'catalog' }, client = { directory };
+  const load = (revision, filename) => { assert.equal(revision, source.revision); return filename.startsWith('contracts/') ? contract : generated; };
+  verifyAcademicSource(provider, client, source, load);
+  assert.throws(() => verifyAcademicSource(provider, client, { ...source, files: {} }, load));
+  assert.throws(() => verifyAcademicSource(provider, client, { ...source, revision: 'branch' }, load));
+  assert.throws(() => verifyAcademicSource(provider, client, { ...source, sha256: {} }, load), /digest/);
+  assert.throws(() => verifyAcademicSource(provider, client, source, () => 'different source'), /Snapshot differs/);
+  const adminGenerated = 'apps/web-antd/src/api/catalog.gen.ts';
+  fs.mkdirSync(path.dirname(path.join(directory, adminGenerated)), { recursive: true });
+  fs.writeFileSync(path.join(directory, adminGenerated), generated);
+  const adminSource = { ...source, files: { ...source.files, 'sdk/catalog.gen.ts': adminGenerated }, sha256: { 'contracts/catalog.openapi.json': digest(contract), [adminGenerated]: digest(generated) } };
+  verifyAcademicSource(provider, { ...client, name: 'admin' }, adminSource, load);
+  assert.throws(() => verifyAcademicSource(provider, { ...client, name: 'admin' }, source, load));
 });
