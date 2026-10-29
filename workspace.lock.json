@@ -1,14 +1,34 @@
 {
   "schema_version": 1,
   "projects": {
+    "platform": {
+      "repository": "https://github.com/StuHelper/stuhelper-platform.git",
+      "revision": "1bb511bb1a2ce0136b3b8ef2fbc456461ffb219e",
+      "dirty": false
+    },
+    "web": {
+      "repository": "https://github.com/StuHelper/stuhelper-web.git",
+      "revision": "fdea61454ae17824410a7b632022e9a5656ecb6a",
+      "dirty": false
+    },
+    "admin": {
+      "repository": "https://github.com/StuHelper/stuhelper-admin.git",
+      "revision": "54baed79617bc178d118fe8845cde374d808d67d",
+      "dirty": false
+    },
     "storage": {
       "repository": "https://github.com/StuHelper/stuhelper-storage.git",
-      "revision": "d3ae76624d6bda5017a3f0d8e3e50368561d1146",
+      "revision": "e5cfd40dcde1822fb75040d834c748744fdb4cfe",
       "dirty": false
     },
     "media": {
       "repository": "https://github.com/StuHelper/stuhelper-media.git",
-      "revision": "013904e1bccd389baa64f237e8383b83ff6d2ace",
+      "revision": "e7deac84aae95d8dc3bde6ae292b6f4242fc2871",
+      "dirty": false
+    },
+    "storage-contribution": {
+      "repository": "https://github.com/StuHelper/stuhelper-storage-contribution.git",
+      "revision": "822b6ff33ec02a6270ba0d2349f25a41f4dff4d7",
       "dirty": false
     },
     "storage-bhpan": {
@@ -16,54 +36,29 @@
       "revision": "51b6f1ff502914673fd6689165537b9e6bd6532d",
       "dirty": false
     },
-    "platform": {
-      "repository": "https://github.com/StuHelper/stuhelper-platform.git",
-      "revision": "d7ad312b73b8bdd408cc32d218f4327fed563ff2",
-      "dirty": false
-    },
-    "web": {
-      "repository": "https://github.com/StuHelper/stuhelper-web.git",
-      "revision": "eecef0bc0319a09f5c493a8117ec00111c37e786",
-      "dirty": false
-    },
-    "admin": {
-      "repository": "https://github.com/StuHelper/stuhelper-admin.git",
-      "revision": "ea5a74cc2d619b887ac104133b4620deda0c388e",
-      "dirty": false
-    },
-    "verification": {
-      "repository": "https://github.com/StuHelper/stuhelper-verification.git",
-      "revision": "36cbcb32b6fd4acc7ff35126a627ae585d4430d9",
-      "dirty": false
-    },
-    "campus-adapters": {
-      "repository": "https://github.com/StuHelper/stuhelper-campus-adapters.git",
-      "revision": "8bbf972a9088b2c38c917bd00788ba928f3d8f00",
-      "dirty": false
-    },
-    "billing": {
-      "repository": "https://github.com/StuHelper/stuhelper-billing.git",
-      "revision": "bb607a3980977898e9e73731c6340b965fad62f3",
-      "dirty": false
-    },
-    "ops": {
-      "repository": "https://github.com/StuHelper/stuhelper-ops.git",
-      "revision": "ef1530fd8dac092481778b11492deaedb471f8bb",
-      "dirty": false
-    },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "99476cf5aaf75c007f2e0b32bc72a3741a77e21c",
+      "revision": "d316537b9d24315f9e73550770f647097e3710c3",
       "dirty": false
     },
-    "tooling": {
-      "repository": "https://github.com/StuHelper/stuhelper-tooling.git",
-      "revision": "cf53a7a2ef06d2843acc7ad4ee7615fe1ad33957",
+    "catalog": {
+      "repository": "https://github.com/StuHelper/stuhelper-catalog.git",
+      "revision": "2359594610ba547bcbefa5003b1358da099796b8",
       "dirty": false
     },
-    "storage-contribution": {
-      "repository": "https://github.com/StuHelper/stuhelper-storage-contribution.git",
-      "revision": "822b6ff33ec02a6270ba0d2349f25a41f4dff4d7",
+    "reviews": {
+      "repository": "https://github.com/StuHelper/stuhelper-reviews.git",
+      "revision": "6ae532c2a8b765faf9e721eedfef40fd9de570da",
+      "dirty": false
+    },
+    "moderation": {
+      "repository": "https://github.com/StuHelper/stuhelper-moderation.git",
+      "revision": "882877fbefeb5b2fb3a48c24a3a7fd517f4d0cc1",
+      "dirty": false
+    },
+    "resources": {
+      "repository": "https://github.com/StuHelper/stuhelper-resources.git",
+      "revision": "bb1dd7dc2f07a4ee3ea479c314566e131efb96f9",
       "dirty": false
     }
   }

@@ -109,6 +109,8 @@ nav:
       - 项目重写路线: development/rewrite-roadmap.md
       - 框架状态: development/framework-bootstrap.md
       - 存储模块实施准备: development/storage-module.md
+      - 课程与评课社区: development/academic-community.md
+      - 学习资料实施: development/resources.md
       - SSO 迁移: development/sso-migration.md
       - 旧业务整理与确认: development/business-design-extraction.md
       - 旧业务迁移覆盖: development/business-migration-coverage.md

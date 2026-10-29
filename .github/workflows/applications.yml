@@ -1,11 +1,31 @@
 name: Public application integration
 on:
   pull_request:
-    branches: [develop, main]
-    paths: [architecture/**, scripts/workspace*, tests/e2e/**, playwright.config.mjs, .github/workflows/applications.yml]
+    branches:
+      - develop
+      - main
+    paths:
+      - architecture/**
+      - scripts/workspace*
+      - scripts/integration-*
+      - tests/e2e/**
+      - tests/academic/**
+      - playwright*.mjs
+      - workspace.lock.json
+      - .github/workflows/applications.yml
   push:
-    branches: [develop, main]
-    paths: [architecture/**, scripts/workspace*, tests/e2e/**, playwright.config.mjs, .github/workflows/applications.yml]
+    branches:
+      - develop
+      - main
+    paths:
+      - architecture/**
+      - scripts/workspace*
+      - scripts/integration-*
+      - tests/e2e/**
+      - tests/academic/**
+      - playwright*.mjs
+      - workspace.lock.json
+      - .github/workflows/applications.yml
   workflow_dispatch:
     inputs:
       platform_commit:
@@ -17,10 +37,29 @@ on:
       admin_commit:
         description: Full candidate SHA, or empty for develop
         type: string
+      catalog_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      reviews_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      moderation_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      storage_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      media_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      resources_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{
+    github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   applications:
@@ -28,39 +67,85 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 35
     env:
-      LEFTHOOK: '0'
-      GOWORK: 'off'
+      LEFTHOOK: "0"
+      GOWORK: off
     steps:
-      - name: Validate explicit candidates
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Resolve source refs
+        id: refs
         env:
           PLATFORM: ${{ inputs.platform_commit }}
           WEB: ${{ inputs.web_commit }}
           ADMIN: ${{ inputs.admin_commit }}
-        run: |
-          for revision in "$PLATFORM" "$WEB" "$ADMIN"; do
-            [[ -z "$revision" || "$revision" =~ ^[a-f0-9]{40}$ ]] || exit 1
-          done
-      - uses: actions/checkout@v7.0.1
-        with:
-          persist-credentials: false
+          CATALOG: ${{ inputs.catalog_commit }}
+          REVIEWS: ${{ inputs.reviews_commit }}
+          MODERATION: ${{ inputs.moderation_commit }}
+          STORAGE: ${{ inputs.storage_commit }}
+          MEDIA: ${{ inputs.media_commit }}
+          RESOURCES: ${{ inputs.resources_commit }}
+        run: node scripts/integration-refs.mjs
       - uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-platform
-          ref: ${{ inputs.platform_commit || 'develop' }}
+          ref: ${{ steps.refs.outputs.platform }}
           path: workspace/platform
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-web
-          ref: ${{ inputs.web_commit || 'develop' }}
+          ref: ${{ steps.refs.outputs.web }}
           path: workspace/web
           persist-credentials: false
       - uses: actions/checkout@v7.0.1
         with:
           repository: StuHelper/stuhelper-admin
-          ref: ${{ inputs.admin_commit || 'develop' }}
+          ref: ${{ steps.refs.outputs.admin }}
           path: workspace/admin
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-catalog
+          ref: ${{ steps.refs.outputs.catalog }}
+          path: workspace/catalog
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-reviews
+          ref: ${{ steps.refs.outputs.reviews }}
+          path: workspace/reviews
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-moderation
+          ref: ${{ steps.refs.outputs.moderation }}
+          path: workspace/moderation
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-storage
+          ref: ${{ steps.refs.outputs.storage }}
+          path: workspace/storage
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-media
+          ref: ${{ steps.refs.outputs.media }}
+          path: workspace/media
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-resources
+          ref: ${{ steps.refs.outputs.resources }}
+          path: workspace/resources
+          fetch-depth: 0
           persist-credentials: false
       - uses: StuHelper/stuhelper-tooling/actions/setup@v0.1.0
       - uses: actions/setup-go@v7.0.0
@@ -74,12 +159,26 @@ jobs:
           node scripts/workspace.mjs toolchains
           node scripts/workspace.mjs contracts
       - name: Build public example and clients
-        run: |
-          (cd workspace/platform && go build -mod=readonly -o bin/stuhelper-platform ./examples/server)
+        run: >
+          (cd workspace/platform && go build -mod=readonly -o
+          bin/stuhelper-platform ./examples/server)
+
           pnpm --dir workspace/web install --frozen-lockfile
+
           pnpm --dir workspace/web run build
+
           pnpm --dir workspace/admin install --frozen-lockfile
+
           pnpm --dir workspace/admin run setup
+
           pnpm --dir workspace/admin run build
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run test:e2e
+      - run: pnpm exec playwright test --config playwright.academic.config.mjs
+      - name: Resources Web and Admin browser acceptance
+        run: >-
+          pnpm --dir workspace/web exec playwright test
+          tests/e2e/resources.spec.mjs
+
+          pnpm --dir workspace/admin exec playwright test --config
+          playwright.storage.config.mjs tests/e2e/resources.spec.mjs

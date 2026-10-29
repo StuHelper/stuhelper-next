@@ -100,7 +100,8 @@ export function verifySource(provider, client, source, loadSource) {
 export function verifyScenarios(directory, definition, checkout) {
   const specs = definition.specifications.map(file => fs.readFileSync(path.join(directory, file), 'utf8')).join('\n');
   for (const [scenario, tests] of Object.entries(definition.scenario_tests ?? {})) {
-    assert(specs.includes(`| ${scenario} |`), `Unknown implemented scenario: ${scenario}`);
+    assert(/^[A-Z]+-\d+$/.test(scenario), `Invalid scenario: ${scenario}`);
+    assert(new RegExp(`\\|\\s*${scenario}\\s*(?:\\||：|:)`).test(specs), `Unknown implemented scenario: ${scenario}`);
     assert(tests.length, `No tests for implemented scenario: ${scenario}`);
     for (const reference of tests) {
       const [file, name] = reference.split('#');
@@ -110,6 +111,21 @@ export function verifyScenarios(directory, definition, checkout) {
       assert(source.includes(`func ${name}(t *testing.T)`), `Missing scenario test: ${scenario}/${reference}`);
     }
   }
+}
+export function verifyAcademicSource(provider, client, source, loadSource) {
+  const module = provider.name;
+  assert(['catalog', 'reviews', 'moderation', 'resources', 'media'].includes(module));
+  assert.equal(source.repository, `StuHelper/stuhelper-${module}`);
+  assert.match(source.revision, /^[0-9a-f]{40}$/);
+  const contract = `contracts/${module}.openapi.json`;
+  const generated = client.name === 'admin' ? `apps/web-antd/src/api/${module}.gen.ts` : `src/api/${module}.gen.ts`;
+  assert.deepEqual(source.files, { [contract]: contract, [`sdk/${module}.gen.ts`]: generated });
+  for (const [providerFile, clientFile] of Object.entries(source.files)) {
+    const content = fs.readFileSync(path.join(client.directory, clientFile), 'utf8');
+    assert.equal(content, loadSource(source.revision, providerFile), `Snapshot differs from declared provider revision: ${module}/${clientFile}`);
+    assert.equal(hash(content), source.sha256[clientFile], `Snapshot digest differs: ${clientFile}`);
+  }
+  assert.equal(readJSON(path.join(client.directory, contract)).info.version, source.version);
 }
 export function providerSource(checkout, revision, filename) {
   assert.match(revision, /^[0-9a-f]{40}$/);
@@ -121,7 +137,7 @@ export function providerSource(checkout, revision, filename) {
   return execFileSync('git', ['-C', checkout, 'show', `${revision}:${filename}`], { encoding: 'utf8' });
 }
 export function contracts(directory = root) {
-  const records = projects(directory).filter(project => ['platform', 'web', 'admin'].includes(project.name));
+  const records = projects(directory);
   const definitions = readYaml(path.join(directory, 'architecture/modules.yaml')).modules;
   const provider = records.find(project => project.name === 'platform');
   const descriptor = readYaml(path.join(provider.directory, 'module.yaml'));
@@ -139,6 +155,18 @@ export function contracts(directory = root) {
     const current = path.join(provider.directory, 'contracts/platform.openapi.yaml');
     if (!fs.readFileSync(prior).equals(fs.readFileSync(current))) {
       execFileSync('go', ['run', 'github.com/oasdiff/oasdiff@v1.34.1', 'breaking', prior, current, '--allow-external-refs=false', '--fail-on', 'WARN'], { cwd: provider.directory, env: { ...process.env, GOWORK: 'off' }, stdio: 'inherit' });
+    }
+    for (const module of ['catalog', 'reviews', 'moderation', 'resources', 'media']) {
+      const sourceFile = path.join(client.directory, `contracts/${module}.source.json`);
+      if (!fs.existsSync(sourceFile)) continue;
+      const academic = records.find(project => project.name === module);
+      const source = readJSON(sourceFile);
+      verifyAcademicSource(academic, client, source, (revision, filename) => providerSource(academic.directory, revision, filename));
+      const prior = path.join(client.directory, `contracts/${module}.openapi.json`);
+      const current = path.join(academic.directory, `contracts/${module}.openapi.json`);
+      if (!fs.readFileSync(prior).equals(fs.readFileSync(current))) {
+        execFileSync('go', ['run', 'github.com/oasdiff/oasdiff@v1.34.1', 'breaking', prior, current, '--allow-external-refs=false', '--fail-on', 'WARN'], { cwd: academic.directory, env: { ...process.env, GOWORK: 'off' }, stdio: 'inherit' });
+      }
     }
   }
   console.log('PASS: scenario mappings, client snapshot provenance and API compatibility');

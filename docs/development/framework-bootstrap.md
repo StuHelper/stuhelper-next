@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-26
+updated: 2026-10-29
 ---
 
 # 框架实施状态
@@ -12,7 +12,7 @@ platform 提供公共模块接口、依赖校验、能力降级、Fx 生命周�
 
 私有 backend 承载正式程序入口，已装配 platform 与存储、通用文件服务。公共示例位于 platform 的 `examples/server`。verification、campus-adapters、billing 尚未装配到正式业务入口。storage-bhpan 独立提供 BHpan Go 存储适配库，其公开协议与脱敏验证记录由适配器仓库维护，真实存储集成见存储主题。
 
-通用存储已有独立库，实现多账号准入、三副本、两份发布门槛、恢复与清理，见[实施状态](storage-module.md)。media 已实现文件上传、批准、引用与下载，backend 固定依赖联调通过。resources 与贡献管理仍待实施，生产环境未开放。
+通用存储已有独立库，实现多账号准入、三副本、两份发布门槛、恢复与清理，见[实施状态](storage-module.md)。media 已实现文件上传、批准、引用与下载，backend 固定依赖联调通过。贡献管理和 resources 资料业务已有候选实现，见[资料实施](resources.md)。生产环境未开放。
 
 Web 与 stuhelper-admin 提供状态展示、错误恢复和八语言入口。Admin 另有存储运营页面，接口、权限和验收范围见[存储实施状态](storage-module.md)。国际化检查覆盖消息键、占位符、复数、数字、金额、日期、时区、相对时间和 RTL。
 
@@ -37,6 +37,6 @@ platform v0.1.0 与 tooling v0.1.0/v0.1.1 已建立不可变版本。已切换�
 
 ## 剩余实施
 
-业务 API、数据库迁移、真实身份接入、校园数据导入、评价、文件、账务和查询仍按各自规格推进。评价资格使用选课记录，教师选项来自本人任课记录，具体行为见[评价规格](../spec/academic-content.md)。
+课程目录、评价与审核的核心 API、首次建库迁移和 Web 页面已有任务分支实现，详见[评课社区状态](academic-community.md)。真实身份、持续教务同步、文件、账务和查询按对应规格继续推进。评价资格使用选课记录，教师选项来自本人任课记录，具体行为见[评价规格](../spec/academic-content.md)。
 
 首次持久化业务写入同时落实幂等、数据访问身份和必要事件；首次身份查询落实查看审计。真实账号、SSO 生产迁移和生产部署继续由相应任务授权和验收。
