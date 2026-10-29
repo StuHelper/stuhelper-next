@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-29
+updated: 2026-10-26
 ---
 
 # 业务确认结果与延期事项

@@ -1,7 +1,7 @@
 ---
 type: design
 status: InReview
-updated: 2026-10-29
+updated: 2026-10-26
 ---
 
 # 文件保护与受控阅读

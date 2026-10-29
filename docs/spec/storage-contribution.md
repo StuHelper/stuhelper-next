@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-29
+updated: 2026-10-28
 ---
 
 # 存储贡献

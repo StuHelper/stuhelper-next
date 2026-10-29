@@ -79,6 +79,14 @@ modules:
     contract_status: library
     specifications:
       - docs/spec/storage-placement.md
+    scenario_tests:
+      SP-27:
+        - content_test.go#TestSharedContentConcurrentProofAndSinglePhysicalObject
+        - content_test.go#TestConcurrentSharedIngestKeepsOneProviderIntent
+      SP-28:
+        - content_test.go#TestSharedContentIndependentReferencesAndLastRelease
+        - content_test.go#TestSharedContentProtectionMigrationAndReuseRemainIndependent
+        - content_test.go#TestDeleteDuringSharedProtectionCopyCleansDestinationAndKeepsOtherHandle
   - id: storage-bhpan
     repository: StuHelper/stuhelper-storage-bhpan
     visibility: public
@@ -187,6 +195,14 @@ modules:
     contract_status: library
     specifications:
       - docs/spec/media.md
+    scenario_tests:
+      MEDIA-11:
+        - reuse_test.go#TestOwnContentReuseKeepsIndependentApprovalAndReferences
+        - reuse_test.go#TestDigestAloneCannotReuseAnotherOwnersFile
+      MEDIA-12:
+        - reuse_test.go#TestReuseRequiresCurrentSourceRightsAndProfile
+        - reuse_test.go#TestReuseLostResponseAndRestartDoNotResendOrApprove
+        - reuse_test.go#TestCancelledReuseReleasesOnlyTheNewHandle
   - id: storage-contribution
     repository: StuHelper/stuhelper-storage-contribution
     visibility: public
@@ -472,6 +488,8 @@ applications:
       - docs/spec/storage-contribution.md
       - docs/spec/resource-sharing.md
     scenario_tests:
+      RS-25:
+        - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
       ST-10:
         - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets
           and preserves the binding on renewal
@@ -530,6 +548,8 @@ applications:
       - docs/spec/storage-contribution.md
       - docs/spec/resource-sharing.md
     scenario_tests:
+      RS-25:
+        - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
       ST-11:
         - tests/e2e/custody.spec.mjs#custody administration resumes original
           consent without credential access
