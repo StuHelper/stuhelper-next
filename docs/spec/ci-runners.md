@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-27
+updated: 2026-10-29
 ---
 
 # CI 与 runner 约定
@@ -20,10 +20,14 @@ updated: 2026-10-27
 | stuhelper-tooling | Tooling checks |
 | stuhelper-platform | Platform checks |
 | stuhelper-backend | Backend checks |
-| stuhelper-web | Web checks |
-| stuhelper-admin | Admin checks |
+| stuhelper-web | Web checks、Contribution browser checks |
+| stuhelper-admin | Admin checks、Storage browser checks |
 | verification、campus-adapters、billing | Documents checks |
 | storage-bhpan | BHpan checks |
+| storage | Storage checks |
+| media | Media checks |
+| resources | Resources checks |
+| storage-contribution | Contribution checks |
 | catalog、reviews、moderation | Catalog checks、Reviews checks、Moderation checks |
 | ops | Documents checks、Deployment configuration |
 

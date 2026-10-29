@@ -1,11 +1,31 @@
 name: Public application integration
 on:
   pull_request:
-    branches: [develop, main]
-    paths: [architecture/**, scripts/workspace*, scripts/integration-*, tests/e2e/**, tests/academic/**, playwright*.mjs, workspace.lock.json, .github/workflows/applications.yml]
+    branches:
+      - develop
+      - main
+    paths:
+      - architecture/**
+      - scripts/workspace*
+      - scripts/integration-*
+      - tests/e2e/**
+      - tests/academic/**
+      - playwright*.mjs
+      - workspace.lock.json
+      - .github/workflows/applications.yml
   push:
-    branches: [develop, main]
-    paths: [architecture/**, scripts/workspace*, scripts/integration-*, tests/e2e/**, tests/academic/**, playwright*.mjs, workspace.lock.json, .github/workflows/applications.yml]
+    branches:
+      - develop
+      - main
+    paths:
+      - architecture/**
+      - scripts/workspace*
+      - scripts/integration-*
+      - tests/e2e/**
+      - tests/academic/**
+      - playwright*.mjs
+      - workspace.lock.json
+      - .github/workflows/applications.yml
   workflow_dispatch:
     inputs:
       platform_commit:
@@ -26,10 +46,20 @@ on:
       moderation_commit:
         description: Full candidate SHA, or empty for develop
         type: string
+      storage_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      media_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
+      resources_commit:
+        description: Full candidate SHA, or empty for develop
+        type: string
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{
+    github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   applications:
@@ -37,8 +67,8 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 35
     env:
-      LEFTHOOK: '0'
-      GOWORK: 'off'
+      LEFTHOOK: "0"
+      GOWORK: off
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -52,6 +82,9 @@ jobs:
           CATALOG: ${{ inputs.catalog_commit }}
           REVIEWS: ${{ inputs.reviews_commit }}
           MODERATION: ${{ inputs.moderation_commit }}
+          STORAGE: ${{ inputs.storage_commit }}
+          MEDIA: ${{ inputs.media_commit }}
+          RESOURCES: ${{ inputs.resources_commit }}
         run: node scripts/integration-refs.mjs
       - uses: actions/checkout@v7.0.1
         with:
@@ -93,6 +126,27 @@ jobs:
           path: workspace/moderation
           fetch-depth: 0
           persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-storage
+          ref: ${{ steps.refs.outputs.storage }}
+          path: workspace/storage
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-media
+          ref: ${{ steps.refs.outputs.media }}
+          path: workspace/media
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: StuHelper/stuhelper-resources
+          ref: ${{ steps.refs.outputs.resources }}
+          path: workspace/resources
+          fetch-depth: 0
+          persist-credentials: false
       - uses: StuHelper/stuhelper-tooling/actions/setup@v0.1.0
       - uses: actions/setup-go@v7.0.0
         with:
@@ -105,13 +159,26 @@ jobs:
           node scripts/workspace.mjs toolchains
           node scripts/workspace.mjs contracts
       - name: Build public example and clients
-        run: |
-          (cd workspace/platform && go build -mod=readonly -o bin/stuhelper-platform ./examples/server)
+        run: >
+          (cd workspace/platform && go build -mod=readonly -o
+          bin/stuhelper-platform ./examples/server)
+
           pnpm --dir workspace/web install --frozen-lockfile
+
           pnpm --dir workspace/web run build
+
           pnpm --dir workspace/admin install --frozen-lockfile
+
           pnpm --dir workspace/admin run setup
+
           pnpm --dir workspace/admin run build
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run test:e2e
       - run: pnpm exec playwright test --config playwright.academic.config.mjs
+      - name: Resources Web and Admin browser acceptance
+        run: >-
+          pnpm --dir workspace/web exec playwright test
+          tests/e2e/resources.spec.mjs
+
+          pnpm --dir workspace/admin exec playwright test --config
+          playwright.storage.config.mjs tests/e2e/resources.spec.mjs

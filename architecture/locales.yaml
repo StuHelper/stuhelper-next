@@ -40,7 +40,27 @@ same_text_exceptions:
       notFound.code:
         value: "404"
         reason: 品牌名称或通用格式标记保持原文。
-    languages: {}
+    languages:
+      es-ES:
+        contribution.bytes:
+          value: "{value} bytes"
+          reason: 西班牙语的字节单位使用 bytes，与英文写法相同。
+        resources.bytes:
+          value: bytes
+          reason: 西班牙语字节单位使用 bytes，与英语同形。
+      fr-FR:
+        resources.description:
+          value: Description
+          reason: 法语 Description 是简介字段的常用名称，与英语同形。
+        resources.min:
+          value: Minimum
+          reason: 法语 Minimum 表示最小值，与英语同形。
+        resources.max:
+          value: Maximum
+          reason: 法语 Maximum 表示最大值，与英语同形。
+        resources.options:
+          value: Options
+          reason: 法语 Options 表示选项，与英语同形。
   admin:
     shared:
       authentication.qq:
@@ -105,7 +125,22 @@ same_text_exceptions:
         page.framework.title:
           value: Administration
           reason: 本语言的正确词语与英文拼写相同。
+        page.resources.description:
+          value: Description
+          reason: 法语 Description 是简介字段的常用名称，与英语同形。
+        page.resources.min:
+          value: Minimum
+          reason: 法语 Minimum 表示最小值，与英语同形。
+        page.resources.max:
+          value: Maximum
+          reason: 法语 Maximum 表示最大值，与英语同形。
+        page.resources.options:
+          value: Options
+          reason: 法语 Options 表示选项，与英语同形。
       es-ES:
+        page.contribution.bytes:
+          value: "{value} bytes"
+          reason: 西班牙语的字节单位使用 bytes，与英文写法相同。
         preferences.vertical:
           value: Vertical
           reason: 本语言的正确词语与英文拼写相同。
@@ -121,3 +156,6 @@ same_text_exceptions:
         common.no:
           value: No
           reason: 本语言的正确词语与英文拼写相同。
+        page.resources.bytes:
+          value: bytes
+          reason: 西班牙语字节单位使用 bytes，与英语同形。

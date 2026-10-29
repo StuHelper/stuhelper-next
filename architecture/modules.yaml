@@ -68,6 +68,17 @@ modules:
     contract_status: design-only
     specifications:
       - docs/spec/catalog-operations.md
+  - id: storage
+    repository: StuHelper/stuhelper-storage
+    visibility: public
+    implementation: library
+    required: []
+    optional:
+      - storage-bhpan
+    interface_owner: storage
+    contract_status: library
+    specifications:
+      - docs/spec/storage-placement.md
   - id: storage-bhpan
     repository: StuHelper/stuhelper-storage-bhpan
     visibility: public
@@ -168,16 +179,25 @@ modules:
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
-    implementation: not-implemented
+    implementation: library
     required:
-      - platform
-    optional:
-      - billing
-      - storage-bhpan
+      - storage
+    optional: []
     interface_owner: media
-    contract_status: design-only
+    contract_status: library
     specifications:
       - docs/spec/media.md
+  - id: storage-contribution
+    repository: StuHelper/stuhelper-storage-contribution
+    visibility: public
+    implementation: library
+    required:
+      - storage
+    optional:
+      - billing
+    interface_owner: storage-contribution
+    contract_status: library
+    specifications:
       - docs/spec/storage-contribution.md
   - id: reviews
     repository: StuHelper/stuhelper-reviews
@@ -252,7 +272,7 @@ modules:
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
       - catalog
@@ -263,13 +283,44 @@ modules:
       - billing
       - identity
     interface_owner: resources
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/resource-sharing.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
       identity_verified: verification
+    api: 1
+    capabilities:
+      - resources.read
+      - resources.write
+      - resources.manage
+    capability_requires: {}
+    scenario_tests:
+      RS-01:
+        - integration_test.go#TestOriginConsentAndRequestsUseOutbox
+      RS-03:
+        - integration_test.go#TestIndependentRightsCampusRevocationAndUnlisting
+      RS-05:
+        - integration_test.go#TestIndependentRightsCampusRevocationAndUnlisting
+      RS-11:
+        - integration_test.go#TestDirectoryPackagesOmitUnauthorizedAndRecheckRights
+      RS-13:
+        - integration_test.go#TestPublicationContinuityAndStaleReview
+      RS-18:
+        - integration_test.go#TestDirectoryPackagesOmitUnauthorizedAndRecheckRights
+      RS-19:
+        - integration_test.go#TestConfigurableTaxonomySnapshotsAndYearFilters
+      RS-20:
+        - integration_test.go#TestConfigurableTaxonomySnapshotsAndYearFilters
+      RS-21:
+        - integration_test.go#TestTaxonomyChangeDuringPreparationCanBeCorrected
+      RS-22:
+        - integration_test.go#TestDeniedInputsDoNotReachDependencies
+      RS-23:
+        - integration_test.go#TestReviewInspectionIsScopedAndGrantListsIdentifySubjects
+      RS-24:
+        - http_test.go#TestReceiptHTTPStatesMatchGeneratedContract
   - id: billing
     repository: StuHelper/stuhelper-billing
     visibility: private
@@ -382,18 +433,127 @@ applications:
     specifications:
       - docs/spec/module-lifecycle.md
       - docs/spec/sso-compatibility.md
+      - docs/spec/resource-sharing.md
+    optional:
+      - catalog
+      - reviews
+      - moderation
+      - media
+      - resources
+    capability_requires:
+      resources.read:
+        - resources
+    scenario_tests:
+      RS-03:
+        - internal/resourceapp/integration_test.go#TestResourceCompositionCatalogReviewMediaArchiveAndRevocation
+      RS-23:
+        - internal/resourceapp/integration_test.go#TestResourceCompositionConfigurationAndCurrentRights
   - id: web
     repository: StuHelper/stuhelper-web
     visibility: public
     implementation: framework
+    optional:
+      - storage
+      - storage-contribution
+      - catalog
+      - reviews
+      - moderation
+      - media
+      - resources
+    capability_requires:
+      storage.custody:
+        - storage
+      contributions.manage:
+        - storage-contribution
+      resources.read:
+        - resources
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/storage-contribution.md
+      - docs/spec/resource-sharing.md
+    scenario_tests:
+      ST-10:
+        - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets
+          and preserves the binding on renewal
+        - tests/e2e/custody.spec.mjs#uncertain custody submission recovers by ID
+          without retaining or resending a password
+        - tests/e2e/custody.spec.mjs#an existing blocked custody request resumes
+          without new credentials
+      ST-01:
+        - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment
+          and renewal retain distinct request state
+      ST-03:
+        - tests/e2e/contributions.spec.mjs#exit remains pending while replicas
+          remain
+      ST-08:
+        - tests/e2e/contributions.spec.mjs#lost response retries original
+          mutation, paginates and clears revoked data
+        - src/composables/hostTransport.test.ts#passes current host credentials
+          to both APIs and clears private state on revocation
+      RS-19:
+        - tests/e2e/resources.spec.mjs#configured category field filters and
+          grouping follow server configuration
+      RS-13:
+        - tests/e2e/resources.spec.mjs#upload uses current terms and retries the
+          original metadata request
+      RS-09:
+        - tests/e2e/resources.spec.mjs#current denial clears resource data and
+          request receipts survive navigation
+      RS-11:
+        - tests/e2e/resources.spec.mjs#folder packages list every part and allow
+          individual retry
   - id: admin
     repository: StuHelper/stuhelper-admin
     visibility: public
     implementation: framework
+    optional:
+      - storage
+      - storage-contribution
+      - catalog
+      - reviews
+      - moderation
+      - media
+      - resources
+    capability_requires:
+      storage.operations:
+        - storage
+      storage.custody.operations:
+        - storage
+      contributions.operations:
+        - storage-contribution
+      resources.read:
+        - resources
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/admin-operations.md
+      - docs/spec/storage-placement.md
+      - docs/spec/storage-contribution.md
+      - docs/spec/resource-sharing.md
+    scenario_tests:
+      ST-11:
+        - tests/e2e/custody.spec.mjs#custody administration resumes original
+          consent without credential access
+        - tests/e2e/custody.spec.mjs#custody administration handles
+          unauthenticated and empty states
+      ST-09:
+        - tests/e2e/contributions.spec.mjs#operator retry preserves conditions,
+          retains uncertain request and clears revoked inventory
+        - tests/e2e/contributions.spec.mjs#operator login boundary recovers to
+          an empty page
+        - apps/web-antd/src/composables/hostTransport.test.ts#passes current
+          host credentials to both APIs and clears private state on revocation
+      RS-19:
+        - tests/e2e/resources.spec.mjs#category configuration preserves stable
+          ids, fields and original-request retry
+      RS-13:
+        - tests/e2e/resources.spec.mjs#review reads the pending file and retries
+          an unknown decision without duplication
+      RS-09:
+        - tests/e2e/resources.spec.mjs#grant creation and revocation retain the
+          subject and respect current permissions
+      RS-11:
+        - tests/e2e/resources.spec.mjs#directory editing saves revision and
+          configured names
 operations:
   - id: ops
     repository: StuHelper/stuhelper-ops
@@ -405,11 +565,16 @@ operations:
       - docs/spec/sso-compatibility.md
     scenario_tests:
       CI-16:
-        - scripts/registry-probe.test.mjs#registry probes are confined to unique temporary tags in Next application repositories
-        - scripts/registry-probe.test.mjs#manifest deletion uses a digest verified against the returned bytes
-        - scripts/registry-probe.test.mjs#interruption during asynchronous cleanup waits for the same cleanup before exit
-        - scripts/registry-probe.test.mjs#interruption stops active work before removing its Registry resources
-        - scripts/registry-probe.test.mjs#cancelled builds exit before Registry cleanup begins
+        - scripts/registry-probe.test.mjs#registry probes are confined to unique
+          temporary tags in Next application repositories
+        - scripts/registry-probe.test.mjs#manifest deletion uses a digest
+          verified against the returned bytes
+        - scripts/registry-probe.test.mjs#interruption during asynchronous
+          cleanup waits for the same cleanup before exit
+        - scripts/registry-probe.test.mjs#interruption stops active work before
+          removing its Registry resources
+        - scripts/registry-probe.test.mjs#cancelled builds exit before Registry
+          cleanup begins
 shared_specifications:
   - docs/spec/terminology.md
   - docs/spec/native-clients.md

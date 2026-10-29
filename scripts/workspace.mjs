@@ -114,7 +114,7 @@ export function verifyScenarios(directory, definition, checkout) {
 }
 export function verifyAcademicSource(provider, client, source, loadSource) {
   const module = provider.name;
-  assert(['catalog', 'reviews', 'moderation'].includes(module));
+  assert(['catalog', 'reviews', 'moderation', 'resources', 'media'].includes(module));
   assert.equal(source.repository, `StuHelper/stuhelper-${module}`);
   assert.match(source.revision, /^[0-9a-f]{40}$/);
   const contract = `contracts/${module}.openapi.json`;
@@ -156,7 +156,7 @@ export function contracts(directory = root) {
     if (!fs.readFileSync(prior).equals(fs.readFileSync(current))) {
       execFileSync('go', ['run', 'github.com/oasdiff/oasdiff@v1.34.1', 'breaking', prior, current, '--allow-external-refs=false', '--fail-on', 'WARN'], { cwd: provider.directory, env: { ...process.env, GOWORK: 'off' }, stdio: 'inherit' });
     }
-    for (const module of ['catalog', 'reviews', 'moderation']) {
+    for (const module of ['catalog', 'reviews', 'moderation', 'resources', 'media']) {
       const sourceFile = path.join(client.directory, `contracts/${module}.source.json`);
       if (!fs.existsSync(sourceFile)) continue;
       const academic = records.find(project => project.name === module);

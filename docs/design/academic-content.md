@@ -1,7 +1,7 @@
 ---
 type: design
 status: InReview
-updated: 2026-10-27
+updated: 2026-10-29
 ---
 
 # 课程、教师与内容关系

@@ -1,4 +1,3 @@
-# Local repository layout. Exact candidate snapshots are generated on demand.
 shell: bash
 sync_gitignore: false
 sync_remotes: false
@@ -40,6 +39,30 @@ projects:
     branch: develop
     tags:
       - documents
+  storage:
+    path: workspace/storage
+    url: https://github.com/StuHelper/stuhelper-storage.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  media:
+    path: workspace/media
+    url: https://github.com/StuHelper/stuhelper-media.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  storage-contribution:
+    path: workspace/storage-contribution
+    url: https://github.com/StuHelper/stuhelper-storage-contribution.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
   storage-bhpan:
     path: workspace/storage-bhpan
     url: https://github.com/StuHelper/stuhelper-storage-bhpan.git
@@ -95,6 +118,14 @@ projects:
   moderation:
     path: workspace/moderation
     url: https://github.com/StuHelper/stuhelper-moderation.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  resources:
+    path: workspace/resources
+    url: https://github.com/StuHelper/stuhelper-resources.git
     branch: develop
     tags:
       - backend

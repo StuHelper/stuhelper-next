@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const modules = ['platform', 'web', 'admin', 'catalog', 'reviews', 'moderation'];
+const modules = ['platform', 'web', 'admin', 'catalog', 'reviews', 'moderation', 'storage', 'media', 'resources'];
 export function integrationRefs(env, snapshot) {
-  const candidatePR = env.GITHUB_EVENT_NAME === 'pull_request' && env.GITHUB_HEAD_REF === 'codex/academic-community';
+  const candidatePR = env.GITHUB_EVENT_NAME === 'pull_request' && ['codex/academic-community','codex/resource-design'].includes(env.GITHUB_HEAD_REF);
   const refs = {};
   for (const name of modules) {
     const explicit = env[name.toUpperCase()] || '';

@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-28
+updated: 2026-10-29
 ---
 
 # 内容运营与审核
