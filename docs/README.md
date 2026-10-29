@@ -1,12 +1,14 @@
 ---
 type: index
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-29
 ---
 
 # StuHelper Next 文档
 
-StuHelper Next 是现有 StuHelper 的重构版本，Next 为过渡名称，未来以 StuHelper 名称继续维护。已确认保留的校园业务、身份规则和货币设计从[业务范围](design/business-scope.md)进入；采用独立官方 Casdoor SSO 与按业务模块划分的多仓库，当前只推进 Web 和 stuhelper-admin。公共文档及私有模块仓库已经建立，业务系统与 SSO 生产迁移尚待实施。
+StuHelper Next 是现有 StuHelper 的重构版本，Next 为过渡名称，未来以 StuHelper 名称继续维护。已确认保留的校园业务、身份规则和货币设计从[业务范围](design/business-scope.md)进入；采用独立官方 Casdoor SSO 与按业务模块划分的多仓库，当前只推进 Web 和 stuhelper-admin。
+
+学生认证、课程与导师评价、资料审核下载已有统一候选，并通过正式应用的隔离组合验收。真实外部账号、生产交付与迁移仍待验收，详见[框架状态](development/framework-bootstrap.md)。
 
 本项目按 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0) 的五类文档架构组织资料。写作规则见[文档维护约定](authoring.md)。
 

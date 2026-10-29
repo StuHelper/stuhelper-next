@@ -68,6 +68,8 @@ nav:
       - 框架运行: design/framework-runtime.md
       - 按模块划分仓库: design/module-repositories.md
       - 课程与内容关系: design/academic-content.md
+      - 通用文件与分布式存储: design/storage-architecture.md
+      - 文件保护与受控阅读: design/file-protection-and-delivery.md
       - 独立 SSO: design/independent-sso.md
       - 原生多端: design/native-clients.md
       - 写作模板: design/TEMPLATE.md
@@ -85,6 +87,7 @@ nav:
       - QQ 入群与群管理: spec/qq-group-services.md
       - 第三方开放平台: spec/open-platform.md
       - 存储贡献: spec/storage-contribution.md
+      - 存储放置与恢复: spec/storage-placement.md
       - 内容运营与审核: spec/content-management.md
       - 管理角色与配置: spec/admin-operations.md
       - 课程维护与教务导入: spec/catalog-operations.md
@@ -105,6 +108,9 @@ nav:
       - 工作导航: development/README.md
       - 项目重写路线: development/rewrite-roadmap.md
       - 框架状态: development/framework-bootstrap.md
+      - 存储模块实施准备: development/storage-module.md
+      - 课程与评课社区: development/academic-community.md
+      - 学习资料实施: development/resources.md
       - SSO 迁移: development/sso-migration.md
       - 旧业务整理与确认: development/business-design-extraction.md
       - 旧业务迁移覆盖: development/business-migration-coverage.md

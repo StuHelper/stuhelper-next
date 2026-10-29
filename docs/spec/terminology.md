@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-29
 ---
 
 # 统一业务术语
@@ -24,5 +24,9 @@ updated: 2026-10-25
 | 积分 | Points | `points` | 按独立账户管理的整数额度 | — |
 | Ivory | Ivory | `ivory` | 站内余额计价单位 | — |
 | 修订号 | Revision | `revision` | 同一业务对象单调递增的状态版本 | — |
+| 数据密级 | Data classification | `data_classification` | 内容敏感程度及存储保护要求，独立于平台下载访问条件 | — |
+| 存储实例 | Storage backend | `storage_backend` | 一个供应商账号、凭据引用和受限根目录组成的物理接入单元 | — |
+| 存储副本 | Storage replica | `storage_replica` | 同一逻辑对象版本在某个存储实例上的物理内容 | — |
+| 故障域 | Failure domain | `failure_domain` | 可能共同失效的一组资源，例如同一账号或同一贡献者控制的账号 | — |
 
 OIDC `scope` 表示身份协议中的请求范围；业务授权范围按业务接口表达。数据库 `schema`、事务 `outbox` 和事件 `revision` 保留技术含义。术语检查针对当前仓库文档正文中的替代表述，术语表自身保留用于检查的映射。

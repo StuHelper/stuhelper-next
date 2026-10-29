@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-29
 ---
 
 # 功能与模块规格
@@ -20,6 +20,7 @@ updated: 2026-10-25
 | [QQ 绑定、入群认证与群聊管理](qq-group-services.md) | 入群、名片、黑名单、资格宽限期与管理员豁免 |
 | [第三方开放平台](open-platform.md) | 应用接入、用户授权和业务信息查询 |
 | [存储贡献](storage-contribution.md) | 容量、期限、占用、续期、退出和贡献榜 |
+| [存储放置与恢复](storage-placement.md) | 密级准入、独立副本、容量预占、撤权与分布式恢复验收 |
 | [管理角色与配置操作](admin-operations.md) | 角色模板、授权范围、并发配置与操作结果 |
 | [内容运营与审核](content-management.md) | 审核、举报、隐藏/恢复、修改/删除申请和反馈 |
 | [课程、教师维护与教务导入](catalog-operations.md) | 目录更正、导入来源、任务和处理结果 |
