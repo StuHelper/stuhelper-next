@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../session-fixture.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 const web=process.env.WEB_PATH || path.resolve('workspace/web');
@@ -18,6 +18,7 @@ const fulfill=(route,value,status=200)=>route.fulfill({status,contentType:'appli
 export async function fixture(page){
   await page.route('**/api/v1/**',async route=>{
     const u=new URL(route.request().url()),p=u.pathname;
+    if(p==='/api/v1/auth/session')return route.fallback();
     if(p==='/api/v1/catalog/objects'){
       const kind=u.searchParams.get('kind');let items=directory[kind]??[];
       if(kind==='term_course')items=items.filter(item=>(!u.searchParams.get('term_id')||item.term_id===u.searchParams.get('term_id'))&&(!u.searchParams.get('teacher_id')||item.term_id===(u.searchParams.get('teacher_id')==='teacher-a'?'fall':'spring')));

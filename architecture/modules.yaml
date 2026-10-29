@@ -35,39 +35,62 @@ modules:
   - id: identity
     repository: StuHelper/stuhelper-backend
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
+      - profiles
     optional: []
     interface_owner: identity
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/sso-compatibility.md
     in_application: backend
+    api: 1
+    capabilities:
+      - identity.session
+    capability_requires: {}
+    scenario_tests:
+      SSO-01:
+        - internal/sessionapp/session_test.go#TestOIDCSessionsPersistAndRejectReplayCSRFRevocationAndWrongScope
+      SSO-02:
+        - internal/sessionapp/session_test.go#TestSessionIsolationEncryptionAllDeviceLogoutAndUnavailableProvider
+      SSO-03:
+        - internal/sessionapp/session_test.go#TestSessionDatabaseIsolationAndMigrationPreserveActiveSessions
   - id: profiles
     repository: StuHelper/stuhelper-profiles
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - identity
       - media
     interface_owner: profiles
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/personal-center.md
+    api: 1
+    capabilities:
+      - profiles.manage
+    capability_requires: {}
+    scenario_tests:
+      PC-08:
+        - integration_test.go#TestProfileOwnershipReplayConcurrentRevisionAndRuntimeRole
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional: []
     interface_owner: campus-adapters
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/catalog-operations.md
+    api: 1
+    capabilities:
+      - campus-adapters.verify
+    capability_requires: {}
   - id: storage
     repository: StuHelper/stuhelper-storage
     visibility: public
@@ -101,16 +124,23 @@ modules:
   - id: verification
     repository: StuHelper/stuhelper-verification
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - identity
       - campus-adapters
     interface_owner: verification
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/student-verification.md
+    api: 1
+    capabilities:
+      - verification.read
+      - verification.write
+      - verification.admin
+      - verification.capture
+    capability_requires: {}
   - id: catalog
     repository: StuHelper/stuhelper-catalog
     visibility: public
@@ -491,35 +521,24 @@ applications:
       RS-25:
         - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
       ST-10:
-        - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets
-          and preserves the binding on renewal
-        - tests/e2e/custody.spec.mjs#uncertain custody submission recovers by ID
-          without retaining or resending a password
-        - tests/e2e/custody.spec.mjs#an existing blocked custody request resumes
-          without new credentials
+        - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets and preserves the binding on renewal
+        - tests/e2e/custody.spec.mjs#uncertain custody submission recovers by ID without retaining or resending a password
+        - tests/e2e/custody.spec.mjs#an existing blocked custody request resumes without new credentials
       ST-01:
-        - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment
-          and renewal retain distinct request state
+        - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment and renewal retain distinct request state
       ST-03:
-        - tests/e2e/contributions.spec.mjs#exit remains pending while replicas
-          remain
+        - tests/e2e/contributions.spec.mjs#exit remains pending while replicas remain
       ST-08:
-        - tests/e2e/contributions.spec.mjs#lost response retries original
-          mutation, paginates and clears revoked data
-        - src/composables/hostTransport.test.ts#passes current host credentials
-          to both APIs and clears private state on revocation
+        - tests/e2e/contributions.spec.mjs#lost response retries original mutation, paginates and clears revoked data
+        - src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
       RS-19:
-        - tests/e2e/resources.spec.mjs#configured category field filters and
-          grouping follow server configuration
+        - tests/e2e/resources.spec.mjs#configured category field filters and grouping follow server configuration
       RS-13:
-        - tests/e2e/resources.spec.mjs#upload uses current terms and retries the
-          original metadata request
+        - tests/e2e/resources.spec.mjs#upload uses current terms and retries the original metadata request
       RS-09:
-        - tests/e2e/resources.spec.mjs#current denial clears resource data and
-          request receipts survive navigation
+        - tests/e2e/resources.spec.mjs#current denial clears resource data and request receipts survive navigation
       RS-11:
-        - tests/e2e/resources.spec.mjs#folder packages list every part and allow
-          individual retry
+        - tests/e2e/resources.spec.mjs#folder packages list every part and allow individual retry
   - id: admin
     repository: StuHelper/stuhelper-admin
     visibility: public
@@ -551,29 +570,20 @@ applications:
       RS-25:
         - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
       ST-11:
-        - tests/e2e/custody.spec.mjs#custody administration resumes original
-          consent without credential access
-        - tests/e2e/custody.spec.mjs#custody administration handles
-          unauthenticated and empty states
+        - tests/e2e/custody.spec.mjs#custody administration resumes original consent without credential access
+        - tests/e2e/custody.spec.mjs#custody administration handles unauthenticated and empty states
       ST-09:
-        - tests/e2e/contributions.spec.mjs#operator retry preserves conditions,
-          retains uncertain request and clears revoked inventory
-        - tests/e2e/contributions.spec.mjs#operator login boundary recovers to
-          an empty page
-        - apps/web-antd/src/composables/hostTransport.test.ts#passes current
-          host credentials to both APIs and clears private state on revocation
+        - tests/e2e/contributions.spec.mjs#operator retry preserves conditions, retains uncertain request and clears revoked inventory
+        - tests/e2e/contributions.spec.mjs#operator login boundary recovers to an empty page
+        - apps/web-antd/src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
       RS-19:
-        - tests/e2e/resources.spec.mjs#category configuration preserves stable
-          ids, fields and original-request retry
+        - tests/e2e/resources.spec.mjs#category configuration preserves stable ids, fields and original-request retry
       RS-13:
-        - tests/e2e/resources.spec.mjs#review reads the pending file and retries
-          an unknown decision without duplication
+        - tests/e2e/resources.spec.mjs#review reads the pending file and retries an unknown decision without duplication
       RS-09:
-        - tests/e2e/resources.spec.mjs#grant creation and revocation retain the
-          subject and respect current permissions
+        - tests/e2e/resources.spec.mjs#grant creation and revocation retain the subject and respect current permissions
       RS-11:
-        - tests/e2e/resources.spec.mjs#directory editing saves revision and
-          configured names
+        - tests/e2e/resources.spec.mjs#directory editing saves revision and configured names
 operations:
   - id: ops
     repository: StuHelper/stuhelper-ops
@@ -585,16 +595,11 @@ operations:
       - docs/spec/sso-compatibility.md
     scenario_tests:
       CI-16:
-        - scripts/registry-probe.test.mjs#registry probes are confined to unique
-          temporary tags in Next application repositories
-        - scripts/registry-probe.test.mjs#manifest deletion uses a digest
-          verified against the returned bytes
-        - scripts/registry-probe.test.mjs#interruption during asynchronous
-          cleanup waits for the same cleanup before exit
-        - scripts/registry-probe.test.mjs#interruption stops active work before
-          removing its Registry resources
-        - scripts/registry-probe.test.mjs#cancelled builds exit before Registry
-          cleanup begins
+        - scripts/registry-probe.test.mjs#registry probes are confined to unique temporary tags in Next application repositories
+        - scripts/registry-probe.test.mjs#manifest deletion uses a digest verified against the returned bytes
+        - scripts/registry-probe.test.mjs#interruption during asynchronous cleanup waits for the same cleanup before exit
+        - scripts/registry-probe.test.mjs#interruption stops active work before removing its Registry resources
+        - scripts/registry-probe.test.mjs#cancelled builds exit before Registry cleanup begins
 shared_specifications:
   - docs/spec/terminology.md
   - docs/spec/native-clients.md

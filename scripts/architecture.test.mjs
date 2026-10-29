@@ -11,6 +11,8 @@ test('declared architecture and all specification owners are valid', () => {
 for (const [name, mutate, message] of [
   ['adapter libraries do not claim runtime capabilities', modules => { modules.get('storage-bhpan').capabilities = ['storage-bhpan.runtime']; }, /runtime capabilities/],
   ['private implementation cannot become public', modules => { modules.get('verification').visibility = 'public'; }, /must remain private/],
+  ['business candidates declare their implemented contract', modules => { modules.get('verification').contract_status = 'design-only'; }, /implemented contract/],
+  ['business candidates declare an API version', modules => { delete modules.get('verification').api; }, /API version/],
   ['storage protocol implementation remains public', modules => { modules.get('storage-bhpan').visibility = 'private'; }, /must remain public/],
   ['repositories have one module owner', modules => { modules.get('reviews').repository = modules.get('catalog').repository; }, /Duplicate repository/],
   ['required dependency cycle fails', modules => { modules.get('platform').required = ['reviews']; }, /cycle/],

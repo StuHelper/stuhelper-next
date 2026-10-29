@@ -71,3 +71,9 @@ Next 的 20 模块架构、18 项脚本测试、文档、工作流、13 个检�
 [Backend #7](https://github.com/StuHelper/stuhelper-backend/pull/7)、[Web #11](https://github.com/StuHelper/stuhelper-web/pull/11)与[Admin #13](https://github.com/StuHelper/stuhelper-admin/pull/13)组成资料应用候选。各应用分支组合了已提交的存储和课程候选，未改动其他任务工作树。
 
 先合入 platform、catalog、reviews 与 moderation 基础，再处理 storage、media、moderation 的资料扩展和 resources。原存储与课程应用 PR 合入后，再处理资料应用候选，最后更新 Next 固定组合。所有合并、发行和部署继续等待负责人授权。
+
+## 统一登录与学生资格
+
+business-acceptance 候选已经在正式 backend 与构建后的 Web/Admin 中验证上传、审核、发布和下载。文件逐字节核对，后端重启保留资料与会话。资格撤销后，已打开资料页的下载请求被拒绝，供应商文件没有被读取。
+
+此次使用合成学校、选课、账号与文件，外部 SSO 和 BHpan 使用隔离协议服务。固定组合与未完成范围见[框架实施状态](framework-bootstrap.md#统一业务组合验收)，真实账号、发行与部署仍分别验收。

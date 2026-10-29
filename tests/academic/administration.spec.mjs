@@ -1,4 +1,4 @@
-import { test,expect } from '@playwright/test';
+import { test,expect } from '../session-fixture.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 const admin=process.env.ADMIN_PATH||path.resolve('workspace/admin');
@@ -12,6 +12,7 @@ const fulfill=(route,value,status=200)=>route.fulfill({status,contentType:'appli
 async function fixture(page){
   await page.route('**/api/v1/**',route=>{
     const u=new URL(route.request().url()),p=u.pathname;
+    if(p==='/api/v1/auth/session')return route.fallback();
     if(p==='/api/v1/catalog/objects')return fulfill(route,{items:u.searchParams.get('kind')==='school'?[school]:u.searchParams.get('kind')==='course'?[course]:[],next:''});
     if(p==='/api/v1/catalog/objects/course/summary')return fulfill(route,{object:course,school,department:null,categories:[],natures:[],course_count:1,teacher_count:0,offering_count:0});
     if(p==='/api/v1/reviews/admin/entries')return fulfill(route,{items:[entry],next:''});
