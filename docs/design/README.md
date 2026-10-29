@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-29
+updated: 2026-10-26
 ---
 
 # 项目设计

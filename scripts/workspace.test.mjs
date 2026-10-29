@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { test } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { goWorkspace, verifyScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
+import { goWorkspace, verifyWorkspaceScenarios, verifyScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
 
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -150,4 +150,20 @@ test('academic snapshots reject forged digests, provider revisions and missing m
   const adminSource = { ...source, files: { ...source.files, 'sdk/catalog.gen.ts': adminGenerated }, sha256: { 'contracts/catalog.openapi.json': digest(contract), [adminGenerated]: digest(generated) } };
   verifyAcademicSource(provider, { ...client, name: 'admin' }, adminSource, load);
   assert.throws(() => verifyAcademicSource(provider, { ...client, name: 'admin' }, source, load));
+});
+
+
+test('scenario verification obeys the explicit integration checkout scope', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-scope-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(directory, 'spec.md'), '| MOD-01 | public |\n| MOD-02 | private |\n');
+  fs.mkdirSync(path.join(directory, 'public'));
+  fs.writeFileSync(path.join(directory, 'public', 'module_test.go'), 'func TestPublic(t *testing.T) {}');
+  const definitions = [{ id: 'platform', repository: 'StuHelper/stuhelper-platform', specifications: ['spec.md'], scenario_tests: {'MOD-01':['module_test.go#TestPublic']} }, {id:'identity',repository:'StuHelper/stuhelper-backend',specifications:['spec.md'],scenario_tests:{'MOD-02':['private_test.go#TestPrivate']}}];
+  const records = ['platform','backend'].map(name => ({name,url:`https://github.com/StuHelper/stuhelper-${name}.git`,directory:path.join(directory,name==='platform'?'public':'missing-private')}));
+  assert.doesNotThrow(() => verifyWorkspaceScenarios(directory, definitions, records, ['platform']));
+  assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records), /ENOENT|Missing scenario test/);
+  assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records, ['typo']), /Unknown scenario checkout/);
+  fs.rmSync(path.join(directory,'public','module_test.go'));
+  assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records, ['platform']), /ENOENT|Missing scenario test/);
 });

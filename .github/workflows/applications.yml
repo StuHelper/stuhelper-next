@@ -157,7 +157,7 @@ jobs:
           pnpm install --frozen-lockfile
           node scripts/workspace.mjs snapshot
           node scripts/workspace.mjs toolchains
-          node scripts/workspace.mjs contracts
+          node scripts/workspace.mjs contracts --scope=platform,web,admin,catalog,reviews,moderation,storage,media,resources
       - name: Build public example and clients
         run: >
           (cd workspace/platform && go build -mod=readonly -o
