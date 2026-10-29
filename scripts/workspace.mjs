@@ -212,14 +212,26 @@ export function goWorkspace(directory = root) {
   console.log(`Created local go.work with ${modules.length} modules; formal builds use GOWORK=off`);
 }
 
+export function parseCommand(args) {
+  const [command, flag, extra] = args;
+  assert(!extra, 'Unexpected command argument');
+  if (command === 'contracts') {
+    assert(!flag || flag.startsWith('--scope='), 'Use contracts [--scope=project,...]');
+    const scope = flag ? flag.slice(8).split(',') : undefined;
+    assert(!scope || scope.every(name => /^[a-z][a-z-]*$/.test(name)), 'Invalid scenario checkout scope');
+    return { command, scope, write: false };
+  }
+  assert(!flag || (['snapshot', 'toolchains'].includes(command) && flag === '--write'), 'Only snapshot and toolchains accept --write');
+  return { command, write: flag === '--write' };
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const [command, flag] = process.argv.slice(2);
-    assert(!flag || flag === '--write', 'Only --write is accepted');
+    const { command, scope, write } = parseCommand(process.argv.slice(2));
     if (command === 'validate') validate();
-    else if (command === 'toolchains') toolchains(root, flag === '--write');
-    else if (command === 'contracts') { assert(!flag || flag.startsWith('--scope='), 'Use contracts [--scope=project,...]'); contracts(root, flag ? flag.slice(8).split(',') : undefined); }
-    else if (command === 'snapshot') snapshot(root, flag === '--write');
+    else if (command === 'toolchains') toolchains(root, write);
+    else if (command === 'contracts') contracts(root, scope);
+    else if (command === 'snapshot') snapshot(root, write);
     else if (command === 'go-work') goWorkspace();
     else throw new Error('Use validate, contracts, toolchains [--write], snapshot [--write], or go-work. Use Mani directly for repository tasks.');
   } catch (error) {
