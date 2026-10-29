@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-25
+updated: 2026-10-29
 ---
 
 # 仓库检查与文档预览
@@ -50,3 +50,5 @@ pre-commit 检查暂存区快照，包括文件安全、脚本权限、语法和
 本地安装 uv 后运行 `make docs`，命令使用 `uvx --with mkdocs-material --with mkdocs-mermaid-zoom mkdocs serve`。MkDocs 配置只服务开发预览，文档没有独立 uv 项目或锁文件。
 
 CI 保留 Markdown、元信息、链接和导航检查，不安装 MkDocs、不构建或部署文档站。专业 Python 工具可使用自己的标准库或明确依赖，不因此为文档引入 Python 工作区。
+
+公共组合工作流为场景检查显式传入 `--scope=platform,web,admin,catalog,reviews,moderation,storage,media,resources`，只检查该作业实际检出的提供方。省略 scope 时仍执行完整工作区场景检查，范围内缺失测试文件会失败。

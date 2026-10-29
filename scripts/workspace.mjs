@@ -136,18 +136,27 @@ export function providerSource(checkout, revision, filename) {
   }
   return execFileSync('git', ['-C', checkout, 'show', `${revision}:${filename}`], { encoding: 'utf8' });
 }
-export function contracts(directory = root) {
+export function verifyWorkspaceScenarios(directory, definitions, records, scope) {
+  if (scope) {
+    assert(scope.length > 0 && new Set(scope).size === scope.length, 'Invalid scenario checkout scope');
+    for (const name of scope) assert(records.some(project => project.name === name), `Unknown scenario checkout: ${name}`);
+  }
+  for (const definition of definitions.filter(module => module.scenario_tests)) {
+    const project = records.find(project => project.url === `https://github.com/${definition.repository}.git`);
+    assert(project, `Scenario provider checkout missing: ${definition.id}`);
+    if (scope && !scope.includes(project.name)) continue;
+    verifyScenarios(directory, definition, project.directory);
+  }
+}
+
+export function contracts(directory = root, scope) {
   const records = projects(directory);
   const definitions = readYaml(path.join(directory, 'architecture/modules.yaml')).modules;
   const provider = records.find(project => project.name === 'platform');
   const descriptor = readYaml(path.join(provider.directory, 'module.yaml'));
   const definition = definitions.find(module => module.id === 'platform');
   for (const key of ['id', 'api', 'capabilities', 'critical']) assert.deepEqual(descriptor[key], definition[key]);
-  for (const definition of definitions.filter(module => module.scenario_tests)) {
-    const project = records.find(project => project.url === `https://github.com/${definition.repository}.git`);
-    assert(project, `Scenario provider checkout missing: ${definition.id}`);
-    verifyScenarios(directory, definition, project.directory);
-  }
+  verifyWorkspaceScenarios(directory, definitions, records, scope);
   for (const client of records.filter(project => project.tags.includes('frontend'))) {
     const source = readJSON(path.join(client.directory, 'contracts/platform.source.json'));
     verifySource(provider, client, source, (revision, filename) => providerSource(provider.directory, revision, filename));
@@ -209,7 +218,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     assert(!flag || flag === '--write', 'Only --write is accepted');
     if (command === 'validate') validate();
     else if (command === 'toolchains') toolchains(root, flag === '--write');
-    else if (command === 'contracts') contracts();
+    else if (command === 'contracts') { assert(!flag || flag.startsWith('--scope='), 'Use contracts [--scope=project,...]'); contracts(root, flag ? flag.slice(8).split(',') : undefined); }
     else if (command === 'snapshot') snapshot(root, flag === '--write');
     else if (command === 'go-work') goWorkspace();
     else throw new Error('Use validate, contracts, toolchains [--write], snapshot [--write], or go-work. Use Mani directly for repository tasks.');
