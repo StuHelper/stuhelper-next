@@ -67,6 +67,7 @@ modules:
     optional:
       - identity
       - media
+      - verification
     interface_owner: profiles
     contract_status: implemented
     specifications:
@@ -78,6 +79,10 @@ modules:
     scenario_tests:
       PC-08:
         - integration_test.go#TestProfileOwnershipReplayConcurrentRevisionAndRuntimeRole
+      PC-05:
+        - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
+      PC-10:
+        - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
@@ -137,6 +142,7 @@ modules:
     contract_status: implemented
     specifications:
       - docs/spec/student-verification.md
+      - docs/spec/personal-center.md
     api: 1
     capabilities:
       - verification.read
@@ -145,6 +151,8 @@ modules:
       - verification.capture
     capability_requires: {}
     scenario_tests:
+      PC-05:
+        - public_profile_test.go#TestPublicProfileFactsOnlyExposeSelectedCurrentAcademicFields
       SV-TEACHER-01:
         - teachers_test.go#TestTeacherApplicationReviewBindingAndDisclosureConsent
       SV-TEACHER-02:
