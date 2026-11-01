@@ -8,7 +8,7 @@
     },
     "verification": {
       "repository": "https://github.com/StuHelper/stuhelper-verification.git",
-      "revision": "2271caaa10efe45a7968e7d6a8eaa17d21e2b28e",
+      "revision": "be5dbdd273969c498a8241f5748ce1e02d45598a",
       "dirty": false
     },
     "storage": {
@@ -28,7 +28,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "ba047c5f751b785c6af96103f0991fa2c0b196e8",
+      "revision": "ad9a178cacbfc3972ddac530797d9d31476f89b7",
       "dirty": false
     },
     "catalog": {

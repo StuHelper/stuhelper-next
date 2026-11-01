@@ -151,8 +151,12 @@ modules:
       - verification.capture
     capability_requires: {}
     scenario_tests:
+      PC-11:
+        - identity_mask_test.go#TestOwnIdentityMasksComeFromVerifiedDataAndNeverLeakThroughFacts
+        - identity_mask_test.go#TestShortIdentityValuesAreRejectedAndMissingHistoricalMasksBlockMigration
       PC-05:
         - public_profile_test.go#TestPublicProfileFactsOnlyExposeSelectedCurrentAcademicFields
+        - public_profile_test.go#TestPublicProfileUsesCollegeNameWithoutGuessingMissingGrade
       SV-TEACHER-01:
         - teachers_test.go#TestTeacherApplicationReviewBindingAndDisclosureConsent
       SV-TEACHER-02:
