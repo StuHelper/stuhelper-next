@@ -346,6 +346,7 @@ modules:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
       ACAD-40:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+        - presentation_test.go#TestPresentationMigrationAndHTTPRemovePreviewFieldsPreservingRatingTexts
       CM-09:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
       CM-14:
