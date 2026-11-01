@@ -28,7 +28,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "a5d4f6deac6306ac7f4219d39cff78c8463647e6",
+      "revision": "7bd4eb149765eb4d430f9377489cf9e3c320c730",
       "dirty": false
     },
     "catalog": {
@@ -43,7 +43,7 @@
     },
     "moderation": {
       "repository": "https://github.com/StuHelper/stuhelper-moderation.git",
-      "revision": "a98002fb6f91f20830c2cd3108504eb92b06b66d",
+      "revision": "2504e5729cabb6b55b3aa0c7c6d7f287410f5951",
       "dirty": false
     },
     "resources": {

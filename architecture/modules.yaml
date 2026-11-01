@@ -215,11 +215,17 @@ modules:
     implementation: in-progress
     required:
       - platform
-    optional: []
+    optional:
+      - verification
+      - identity
     interface_owner: moderation
     contract_status: implemented
     specifications:
       - docs/spec/content-management.md
+      - docs/spec/academic-content.md
+      - docs/spec/action-eligibility.md
+    eligibility_facts:
+      content_access: verification
     api: 1
     capabilities:
       - moderation.tasks
@@ -238,6 +244,9 @@ modules:
         - operations_test.go#TestBatchPreviewAndRetryPreservePerItemResults
       CM-13:
         - operations_test.go#TestAffectedAuthorSeesDecisionWithoutReportersPrivateEvidence
+      ACAD-15:
+        - report_test.go#TestNewReportsRequireAdmissionButOwnPendingEvidenceRemainsAvailable
+        - report_test.go#TestPendingEvidenceCannotOverwriteConcurrentDecision
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
