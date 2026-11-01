@@ -55,6 +55,16 @@
       "repository": "https://github.com/StuHelper/stuhelper-profiles.git",
       "revision": "c78feb777d73bd0ce8a516a445bfa57e3a29a33c",
       "dirty": false
+    },
+    "web": {
+      "repository": "https://github.com/StuHelper/stuhelper-web.git",
+      "revision": "837e00a867d838b5e8a970af0084bdf804b0cf93",
+      "dirty": false
+    },
+    "admin": {
+      "repository": "https://github.com/StuHelper/stuhelper-admin.git",
+      "revision": "fbeafb644e071ee833ccbe5b9b989999468f8abb",
+      "dirty": false
     }
   }
 }

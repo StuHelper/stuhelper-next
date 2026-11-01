@@ -128,3 +128,5 @@ platform、catalog、reviews、resources 和 backend 完整 make check 通过，
 客户端需同步 catalog 0.2.0、reviews 0.3.0、resources 0.2.0 候选契约与生成类型。目录管理读取改用 /catalog/admin；投票记录改读 OwnVote；内容页按 401、403、503 分别处理。旧预览字段在第 4 阶段删除。
 
 先合入 verification、platform 与业务提供方，再把 backend 更新到合并后可拉取的提交并重验，最后合入 backend 和架构记录。本轮不合并。真实账号、Web/Admin、生产迁移与部署均未验收，测试容器已清理。
+
+本候选 PR 的公共集成明确使用 workspace.lock.json 中的源码。Web 与 Admin 固定为当前 develop 基线，只用于发现兼容性差异；本任务不修改客户端。候选登记修复前的集成失败原因为错误检出旧提供方，当前重跑保留全部契约与客户端检查。
