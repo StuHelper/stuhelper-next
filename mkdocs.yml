@@ -81,6 +81,7 @@ nav:
       - 学生认证与实名: spec/student-verification.md
       - 资料与访问权益: spec/resource-sharing.md
       - 积分与 Ivory 余额: spec/wallet-and-points.md
+      - 收藏与收藏夹: spec/favorites.md
       - 个人中心: spec/personal-center.md
       - 通知中心: spec/notifications.md
       - 我的课程与课表: spec/my-courses.md

@@ -80,7 +80,9 @@ projects:
     url: https://github.com/StuHelper/stuhelper-billing.git
     branch: develop
     tags:
-      - documents
+      - backend
+      - code
+      - private
   ops:
     path: workspace/ops
     url: https://github.com/StuHelper/stuhelper-ops.git
@@ -106,6 +108,14 @@ projects:
   catalog:
     path: workspace/catalog
     url: https://github.com/StuHelper/stuhelper-catalog.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  favorites:
+    path: workspace/favorites
+    url: https://github.com/StuHelper/stuhelper-favorites.git
     branch: develop
     tags:
       - backend

@@ -261,6 +261,7 @@ modules:
         - integration_test.go#TestPolicyScopeReplayAndPrivateDecisionProjection
         - policies_test.go#TestEffectivePolicyAndAdminInitiatedReviewAreScoped
       CM-10:
+        - contract_test.go#TestGeneratedAppealSubmissionPreservesRequestFields
         - operations_test.go#TestAppealRequiresContentOwnerAndAnotherReviewer
       CM-12:
         - operations_test.go#TestBatchPreviewAndRetryPreservePerItemResults
@@ -300,6 +301,34 @@ modules:
     contract_status: library
     specifications:
       - docs/spec/storage-contribution.md
+  - id: favorites
+    repository: StuHelper/stuhelper-favorites
+    visibility: public
+    implementation: in-progress
+    required:
+      - platform
+      - catalog
+      - reviews
+    optional:
+      - resources
+      - identity
+      - verification
+    interface_owner: favorites
+    contract_status: implemented
+    specifications:
+      - docs/spec/favorites.md
+      - docs/spec/action-eligibility.md
+    eligibility_facts:
+      content_access: verification
+    api: 1
+    capabilities:
+      - favorites.manage
+    capability_requires: {}
+    scenario_tests:
+      FAV-01:
+        - integration_test.go#TestFavoritesOwnershipFoldersAdmissionAndConcurrentReplay
+      FAV-02:
+        - integration_test.go#TestLegacyImportResumesWithoutDuplicatesOrResurrection
   - id: reviews
     repository: StuHelper/stuhelper-reviews
     visibility: public
@@ -309,6 +338,7 @@ modules:
       - catalog
       - moderation
     optional:
+      - favorites
       - profiles
       - verification
       - identity
@@ -385,6 +415,7 @@ modules:
       ACAD-16:
         - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
       ACAD-15:
+        - bookmark_transfer_test.go#TestBookmarkTransferSealsLegacyWritesAndRetainsOriginalReplay
         - interaction_test.go#TestExpiredAdmissionAllowsOnlyOwnVoteAndBookmarkRemoval
       PC-07:
         - closure_test.go#TestClosedOwnerKeepsContentWithoutProfileOrDisclosures

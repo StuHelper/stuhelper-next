@@ -1,7 +1,7 @@
 ---
 type: index
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-01
 ---
 
 # StuHelper Next 文档
@@ -21,3 +21,5 @@ StuHelper Next 是现有 StuHelper 的重构版本，Next 为过渡名称，未�
 | adr | 追溯重要决定及取舍 | [决策记录](adr/README.md) |
 
 首次阅读从项目设计进入；继续实施从开发工作进入。文档的 `Accepted` 表示其声明范围已确认，功能是否实现和验证须查看对应开发记录。
+
+课程、教师和资料收藏的归属、收藏夹规则与旧记录迁移见[收藏规格](spec/favorites.md)。
