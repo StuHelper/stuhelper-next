@@ -234,6 +234,7 @@ modules:
     scenario_tests:
       CM-01:
         - integration_test.go#TestPendingReportMergesEvidenceAndAuthorRequestsAreScoped
+        - complaints_test.go#TestResourceComplaintPortPreservesLegacyReplayAndRejectsPublicBypass
       CM-02:
         - integration_test.go#TestDecisionDeliveryRecoversUnknownResultAndRejectsStaleRevision
       CM-05:
@@ -416,6 +417,8 @@ modules:
         - integration_test.go#TestDeniedInputsDoNotReachDependencies
       RS-23:
         - integration_test.go#TestReviewInspectionIsScopedAndGrantListsIdentifySubjects
+      RS-26:
+        - file_access_test.go#TestPreviewAndDownloadShareCurrentRightsAndExactMissingConditions
       RS-24:
         - http_test.go#TestReceiptHTTPStatesMatchGeneratedContract
         - references_test.go#TestComplaintTitleSnapshotRequiresAdmissionAtSubmission
