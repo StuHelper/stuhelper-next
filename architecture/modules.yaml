@@ -130,6 +130,7 @@ modules:
     optional:
       - identity
       - campus-adapters
+      - catalog
     interface_owner: verification
     contract_status: implemented
     specifications:
@@ -141,6 +142,16 @@ modules:
       - verification.admin
       - verification.capture
     capability_requires: {}
+    scenario_tests:
+      SV-TEACHER-01:
+        - teachers_test.go#TestTeacherApplicationReviewBindingAndDisclosureConsent
+      SV-TEACHER-02:
+        - teachers_test.go#TestTeacherApprovalConcurrencyUniqueBindingAndRollback
+        - teachers_test.go#TestTeacherMultipleBindingsFollowCatalogMergeAndRejectOwnershipConflict
+      SV-TEACHER-03:
+        - teachers_test.go#TestTeacherApprovalFailureExpiryAndSelfReview
+      SV-TEACHER-04:
+        - teachers_test.go#TestTeacherMigrationPreservesStudentDataAndRuntimeIsolation
   - id: catalog
     repository: StuHelper/stuhelper-catalog
     visibility: public

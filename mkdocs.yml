@@ -115,6 +115,8 @@ nav:
       - 旧业务整理与确认: development/business-design-extraction.md
       - 旧业务迁移覆盖: development/business-migration-coverage.md
       - 确认结果与延期事项: development/business-decisions.md
+      - 业务决定的后端实施: development/backend-decisions.md
+      - 前端审查处理: development/frontend-review.md
       - 写作模板: development/TEMPLATE.md
   - 指南:
       - 操作导航: guide/README.md
