@@ -33,12 +33,17 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "e443fc5d3c806860784c7973cf9086e3ce888415",
+      "revision": "3f9dfcf9384f612d2063e433d64a1b02fcc79c41",
       "dirty": false
     },
     "catalog": {
       "repository": "https://github.com/StuHelper/stuhelper-catalog.git",
-      "revision": "14a3bcb620facc5400e5fec7daf5a9f2fa2ee032",
+      "revision": "b465865ab07f6b564de31cc3813c217935620439",
+      "dirty": false
+    },
+    "open-platform": {
+      "repository": "https://github.com/StuHelper/stuhelper-open-platform.git",
+      "revision": "df36decaed3e371f2742d74e679658e7490b4a37",
       "dirty": false
     },
     "favorites": {

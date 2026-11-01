@@ -203,6 +203,7 @@ modules:
       CO-04:
         - integration_test.go#TestImportIdempotencyConcurrencyAndRollback
       CO-05:
+        - schedule_test.go#TestOwnedScheduleReadsOnlyCurrentEnrollmentMeetings
         - integration_test.go#TestCourseTeacherJoinsAndEnrollmentAssignments
       CO-07:
         - integration_test.go#TestSchoolScopePublicProjectionAndBoundedHTTP
@@ -557,18 +558,43 @@ modules:
   - id: open-platform
     repository: StuHelper/stuhelper-open-platform
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
-    optional:
       - identity
-      - verification
       - profiles
+    optional:
+      - verification
+      - catalog
+      - reviews
       - groups
     interface_owner: open-platform
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/open-platform.md
+    api: 1
+    capabilities:
+      - open-platform.manage
+      - open-platform.data
+    capability_requires: {}
+    scenario_tests:
+      OP-01:
+        - integration_test.go#TestApplicationApprovalAndPerScopeAuthorization
+      OP-02:
+        - integration_test.go#TestApplicationApprovalAndPerScopeAuthorization
+      OP-03:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+        - integration_test.go#TestSuspensionConsentBindingAndConcurrentQuota
+      OP-04:
+        - integration_test.go#TestHTTPRejectsForgedOwnersAndUsesOAuthExchange
+      OP-06:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+      OP-07:
+        - integration_test.go#TestSuspensionConsentBindingAndConcurrentQuota
+      OP-08:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+      OP-09:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
   - id: search
     repository: StuHelper/stuhelper-search
     visibility: public
@@ -605,16 +631,26 @@ applications:
       - docs/spec/module-lifecycle.md
       - docs/spec/sso-compatibility.md
       - docs/spec/resource-sharing.md
+      - docs/spec/open-platform.md
+      - docs/spec/personal-center.md
     optional:
       - catalog
       - reviews
       - moderation
       - media
       - resources
+      - open-platform
+      - profiles
+      - billing
+      - favorites
     capability_requires:
       resources.read:
         - resources
     scenario_tests:
+      OP-05:
+        - internal/openplatformapp/integration_test.go#TestOpenPlatformComposesCurrentContentAdmissionAndMinimalOwnedData
+      PC-07:
+        - internal/resourceapp/closure_combination_test.go#TestClosureComposesAssetsSessionsAuthorizationsAndContentWithoutChangingCopyright
       RS-03:
         - internal/resourceapp/integration_test.go#TestResourceCompositionCatalogReviewMediaArchiveAndRevocation
       RS-23:

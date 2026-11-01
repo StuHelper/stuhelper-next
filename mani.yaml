@@ -113,6 +113,11 @@ projects:
       - backend
       - code
       - public
+  open-platform:
+    path: workspace/open-platform
+    url: https://github.com/StuHelper/stuhelper-open-platform.git
+    branch: develop
+    tags: [backend, code, public]
   favorites:
     path: workspace/favorites
     url: https://github.com/StuHelper/stuhelper-favorites.git
