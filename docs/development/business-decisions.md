@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-26
+updated: 2026-11-01
 ---
 
 # 业务确认结果与延期事项
@@ -20,6 +20,7 @@ updated: 2026-10-26
 | 内容运营 | 可配置审核、分类、敏感词、复核与批量预览，有效与优质内容有明确认定方式 | [内容管理](../spec/content-management.md) |
 | 账号与个人主页 | 学校与徽章默认公开可调整，绑定唯一归属，注销只处理本应用 | [个人中心](../spec/personal-center.md) |
 | 学生资格与实名 | 完整规则私有维护，公共模块只使用必要资格结论 | [认证对接](../spec/student-verification.md) |
+| 服务范围与内容准入 | 当前只服务北航，不做多租户。内容准入要求有效校园资格（含校友和临时新生）或有效教师认证，服务端读接口、搜索和统计同样执行；不保留评价预览；认证失效后仍可管理本人记录（含我的课程） | [资格配置](../spec/action-eligibility.md) |
 | 动作资格 | 全站默认和授权范围覆盖，可收紧或放宽，后续操作生效并保留既有记录 | [资格配置](../spec/action-eligibility.md) |
 | 资料与作品许可 | 原创/转载简化填写，版本先审，保留文件原名，目录只打包有权内容 | [资料共享](../spec/resource-sharing.md) |
 | 账户、会员与交易 | 已确认规则移入私有账务模块，金额与期限按配置管理 | [账务对接](../spec/wallet-and-points.md) |
@@ -38,6 +39,25 @@ updated: 2026-10-26
 | 客户端与迁移 | 当前仅 Web/Admin；保留 SSO 与学生认证数据，不迁移独立实名及其他旧业务数据 | [重写路线](rewrite-roadmap.md) |
 | 品牌与产品边界 | 沿用 StuHelper 和纸飞机品牌，不建设作业实验系统或学校教务写入功能 | [业务范围](../design/business-scope.md) |
 | 仓库边界 | 按业务模块拆仓，认证、学校适配、账务与生产配置私有 | [多仓库设计](../design/module-repositories.md) |
+
+## 2026-11-01 前端审查后的决定
+
+| 主题 | 决定 | 规则位置 |
+| --- | --- | --- |
+| 账户展示 | 积分与 Ivory 分别展示余额和明细，其他账务规则不变 | [账务对接](../spec/wallet-and-points.md) |
+| 收藏 | 独立 favorites 模块拥有课程、教师、资料收藏和收藏夹 | [资格配置](../spec/action-eligibility.md) |
+| 账号注销 | 7 天冷静期内登录可撤销；期满且资产处置完成后由管理员注销 | [个人中心](../spec/personal-center.md) |
+| 认证期限 | 普通认证长期有效，只对限时凭证提示到期 | [学生认证](../spec/student-verification.md) |
+| 本人身份字段 | 只展示服务端生成的脱敏姓名和证件号 | [个人中心](../spec/personal-center.md) |
+| 昵称 | 最多 20 个字符，首次登录依次尝试 SSO 显示名和用户名，都不合规时由用户填写 | [个人中心](../spec/personal-center.md) |
+| 主页开关 | 学院、年级、署名评价、资料、学校和认证徽章都可关闭 | [个人中心](../spec/personal-center.md) |
+| 基础主页 | 游客可见，关联内容按各自权限显示 | [资格配置](../spec/action-eligibility.md) |
+| 开放平台范围 | 本轮实现后端模块；学生认证状态、学校、QQ、个人资料、课表、目录、公开评价分别审批和授权；目录与评价要求授权用户通过内容准入 | [开放平台](../spec/open-platform.md) |
+| 资料预览 | 与下载使用同一权限检查 | [资料共享](../spec/resource-sharing.md) |
+| 访问权 | 不新增申请或审批，按实际缺失条件提示；投诉入口独立，只要求登录 | [资料共享](../spec/resource-sharing.md) |
+| 受限资料购买 | 流程延期，不提供可执行的支付入口 | [资格配置](../spec/action-eligibility.md) |
+| 互动 | 新增点赞、点踩、收藏和举报要求内容准入，本人已有记录可继续管理 | [资格配置](../spec/action-eligibility.md) |
+| 教师认证 | 首期人工审核并绑定教师档案，自动核验后补 | [学生认证](../spec/student-verification.md) |
 
 ## 项目负责人明确延期的事项
 

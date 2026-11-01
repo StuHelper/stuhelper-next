@@ -59,6 +59,10 @@ test('implemented scenarios reference an existing specification and executable t
   verifyScenarios(directory, definition, directory);
   fs.writeFileSync(path.join(directory, 'spec.md'), '| MOD-06：condition | result |');
   verifyScenarios(directory, definition, directory);
+  fs.appendFileSync(path.join(directory, 'spec.md'), '\n| AE-ACCESS-07：denied | closed |\n| SV-TEACHER-01 | verified |');
+  for (const id of ['AE-ACCESS-07', 'SV-TEACHER-01']) verifyScenarios(directory, { ...definition, scenario_tests: { [id]: ['module_test.go#TestOptional'] } }, directory);
+  assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'AE-ACCESS-99': ['module_test.go#TestOptional'] } }, directory), /Unknown implemented scenario/);
+  assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'ae-ACCESS-07': ['module_test.go#TestOptional'] } }, directory), /Invalid scenario/);
   assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-99': ['module_test.go#TestOptional'] } }, directory), /Unknown implemented scenario/);
   fs.writeFileSync(path.join(directory, 'module_test.go'), '');
   assert.throws(() => verifyScenarios(directory, definition, directory), /Missing scenario test/);

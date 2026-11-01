@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-26
+updated: 2026-11-01
 ---
 
 # 功能与模块规格
@@ -14,6 +14,7 @@ updated: 2026-10-26
 | [学生认证的公共对接说明](student-verification.md) | 公共认证入口与私有规格位置 |
 | [资料共享与访问权益](resource-sharing.md) | 原创/转载、长期授权、下架申请、逐用户与群体授权 |
 | [账户与交易的公共对接说明](wallet-and-points.md) | 两套账户、获取奖励、购买权益与退款的业务关系 |
+| [收藏与收藏夹](favorites.md) | 课程、教师、资料收藏、收藏夹与旧记录迁移 |
 | [个人中心](personal-center.md) | 资料、认证、账号绑定、本人内容和业务入口 |
 | [通知中心](notifications.md) | 通知来源、未读、已读与相关内容跳转 |
 | [我的课程与课表](my-courses.md) | 本人课程、教师、时间、地点与学期 |

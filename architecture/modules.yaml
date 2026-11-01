@@ -26,6 +26,8 @@ modules:
         - module/remote_test.go#TestRemoteDegradedStartupRecoveryAndBoundedProbes
       MOD-09:
         - module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness
+      AE-ACCESS-06:
+        - eligibility/rules_test.go#TestContentAdmissionFactIsIndependentFromCampusQualification
     api: 1
     capabilities:
       - platform.status
@@ -65,6 +67,11 @@ modules:
     optional:
       - identity
       - media
+      - verification
+      - billing
+      - reviews
+      - resources
+      - open-platform
     interface_owner: profiles
     contract_status: implemented
     specifications:
@@ -76,6 +83,14 @@ modules:
     scenario_tests:
       PC-08:
         - integration_test.go#TestProfileOwnershipReplayConcurrentRevisionAndRuntimeRole
+      PC-05:
+        - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
+      PC-10:
+        - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
+      PC-07:
+        - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
+      PC-09:
+        - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
@@ -130,10 +145,12 @@ modules:
     optional:
       - identity
       - campus-adapters
+      - catalog
     interface_owner: verification
     contract_status: implemented
     specifications:
       - docs/spec/student-verification.md
+      - docs/spec/personal-center.md
     api: 1
     capabilities:
       - verification.read
@@ -141,6 +158,22 @@ modules:
       - verification.admin
       - verification.capture
     capability_requires: {}
+    scenario_tests:
+      PC-11:
+        - identity_mask_test.go#TestOwnIdentityMasksComeFromVerifiedDataAndNeverLeakThroughFacts
+        - identity_mask_test.go#TestShortIdentityValuesAreRejectedAndMissingHistoricalMasksBlockMigration
+      PC-05:
+        - public_profile_test.go#TestPublicProfileFactsOnlyExposeSelectedCurrentAcademicFields
+        - public_profile_test.go#TestPublicProfileUsesCollegeNameWithoutGuessingMissingGrade
+      SV-TEACHER-01:
+        - teachers_test.go#TestTeacherApplicationReviewBindingAndDisclosureConsent
+      SV-TEACHER-02:
+        - teachers_test.go#TestTeacherApprovalConcurrencyUniqueBindingAndRollback
+        - teachers_test.go#TestTeacherMultipleBindingsFollowCatalogMergeAndRejectOwnershipConflict
+      SV-TEACHER-03:
+        - teachers_test.go#TestTeacherApprovalFailureExpiryAndSelfReview
+      SV-TEACHER-04:
+        - teachers_test.go#TestTeacherMigrationPreservesStudentDataAndRuntimeIsolation
   - id: catalog
     repository: StuHelper/stuhelper-catalog
     visibility: public
@@ -149,12 +182,15 @@ modules:
       - platform
     optional:
       - campus-adapters
+      - verification
+      - identity
     interface_owner: catalog
     contract_status: implemented
     specifications:
       - docs/spec/catalog-operations.md
       - docs/spec/my-courses.md
       - docs/spec/academic-content.md
+      - docs/spec/action-eligibility.md
     api: 1
     capabilities:
       - catalog.read
@@ -167,6 +203,7 @@ modules:
       CO-04:
         - integration_test.go#TestImportIdempotencyConcurrencyAndRollback
       CO-05:
+        - schedule_test.go#TestOwnedScheduleReadsOnlyCurrentEnrollmentMeetings
         - integration_test.go#TestCourseTeacherJoinsAndEnrollmentAssignments
       CO-07:
         - integration_test.go#TestSchoolScopePublicProjectionAndBoundedHTTP
@@ -185,17 +222,32 @@ modules:
         - operations_test.go#TestMergeKeepsOldLinksOfferingsAndEnrollmentsAndSupportsDeactivation
       CO-10:
         - operations_test.go#TestImportPreviewRollsBackAndRejectsChangedConfirmation
+      AE-ACCESS-05:
+        - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
+        - references_test.go#TestOwnEnrollmentNamesSurviveAdmissionExpiryWithoutPublicDetails
+      AE-ACCESS-06:
+        - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
+      AE-ACCESS-07:
+        - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
+    eligibility_facts:
+      content_access: verification
   - id: moderation
     repository: StuHelper/stuhelper-moderation
     visibility: public
     implementation: in-progress
     required:
       - platform
-    optional: []
+    optional:
+      - verification
+      - identity
     interface_owner: moderation
     contract_status: implemented
     specifications:
       - docs/spec/content-management.md
+      - docs/spec/academic-content.md
+      - docs/spec/action-eligibility.md
+    eligibility_facts:
+      content_access: verification
     api: 1
     capabilities:
       - moderation.tasks
@@ -203,17 +255,22 @@ modules:
     scenario_tests:
       CM-01:
         - integration_test.go#TestPendingReportMergesEvidenceAndAuthorRequestsAreScoped
+        - complaints_test.go#TestResourceComplaintPortPreservesLegacyReplayAndRejectsPublicBypass
       CM-02:
         - integration_test.go#TestDecisionDeliveryRecoversUnknownResultAndRejectsStaleRevision
       CM-05:
         - integration_test.go#TestPolicyScopeReplayAndPrivateDecisionProjection
         - policies_test.go#TestEffectivePolicyAndAdminInitiatedReviewAreScoped
       CM-10:
+        - contract_test.go#TestGeneratedAppealSubmissionPreservesRequestFields
         - operations_test.go#TestAppealRequiresContentOwnerAndAnotherReviewer
       CM-12:
         - operations_test.go#TestBatchPreviewAndRetryPreservePerItemResults
       CM-13:
         - operations_test.go#TestAffectedAuthorSeesDecisionWithoutReportersPrivateEvidence
+      ACAD-15:
+        - report_test.go#TestNewReportsRequireAdmissionButOwnPendingEvidenceRemainsAvailable
+        - report_test.go#TestPendingEvidenceCannotOverwriteConcurrentDecision
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
@@ -245,6 +302,34 @@ modules:
     contract_status: library
     specifications:
       - docs/spec/storage-contribution.md
+  - id: favorites
+    repository: StuHelper/stuhelper-favorites
+    visibility: public
+    implementation: in-progress
+    required:
+      - platform
+      - catalog
+      - reviews
+    optional:
+      - resources
+      - identity
+      - verification
+    interface_owner: favorites
+    contract_status: implemented
+    specifications:
+      - docs/spec/favorites.md
+      - docs/spec/action-eligibility.md
+    eligibility_facts:
+      content_access: verification
+    api: 1
+    capabilities:
+      - favorites.manage
+    capability_requires: {}
+    scenario_tests:
+      FAV-01:
+        - integration_test.go#TestFavoritesOwnershipFoldersAdmissionAndConcurrentReplay
+      FAV-02:
+        - integration_test.go#TestLegacyImportResumesWithoutDuplicatesOrResurrection
   - id: reviews
     repository: StuHelper/stuhelper-reviews
     visibility: public
@@ -254,6 +339,7 @@ modules:
       - catalog
       - moderation
     optional:
+      - favorites
       - profiles
       - verification
       - identity
@@ -262,11 +348,14 @@ modules:
     specifications:
       - docs/spec/academic-content.md
       - docs/spec/content-management.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
       identity_verified: verification
       course_enrollment: catalog
+      content_access: verification
     api: 1
     capabilities:
       - reviews.read
@@ -274,7 +363,7 @@ modules:
     capability_requires: {}
     scenario_tests:
       ACAD-04:
-        - integration_test.go#TestAnonymousPreviewAndCurrentAccessCannotLeakIdentity
+        - integration_test.go#TestContentAdmissionAndCurrentAccessCannotLeakIdentity
       ACAD-05:
         - integration_test.go#TestCourseTermEligibilityAndImmutableTeacherAttribution
       ACAD-13:
@@ -311,10 +400,27 @@ modules:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
       ACAD-40:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+        - presentation_test.go#TestPresentationMigrationAndHTTPRemovePreviewFieldsPreservingRatingTexts
       CM-09:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
       CM-14:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+      AE-ACCESS-05:
+        - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
+        - content_security_regression_test.go#TestVoteReceiptsDoNotExposeTargetContentAfterAdmissionExpires
+        - own_references_test.go#TestOwnNamesAndValidatedDraftAssociationsSurviveAdmissionExpiry
+        - own_references_test.go#TestOwnReferenceHTTPDoesNotOpenPublicContent
+      AE-ACCESS-07:
+        - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
+        - content_test.go#TestContentListsStatisticsAndComposerRespectServedSchool
+      ACAD-16:
+        - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
+      ACAD-15:
+        - bookmark_transfer_test.go#TestBookmarkTransferSealsLegacyWritesAndRetainsOriginalReplay
+        - interaction_test.go#TestExpiredAdmissionAllowsOnlyOwnVoteAndBookmarkRemoval
+      PC-07:
+        - closure_test.go#TestClosedOwnerKeepsContentWithoutProfileOrDisclosures
+        - closure_test.go#TestClosureRejectsPublicationAlreadyWaitingForExternalModeration
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public
@@ -332,10 +438,13 @@ modules:
     contract_status: implemented
     specifications:
       - docs/spec/resource-sharing.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
       identity_verified: verification
+      content_access: verification
     api: 1
     capabilities:
       - resources.read
@@ -365,20 +474,37 @@ modules:
         - integration_test.go#TestDeniedInputsDoNotReachDependencies
       RS-23:
         - integration_test.go#TestReviewInspectionIsScopedAndGrantListsIdentifySubjects
+      RS-26:
+        - file_access_test.go#TestPreviewAndDownloadShareCurrentRightsAndExactMissingConditions
       RS-24:
         - http_test.go#TestReceiptHTTPStatesMatchGeneratedContract
+        - references_test.go#TestComplaintTitleSnapshotRequiresAdmissionAtSubmission
+      AE-ACCESS-05:
+        - references_test.go#TestOwnResourceNamesRequireUploadOwnershipAndKeepContentPrivate
+      AE-ACCESS-07:
+        - integration_test.go#TestCategoryReadsRequireContentAdmissionAndKeepScopedAdministration
+      PC-07:
+        - closure_test.go#TestClosedUploaderKeepsFilesAndCopyrightWithoutPublicAccountLink
   - id: billing
     repository: StuHelper/stuhelper-billing
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - identity
     interface_owner: billing
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/wallet-and-points.md
+      - docs/spec/personal-center.md
+    api: 1
+    capabilities:
+      - billing.closure
+    capability_requires: {}
+    scenario_tests:
+      PC-07:
+        - closure_test.go#TestClosureClearanceRequiresKnownAssetsAndReconcilesUnknownSettlement
   - id: community
     repository: StuHelper/stuhelper-community
     visibility: public
@@ -432,18 +558,43 @@ modules:
   - id: open-platform
     repository: StuHelper/stuhelper-open-platform
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
-    optional:
       - identity
-      - verification
       - profiles
+    optional:
+      - verification
+      - catalog
+      - reviews
       - groups
     interface_owner: open-platform
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/open-platform.md
+    api: 1
+    capabilities:
+      - open-platform.manage
+      - open-platform.data
+    capability_requires: {}
+    scenario_tests:
+      OP-01:
+        - integration_test.go#TestApplicationApprovalAndPerScopeAuthorization
+      OP-02:
+        - integration_test.go#TestApplicationApprovalAndPerScopeAuthorization
+      OP-03:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+        - integration_test.go#TestSuspensionConsentBindingAndConcurrentQuota
+      OP-04:
+        - integration_test.go#TestHTTPRejectsForgedOwnersAndUsesOAuthExchange
+      OP-06:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+      OP-07:
+        - integration_test.go#TestSuspensionConsentBindingAndConcurrentQuota
+      OP-08:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+      OP-09:
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
   - id: search
     repository: StuHelper/stuhelper-search
     visibility: public
@@ -480,16 +631,26 @@ applications:
       - docs/spec/module-lifecycle.md
       - docs/spec/sso-compatibility.md
       - docs/spec/resource-sharing.md
+      - docs/spec/open-platform.md
+      - docs/spec/personal-center.md
     optional:
       - catalog
       - reviews
       - moderation
       - media
       - resources
+      - open-platform
+      - profiles
+      - billing
+      - favorites
     capability_requires:
       resources.read:
         - resources
     scenario_tests:
+      OP-05:
+        - internal/openplatformapp/integration_test.go#TestOpenPlatformComposesCurrentContentAdmissionAndMinimalOwnedData
+      PC-07:
+        - internal/resourceapp/closure_combination_test.go#TestClosureComposesAssetsSessionsAuthorizationsAndContentWithoutChangingCopyright
       RS-03:
         - internal/resourceapp/integration_test.go#TestResourceCompositionCatalogReviewMediaArchiveAndRevocation
       RS-23:
@@ -519,26 +680,38 @@ applications:
       - docs/spec/resource-sharing.md
     scenario_tests:
       RS-25:
-        - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
+        - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer
+          and keeps separate review
       ST-10:
-        - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets and preserves the binding on renewal
-        - tests/e2e/custody.spec.mjs#uncertain custody submission recovers by ID without retaining or resending a password
-        - tests/e2e/custody.spec.mjs#an existing blocked custody request resumes without new credentials
+        - tests/e2e/custody.spec.mjs#custody requires consent, clears secrets
+          and preserves the binding on renewal
+        - tests/e2e/custody.spec.mjs#uncertain custody submission recovers by ID
+          without retaining or resending a password
+        - tests/e2e/custody.spec.mjs#an existing blocked custody request resumes
+          without new credentials
       ST-01:
-        - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment and renewal retain distinct request state
+        - tests/e2e/contributions.spec.mjs#consent, creation, quota adjustment
+          and renewal retain distinct request state
       ST-03:
-        - tests/e2e/contributions.spec.mjs#exit remains pending while replicas remain
+        - tests/e2e/contributions.spec.mjs#exit remains pending while replicas
+          remain
       ST-08:
-        - tests/e2e/contributions.spec.mjs#lost response retries original mutation, paginates and clears revoked data
-        - src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
+        - tests/e2e/contributions.spec.mjs#lost response retries original
+          mutation, paginates and clears revoked data
+        - src/composables/hostTransport.test.ts#passes current host credentials
+          to both APIs and clears private state on revocation
       RS-19:
-        - tests/e2e/resources.spec.mjs#configured category field filters and grouping follow server configuration
+        - tests/e2e/resources.spec.mjs#configured category field filters and
+          grouping follow server configuration
       RS-13:
-        - tests/e2e/resources.spec.mjs#upload uses current terms and retries the original metadata request
+        - tests/e2e/resources.spec.mjs#upload uses current terms and retries the
+          original metadata request
       RS-09:
-        - tests/e2e/resources.spec.mjs#current denial clears resource data and request receipts survive navigation
+        - tests/e2e/resources.spec.mjs#current denial clears resource data and
+          request receipts survive navigation
       RS-11:
-        - tests/e2e/resources.spec.mjs#folder packages list every part and allow individual retry
+        - tests/e2e/resources.spec.mjs#folder packages list every part and allow
+          individual retry
   - id: admin
     repository: StuHelper/stuhelper-admin
     visibility: public
@@ -568,22 +741,32 @@ applications:
       - docs/spec/resource-sharing.md
     scenario_tests:
       RS-25:
-        - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
+        - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer
+          and keeps separate review
       ST-11:
-        - tests/e2e/custody.spec.mjs#custody administration resumes original consent without credential access
-        - tests/e2e/custody.spec.mjs#custody administration handles unauthenticated and empty states
+        - tests/e2e/custody.spec.mjs#custody administration resumes original
+          consent without credential access
+        - tests/e2e/custody.spec.mjs#custody administration handles
+          unauthenticated and empty states
       ST-09:
-        - tests/e2e/contributions.spec.mjs#operator retry preserves conditions, retains uncertain request and clears revoked inventory
-        - tests/e2e/contributions.spec.mjs#operator login boundary recovers to an empty page
-        - apps/web-antd/src/composables/hostTransport.test.ts#passes current host credentials to both APIs and clears private state on revocation
+        - tests/e2e/contributions.spec.mjs#operator retry preserves conditions,
+          retains uncertain request and clears revoked inventory
+        - tests/e2e/contributions.spec.mjs#operator login boundary recovers to
+          an empty page
+        - apps/web-antd/src/composables/hostTransport.test.ts#passes current
+          host credentials to both APIs and clears private state on revocation
       RS-19:
-        - tests/e2e/resources.spec.mjs#category configuration preserves stable ids, fields and original-request retry
+        - tests/e2e/resources.spec.mjs#category configuration preserves stable
+          ids, fields and original-request retry
       RS-13:
-        - tests/e2e/resources.spec.mjs#review reads the pending file and retries an unknown decision without duplication
+        - tests/e2e/resources.spec.mjs#review reads the pending file and retries
+          an unknown decision without duplication
       RS-09:
-        - tests/e2e/resources.spec.mjs#grant creation and revocation retain the subject and respect current permissions
+        - tests/e2e/resources.spec.mjs#grant creation and revocation retain the
+          subject and respect current permissions
       RS-11:
-        - tests/e2e/resources.spec.mjs#directory editing saves revision and configured names
+        - tests/e2e/resources.spec.mjs#directory editing saves revision and
+          configured names
 operations:
   - id: ops
     repository: StuHelper/stuhelper-ops
@@ -595,11 +778,16 @@ operations:
       - docs/spec/sso-compatibility.md
     scenario_tests:
       CI-16:
-        - scripts/registry-probe.test.mjs#registry probes are confined to unique temporary tags in Next application repositories
-        - scripts/registry-probe.test.mjs#manifest deletion uses a digest verified against the returned bytes
-        - scripts/registry-probe.test.mjs#interruption during asynchronous cleanup waits for the same cleanup before exit
-        - scripts/registry-probe.test.mjs#interruption stops active work before removing its Registry resources
-        - scripts/registry-probe.test.mjs#cancelled builds exit before Registry cleanup begins
+        - scripts/registry-probe.test.mjs#registry probes are confined to unique
+          temporary tags in Next application repositories
+        - scripts/registry-probe.test.mjs#manifest deletion uses a digest
+          verified against the returned bytes
+        - scripts/registry-probe.test.mjs#interruption during asynchronous
+          cleanup waits for the same cleanup before exit
+        - scripts/registry-probe.test.mjs#interruption stops active work before
+          removing its Registry resources
+        - scripts/registry-probe.test.mjs#cancelled builds exit before Registry
+          cleanup begins
 shared_specifications:
   - docs/spec/terminology.md
   - docs/spec/native-clients.md
