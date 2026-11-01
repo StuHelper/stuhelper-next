@@ -349,6 +349,8 @@ modules:
         - content_test.go#TestContentListsStatisticsAndComposerRespectServedSchool
       ACAD-16:
         - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
+      ACAD-15:
+        - interaction_test.go#TestExpiredAdmissionAllowsOnlyOwnVoteAndBookmarkRemoval
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public
