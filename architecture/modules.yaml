@@ -203,6 +203,7 @@ modules:
         - operations_test.go#TestImportPreviewRollsBackAndRejectsChangedConfirmation
       AE-ACCESS-05:
         - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
+        - references_test.go#TestOwnEnrollmentNamesSurviveAdmissionExpiryWithoutPublicDetails
       AE-ACCESS-06:
         - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
       AE-ACCESS-07:
@@ -354,6 +355,8 @@ modules:
       AE-ACCESS-05:
         - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
         - content_security_regression_test.go#TestVoteReceiptsDoNotExposeTargetContentAfterAdmissionExpires
+        - own_references_test.go#TestOwnNamesAndValidatedDraftAssociationsSurviveAdmissionExpiry
+        - own_references_test.go#TestOwnReferenceHTTPDoesNotOpenPublicContent
       AE-ACCESS-07:
         - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
         - content_test.go#TestContentListsStatisticsAndComposerRespectServedSchool
@@ -415,6 +418,9 @@ modules:
         - integration_test.go#TestReviewInspectionIsScopedAndGrantListsIdentifySubjects
       RS-24:
         - http_test.go#TestReceiptHTTPStatesMatchGeneratedContract
+        - references_test.go#TestComplaintTitleSnapshotRequiresAdmissionAtSubmission
+      AE-ACCESS-05:
+        - references_test.go#TestOwnResourceNamesRequireUploadOwnershipAndKeepContentPrivate
       AE-ACCESS-07:
         - integration_test.go#TestCategoryReadsRequireContentAdmissionAndKeepScopedAdministration
   - id: billing
