@@ -1,6 +1,6 @@
 # StuHelper Next 工程约定
 
-更新日期：2026-10-26。
+更新日期：2026-11-01。
 
 先读 [README](README.md)、[文档导航](docs/README.md)和任务主题。文档分类、状态与维护方式见[文档约定](docs/authoring.md)。
 
@@ -24,6 +24,7 @@
 * 工具链变更先改 `architecture/toolchains.yaml`，再执行 `node scripts/workspace.mjs toolchains --write` 并更新 pnpm 锁文件。共享检查通过固定版本的工程工具包复用。
 * 项目使用 AGPL-3.0-only，保留第三方许可证与来源。Vben 源码标识保留，产品名称使用 stuhelper-admin。
 * API 先定义 OpenAPI，再生成各端 SDK。客户端快照记录提供方版本和源码提交，通过兼容性与共享行为用例验证。
+* 产品采用 AI native 形态。模块新增或修改用户能力时，同步维护 Agent 工具声明和验收场景，规则见 [Agent 助手规格](docs/spec/agent-assistant.md)。业务规则、授权和计算留在 Service，不放进提示词。
 * 后端采用 Handler → Service → Repository。模块拥有自己的数据与迁移，跨模块协作使用公开接口。必需依赖、可选依赖和能力依赖分别声明。
 * 公共授权、审核与审计由服务端执行。模块关闭保留数据。原生客户端使用公有客户端认证方式，服务管理凭据和私钥留在服务端。
 * 生产配置、凭据、身份材料、支付载荷及备份仅保存在获准的私有环境中。公开代码、日志与检查输出使用脱敏内容。

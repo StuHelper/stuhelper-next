@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-01
 ---
 
 # 开发工作
@@ -15,6 +15,7 @@ updated: 2026-10-29
 | [StuHelper Next 重写路线](rewrite-roadmap.md) | 已有工程基础、业务阶段、原生端和旧数据迁移 |
 | [课程目录与评课社区](academic-community.md) | 目录、评价、审核与页面实现，以及真实接入和验证范围 |
 | [框架实施状态](framework-bootstrap.md) | 平台和客户端的当前实施范围与检查入口 |
+| [AI native 实施](ai-native.md) | 与现有实现的差距、实施阶段和待验证事项 |
 | [存储模块实施准备](storage-module.md) | 存储、文件、托管、贡献的实现、真实 BHpan 验收与后续接入 |
 | [学习资料实施](resources.md) | 配置分类、课程关联、审核、授权、目录、页面与候选验证 |
 

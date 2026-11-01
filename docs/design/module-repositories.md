@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-01
 ---
 
 # 按模块划分仓库
@@ -32,7 +32,7 @@ updated: 2026-10-29
 | storage | stuhelper-storage | public | 存储实例、准入与容量预占、副本账本、校验修复、可靠任务、清理，以及用户账号托管申请流程 |
 | storage-contribution | stuhelper-storage-contribution | public | 贡献同意、额度与保留空间、期限、暂停退出、撤权及核验统计 |
 | storage-bhpan | stuhelper-storage-bhpan | public | BHpan 登录、稳定身份、目录与文件传输协议；由 storage 的 adapter 桥接使用 |
-| catalog | stuhelper-catalog | public | 学校、院系、学期、课程、教师、开课与个人课表 |
+| catalog | stuhelper-catalog | public | 学校、院系、学期、校历、课程、教师、开课、结构化上课时间与可信选课记录 |
 | reviews | stuhelper-reviews | public | 课程评价、导师评论、评分、回复、投票、收藏与草稿 |
 | resources | stuhelper-resources | public | 统一分类及字段、课程关联、资料版本、作品许可、审核、访问授权、目录与交付状态 |
 | billing | stuhelper-billing | private | 积分、Ivory、收费、会员售卖、奖励、退款与交易权益凭据 |
@@ -44,6 +44,8 @@ updated: 2026-10-29
 | open-platform | stuhelper-open-platform | public | 开发者应用审批、业务授权与撤回 |
 | search | stuhelper-search | public | 可重建搜索索引、热度与发现查询 |
 | notifications | stuhelper-notifications | public | 站内通知、发送意图、渠道投递与偏好 |
+| assistant | stuhelper-assistant | public | 会话、Agent 运行、待确认操作、Agent 授权、长期记忆与用量 |
+| planner | stuhelper-planner | public | 个人日程、DDL、个人课表更正与空闲时间 |
 | 运维仓库 | stuhelper-ops | private | Compose、部署组合、官方 SSO/Koishi 运维与恢复 |
 
 campus-adapters 负责学校认证与教务数据接入。BHpan 存储协议归 storage-bhpan，存储根、容量与副本归 storage。调用方向为业务 → media → storage → adapter；media 不直接调用 BHpan 协议，也不保管供应商凭据。

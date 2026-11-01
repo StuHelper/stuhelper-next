@@ -471,6 +471,36 @@ modules:
     contract_status: design-only
     specifications:
       - docs/spec/notifications.md
+  - id: planner
+    repository: StuHelper/stuhelper-planner
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - catalog
+      - notifications
+    interface_owner: planner
+    contract_status: design-only
+    specifications:
+      - docs/spec/personal-planner.md
+  - id: assistant
+    repository: StuHelper/stuhelper-assistant
+    visibility: public
+    implementation: not-implemented
+    required:
+      - platform
+    optional:
+      - catalog
+      - planner
+      - reviews
+      - resources
+      - profiles
+      - notifications
+    interface_owner: assistant
+    contract_status: design-only
+    specifications:
+      - docs/spec/agent-assistant.md
 applications:
   - id: backend
     repository: StuHelper/stuhelper-backend

@@ -1,7 +1,7 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-01
 ---
 
 # 决策记录
@@ -13,5 +13,6 @@ updated: 2026-10-25
 | [0003：采用 project-docs-starter 文档架构](0003-documentation-architecture.md) | 分类、导航、状态、模板与检查方式 |
 | [0004：按业务模块采用多仓库](0004-modular-multi-repository.md) | 模块数据与接口归属、公私仓可见性和独立维护边界 |
 | [0005：使用 Mani 管理开发工作区](0005-mani-workspace.md) | 统一仓库清单、主机工具与独立任务工作树 |
+| [0006：采用 AI native 应用形态](0006-ai-native-application.md) | 对话首页、模块工具、用户自主授权与首期 MCP 范围 |
 
 新增主题使用[分类模板](TEMPLATE.md)，并同步维护[文档导航](../README.md)。

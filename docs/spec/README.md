@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-26
+updated: 2026-11-01
 ---
 
 # 功能与模块规格
@@ -17,6 +17,8 @@ updated: 2026-10-26
 | [个人中心](personal-center.md) | 资料、认证、账号绑定、本人内容和业务入口 |
 | [通知中心](notifications.md) | 通知来源、未读、已读与相关内容跳转 |
 | [我的课程与课表](my-courses.md) | 本人课程、教师、时间、地点与学期 |
+| [个人日程与 DDL](personal-planner.md) | 个人日程、DDL、课表更正与空闲时间 |
+| [Agent 助手与 MCP](agent-assistant.md) | 对话首页、用户自主授权、工具、语音和 MCP |
 | [QQ 绑定、入群认证与群聊管理](qq-group-services.md) | 入群、名片、黑名单、资格宽限期与管理员豁免 |
 | [第三方开放平台](open-platform.md) | 应用接入、用户授权和业务信息查询 |
 | [存储贡献](storage-contribution.md) | 容量、期限、占用、续期、退出和贡献榜 |

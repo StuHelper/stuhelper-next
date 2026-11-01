@@ -38,6 +38,7 @@ updated: 2026-11-01
 | 管理后台 | 可配置角色模板、对象范围、独立敏感权限及并发配置提示 | [管理操作](../spec/admin-operations.md) |
 | 客户端与迁移 | 当前仅 Web/Admin；保留 SSO 与学生认证数据，不迁移独立实名及其他旧业务数据 | [重写路线](rewrite-roadmap.md) |
 | 品牌与产品边界 | 沿用 StuHelper 和纸飞机品牌，不建设作业实验系统或学校教务写入功能 | [业务范围](../design/business-scope.md) |
+| AI native 形态 | 对话首页、语音、个人 DDL、用户自主授权；首期所有写操作都确认，MCP 只面向用户本人客户端且只读；选课只查询和建议 | [ADR 0006](../adr/0006-ai-native-application.md) |
 | 仓库边界 | 按业务模块拆仓，认证、学校适配、账务与生产配置私有 | [多仓库设计](../design/module-repositories.md) |
 
 ## 项目负责人明确延期的事项

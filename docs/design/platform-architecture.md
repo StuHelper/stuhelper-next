@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-01
 ---
 
 # 平台架构
@@ -22,6 +22,9 @@ updated: 2026-10-25
 flowchart TB
   CLIENT[Web / Admin / 原生客户端] --> API[组合 API / 模块能力发现]
   CLIENT -. OIDC .-> SSO[独立官方 SSO]
+  CLIENT --> AGENT[assistant：对话与 Agent]
+  MCP[用户本人的 MCP 客户端] --> AGENT
+  AGENT --> API
   API --> CORE[公共业务模块]
   API --> PRIVATE[私有认证与账务模块]
   CORE -. 最小授权接口 .-> PRIVATE
@@ -35,6 +38,8 @@ flowchart TB
 ```
 
 SSO 可以独立登录、启动、更新和恢复。AI、Store 与现有 Payment 保留原有职责，身份使用 OIDC 接入。OIDC 是应用使用统一登录的协议，业务模块不访问 SSO 数据库。
+
+产品以对话为主要入口。Agent 通过工具网关调用模块公开接口，业务判断仍由各模块 Service 执行，详见 [AI native 架构](ai-native-architecture.md)。assistant 是主站模块，与独立 AI 应用分开。
 
 ## 模块与数据所有权
 
