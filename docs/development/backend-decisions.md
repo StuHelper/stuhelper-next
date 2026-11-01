@@ -81,11 +81,30 @@ verification 与 backend 的 make check 在隔离 PostgreSQL 18.6 中通过，�
 
 | 仓库 | 候选提交 | PR |
 | --- | --- | --- |
-| verification | 459d8997b6ea656284064e3c09366bb42a7ad85d | [教师人工认证](https://github.com/StuHelper/stuhelper-verification/pull/8) |
-| backend | c99b3d817d1a7bf8c26795efc7adf3655428cb64 | [教师事实装配](https://github.com/StuHelper/stuhelper-backend/pull/17) |
+| verification | a3df0632e9b4f6fcc8f6533fd5957b9a2115ad03 | [教师人工认证](https://github.com/StuHelper/stuhelper-verification/pull/8) |
+| backend | 084583dd33785af8d08ae9a31104eedaf0d93260 | [教师事实装配](https://github.com/StuHelper/stuhelper-backend/pull/17) |
 
 先合入 verification，再把 backend 依赖更新到 squash 后可拉取的提交并重跑组合检查，随后合入 backend 和架构记录。本轮不合并 PR。候选工作区源码由 workspace.lock.json 记录，正式依赖以 backend/go.mod 为准。
 
 客户端需要更新 verification 候选 SDK，接入教师申请、拍摄、补充材料、审核、当前资格、公开字段授权和撤销操作，并读取 summary.teacher_verified。本轮不修改 Web/Admin。
 
 真实教师账号和材料、客户端联调、生产迁移与部署尚未验收。隔离测试容器已清理，保留共享测试镜像和其他任务资源。
+
+## PostgreSQL 检查配置
+
+负责人要求开发与 CI 跟随最新稳定 PostgreSQL，不再固定 18.6 的发行包版本。10 个使用 PostgreSQL 的仓库已改用稳定元包，并由检查脚本识别已安装主版本。2026-11-01 官方最新稳定版仍为 18.6，19 为预发布版本。
+
+本地已重新拉取官方 postgres:18-alpine，并完成 10 个仓库的 make check。各仓使用 GOWORK=off、独立数据库和模块运行身份，临时容器全部清理。新的原生安装配置由对应 PR 的 CI 验证。规则见[CI 规格](../spec/ci-runners.md)。
+
+| PostgreSQL 检查仓库 | PR |
+| --- | --- |
+| verification | [最新稳定版检查](https://github.com/StuHelper/stuhelper-verification/pull/8) |
+| backend | [最新稳定版检查](https://github.com/StuHelper/stuhelper-backend/pull/17) |
+| catalog | [最新稳定版检查](https://github.com/StuHelper/stuhelper-catalog/pull/2) |
+| reviews | [最新稳定版检查](https://github.com/StuHelper/stuhelper-reviews/pull/2) |
+| resources | [最新稳定版检查](https://github.com/StuHelper/stuhelper-resources/pull/2) |
+| media | [最新稳定版检查](https://github.com/StuHelper/stuhelper-media/pull/2) |
+| moderation | [最新稳定版检查](https://github.com/StuHelper/stuhelper-moderation/pull/4) |
+| storage | [最新稳定版检查](https://github.com/StuHelper/stuhelper-storage/pull/2) |
+| storage-contribution | [最新稳定版检查](https://github.com/StuHelper/stuhelper-storage-contribution/pull/2) |
+| profiles | [最新稳定版检查](https://github.com/StuHelper/stuhelper-profiles/pull/2) |
