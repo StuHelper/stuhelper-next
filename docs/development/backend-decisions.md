@@ -10,7 +10,7 @@ updated: 2026-11-01
 
 本主题列出 2026-11-01 前端审查后需要后端完成的工作，由 Codex 负责实施。规则以[确认结果](business-decisions.md)和各规格为准，本主题只说明范围、顺序和完成条件。
 
-当前进度：第 1 阶段已提交候选并建立草稿 PR，模块检查、跨仓组合和 GOWORK=off 固定依赖检查通过。第 2 阶段尚未实施，服务端内容准入仍待补齐。
+当前进度：第 1、2 阶段已形成候选提交。教师认证、内容读取、搜索和统计的服务端准入已实现，模块检查、候选组合和 GOWORK=off 固定依赖检查通过。第 3 至 11 阶段待实施。
 
 ## 工作规则
 
@@ -65,7 +65,7 @@ verification 与 backend 的 make check 在隔离 PostgreSQL 18.6 中通过，�
 | 位置 | 现状 |
 | --- | --- |
 | reviews `reading.go`、`management.go` | 游客和登录用户的预览处理，`Presentation` 的预览配置 |
-| backend 业务装配 `PublicFacts` | 尚未提供完整的教师认证映射 |
+| backend 业务装配 `PublicFacts` | 已提供当前教师认证及获准属性，内容准入使用独立事实 |
 | resources `Get` | 资格不足和权益不足都返回 `access_required` |
 | moderation `882877fbefeb` | 代码已实现 `appeal`，OpenAPI 的 Submission 枚举未声明 |
 | profiles | 昵称按 Unicode 码点计数，前端目前按 UTF-16 计数，统一到码点后由前端跟进 |
@@ -94,7 +94,7 @@ verification 与 backend 的 make check 在隔离 PostgreSQL 18.6 中通过，�
 
 负责人要求开发与 CI 跟随最新稳定 PostgreSQL，不再固定 18.6 的发行包版本。10 个使用 PostgreSQL 的仓库已改用稳定元包，并由检查脚本识别已安装主版本。2026-11-01 官方最新稳定版仍为 18.6，19 为预发布版本。
 
-本地已重新拉取官方 postgres:18-alpine，并完成 10 个仓库的 make check。各仓使用 GOWORK=off、独立数据库和模块运行身份，临时容器全部清理。新的原生安装配置由对应 PR 的 CI 验证。规则见[CI 规格](../spec/ci-runners.md)。
+本地已重新拉取官方 postgres:18-alpine，并完成 10 个仓库的 make check。各仓使用 GOWORK=off、独立数据库和模块运行身份，临时容器全部清理。10 个仓库的原生安装配置已由对应提交的 CI 验证通过。规则见[CI 规格](../spec/ci-runners.md)。
 
 | PostgreSQL 检查仓库 | PR |
 | --- | --- |
@@ -108,3 +108,23 @@ verification 与 backend 的 make check 在隔离 PostgreSQL 18.6 中通过，�
 | storage | [最新稳定版检查](https://github.com/StuHelper/stuhelper-storage/pull/2) |
 | storage-contribution | [最新稳定版检查](https://github.com/StuHelper/stuhelper-storage-contribution/pull/2) |
 | profiles | [最新稳定版检查](https://github.com/StuHelper/stuhelper-profiles/pull/2) |
+
+## 第 2 阶段交付
+
+目录、课程评价、导师评论、搜索、统计和资料分类在读取前执行当前内容准入。未登录返回 401，资格不足返回 403，所需事实不可用返回 503。本人记录保留登录和归属授权，目录管理使用独立维护入口。
+
+| 仓库 | 候选提交 | PR |
+| --- | --- | --- |
+| platform | 02b01a19a307eb61313c506a639d528ae070cece | [候选 PR](https://github.com/StuHelper/stuhelper-platform/pull/10) |
+| catalog | 906bb58beb3a180176daf89d3b6662bbdee4ab3e | [候选 PR](https://github.com/StuHelper/stuhelper-catalog/pull/2) |
+| reviews | ef445b6dbd76c03299f5cfe69ad1be2ae7dd3aa4 | [候选 PR](https://github.com/StuHelper/stuhelper-reviews/pull/2) |
+| resources | fabb6ba811d514f0f97ed578aa877254ed56f181 | [候选 PR](https://github.com/StuHelper/stuhelper-resources/pull/2) |
+| backend | d061357471ca92f6216107349f413d9f97bb405d | [候选 PR](https://github.com/StuHelper/stuhelper-backend/pull/17) |
+
+platform、catalog、reviews、resources 和 backend 完整 make check 通过，包括真实 PostgreSQL、模块运行身份、竞态和正式入口构建。backend 同时通过候选工作区和 GOWORK=off 检查，五个提供方固定版本通过空模块缓存下载核验。架构检查及实际场景到测试函数的映射检查通过。
+
+我的投票原接口泄露目标正文，已在旧提交复现。OwnVote 回执仅保留目标标识和本人投票值；读取他人正文继续要求内容准入。导师评论与跨学校教师统计已加入回归场景。
+
+客户端需同步 catalog 0.2.0、reviews 0.3.0、resources 0.2.0 候选契约与生成类型。目录管理读取改用 /catalog/admin；投票记录改读 OwnVote；内容页按 401、403、503 分别处理。旧预览字段在第 4 阶段删除。
+
+先合入 verification、platform 与业务提供方，再把 backend 更新到合并后可拉取的提交并重验，最后合入 backend 和架构记录。本轮不合并。真实账号、Web/Admin、生产迁移与部署均未验收，测试容器已清理。

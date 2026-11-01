@@ -100,7 +100,7 @@ export function verifySource(provider, client, source, loadSource) {
 export function verifyScenarios(directory, definition, checkout) {
   const specs = definition.specifications.map(file => fs.readFileSync(path.join(directory, file), 'utf8')).join('\n');
   for (const [scenario, tests] of Object.entries(definition.scenario_tests ?? {})) {
-    assert(/^[A-Z]+-\d+$/.test(scenario), `Invalid scenario: ${scenario}`);
+    assert(/^[A-Z]+(?:-[A-Z]+)*-\d+$/.test(scenario), `Invalid scenario: ${scenario}`);
     assert(new RegExp(`\\|\\s*${scenario}\\s*(?:\\||：|:)`).test(specs), `Unknown implemented scenario: ${scenario}`);
     assert(tests.length, `No tests for implemented scenario: ${scenario}`);
     for (const reference of tests) {
