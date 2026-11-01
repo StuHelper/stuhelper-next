@@ -68,6 +68,10 @@ modules:
       - identity
       - media
       - verification
+      - billing
+      - reviews
+      - resources
+      - open-platform
     interface_owner: profiles
     contract_status: implemented
     specifications:
@@ -83,6 +87,10 @@ modules:
         - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
       PC-10:
         - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
+      PC-07:
+        - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
+      PC-09:
+        - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
@@ -310,6 +318,7 @@ modules:
       - docs/spec/academic-content.md
       - docs/spec/content-management.md
       - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
@@ -377,6 +386,9 @@ modules:
         - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
       ACAD-15:
         - interaction_test.go#TestExpiredAdmissionAllowsOnlyOwnVoteAndBookmarkRemoval
+      PC-07:
+        - closure_test.go#TestClosedOwnerKeepsContentWithoutProfileOrDisclosures
+        - closure_test.go#TestClosureRejectsPublicationAlreadyWaitingForExternalModeration
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public
@@ -395,6 +407,7 @@ modules:
     specifications:
       - docs/spec/resource-sharing.md
       - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
@@ -438,18 +451,28 @@ modules:
         - references_test.go#TestOwnResourceNamesRequireUploadOwnershipAndKeepContentPrivate
       AE-ACCESS-07:
         - integration_test.go#TestCategoryReadsRequireContentAdmissionAndKeepScopedAdministration
+      PC-07:
+        - closure_test.go#TestClosedUploaderKeepsFilesAndCopyrightWithoutPublicAccountLink
   - id: billing
     repository: StuHelper/stuhelper-billing
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - identity
     interface_owner: billing
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/wallet-and-points.md
+      - docs/spec/personal-center.md
+    api: 1
+    capabilities:
+      - billing.closure
+    capability_requires: {}
+    scenario_tests:
+      PC-07:
+        - closure_test.go#TestClosureClearanceRequiresKnownAssetsAndReconcilesUnknownSettlement
   - id: community
     repository: StuHelper/stuhelper-community
     visibility: public

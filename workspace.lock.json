@@ -28,7 +28,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "ad9a178cacbfc3972ddac530797d9d31476f89b7",
+      "revision": "cb8950c2d7eb2060e2270edde4ff32e5cf7c6875",
       "dirty": false
     },
     "catalog": {
@@ -38,7 +38,7 @@
     },
     "reviews": {
       "repository": "https://github.com/StuHelper/stuhelper-reviews.git",
-      "revision": "00f3ecca25a6d47d5b80fe281a5bdf7c9db31b56",
+      "revision": "7e0e162f40a955701de7dcf58091d13d16d44829",
       "dirty": false
     },
     "moderation": {
@@ -48,12 +48,12 @@
     },
     "resources": {
       "repository": "https://github.com/StuHelper/stuhelper-resources.git",
-      "revision": "475124111480dd550d7fbdb9e3c4674aaa48bf73",
+      "revision": "aa88c9c3f50db6c0338e38bf949d6e7a9cf03a82",
       "dirty": false
     },
     "profiles": {
       "repository": "https://github.com/StuHelper/stuhelper-profiles.git",
-      "revision": "f665ae6ca26c6b46c834d8521b55fcd5dcb4f257",
+      "revision": "36ae2136670e0c284ba0e51623746dac9c7e9349",
       "dirty": false
     },
     "web": {
@@ -64,6 +64,11 @@
     "admin": {
       "repository": "https://github.com/StuHelper/stuhelper-admin.git",
       "revision": "fbeafb644e071ee833ccbe5b9b989999468f8abb",
+      "dirty": false
+    },
+    "billing": {
+      "repository": "https://github.com/StuHelper/stuhelper-billing.git",
+      "revision": "82dd3633f0c119e6d79d819c106d8ce2e452f651",
       "dirty": false
     }
   }
