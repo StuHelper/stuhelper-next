@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-01
+updated: 2026-11-04
 ---
 
 # AI native 实施
@@ -34,7 +34,7 @@ Agent 的内容准入依赖 `claude/beihang-content-access` 分支的[内容准�
 
 | 阶段 | 成果 | 完成条件 |
 | --- | --- | --- |
-| 基础 | 委托信息、`x-agent-tool`、工具网关、上下文校验、待确认操作、assistant 骨架和模型网关 | AG-03 至 AG-05、AG-16 至 AG-24、AG-27 通过 |
+| 基础 | 委托信息、`x-agent-tool`、工具网关、上下文校验、待确认操作、assistant 骨架和模型网关 | AG-03 至 AG-05、AG-16 至 AG-24、AG-27、AG-28 通过 |
 | 只读助手 | catalog 结构化课表、对话首页和回答质量评测集 | AG-01、AG-02、AG-09、AG-10、AG-11 通过 |
 | 个人助理 | planner、DDL、空闲时间和写工具 | PL-01 至 PL-15、AG-06、AG-07、AG-14、AG-25 通过 |
 | 选课参考 | 教师比较、评价摘要和索引 | AG-08、AG-13 和 ACAD-41 至 ACAD-44 通过 |
