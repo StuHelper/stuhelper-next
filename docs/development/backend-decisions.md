@@ -1,0 +1,69 @@
+---
+type: development
+status: Accepted
+updated: 2026-11-04
+---
+
+# 业务决定的后端实施
+
+## 目标与当前状态
+
+本主题列出 2026-11-01 前端审查后需要后端完成的工作，由 Codex 负责实施。规则以[确认结果](business-decisions.md)和各规格为准，本主题只说明范围、顺序和完成条件。
+
+当前进度：工作尚未开始。页面已经拦截未通过内容准入的用户，但服务端接口尚未全部执行，所以直接调用接口仍可能绕过。这一项优先级最高。
+
+## 工作规则
+
+- 从各仓库最新 `origin/develop` 建立专用分支和工作树，工作树放在 `workspace/worktrees/backend-decisions/<仓库名>`。
+- 先改 OpenAPI，再用生成命令更新 SDK 和类型，不手改生成文件。
+- 持久化变更使用真实 PostgreSQL 和模块运行身份测试，并验证迁移。
+- 新场景登记到 `architecture/modules.yaml` 的 `scenario_tests`，写明实际测试函数。
+- 跨仓改动在 PR 中写明依赖、合并顺序和实际验证的提交组合。
+- 不操作生产数据，不发行版本，不部署。合并和发行由负责人授权。
+- 不修改前端候选工作树 `worktrees/frontend-rewrite/web`。Web 和 Admin 的接口接入另行处理，只在 PR 中列出客户端需要的变化。
+
+## 遇到冲突时
+
+规格没有覆盖的产品选择，以及前后端或文档之间的冲突，必须停下来逐个询问负责人，不能自行决定。每个问题写明冲突位置、可选方案和影响。
+
+## 实施顺序
+
+| 阶段 | 模块 | 工作 | 完成条件 |
+| --- | --- | --- | --- |
+| 1 | verification、backend | 提供有效教师认证事实和账号到教师档案的绑定，由管理员人工审核 | 教师认证通过内容准入，不能从昵称或普通登录推断 |
+| 2 | reviews、catalog、resources、backend | 服务端读接口、搜索和统计执行内容准入 | AE-ACCESS-05 至 AE-ACCESS-07、ACAD-04、ACAD-16 |
+| 3 | reviews、moderation | 新增点赞、点踩、收藏和举报要求内容准入，本人已有记录可管理 | 认证失效后可取消已有收藏和投票，不能新增 |
+| 4 | reviews | 删除预览字段、预览配置和相关接口用例，保留评分展示配置 | ACAD-40，接口不再返回 `preview`、`guest_preview`、`member_preview`、`preview_ratio` |
+| 5 | catalog、reviews、resources | 本人记录所需的对象名称查询只按登录和归属授权，不开放公共内容 | 认证失效后本人记录能显示名称，公共详情仍被拒绝 |
+| 6 | resources | 预览与下载同权；区分具体缺失条件和服务不可用；投诉只要求登录 | 未解锁资料读不到文件内容，投诉不返回资料内容 |
+| 7 | profiles、backend、verification | 20 字符昵称和回退流程、主页开关、基础主页游客可见、脱敏身份字段 | PC-05、PC-10、PC-11 |
+| 8 | profiles、billing | 注销 7 天冷静期、撤销和管理员处理 | PC-07、PC-09 |
+| 9 | 待确认 | 教师和资料收藏、收藏夹 | 鉴权、幂等和跨设备结果一致 |
+| 10 | moderation | 修正 OpenAPI 缺少的 `appeal` 和 `previous_task_id`，并对齐依赖版本 | 提供方和消费者的契约与行为测试通过 |
+| 11 | open-platform | 按决定扩展信息范围，使用稳定权限标识 | OP-05 |
+
+第 2 阶段依赖第 1 阶段，否则教师会被拒绝。第 4、5 阶段依赖第 2 阶段。其余阶段可以并行。
+
+## 开工前要向负责人确认
+
+- 第 9 阶段的归属：现有收藏属于 reviews，但教师和资料收藏及收藏夹跨越多个模块，需要确定由哪个模块拥有。
+- 第 11 阶段的时机：open-platform 模块尚未实现，需要确定本轮是实现模块，还是只更新接口设计。
+
+## 已知代码位置
+
+以下位置来自 2026-11-01 的只读检查，开工时重新核对。
+
+| 位置 | 现状 |
+| --- | --- |
+| reviews `reading.go`、`management.go` | 游客和登录用户的预览处理，`Presentation` 的预览配置 |
+| backend 业务装配 `PublicFacts` | 尚未提供完整的教师认证映射 |
+| resources `Get` | 资格不足和权益不足都返回 `access_required` |
+| moderation `882877fbefeb` | 代码已实现 `appeal`，OpenAPI 的 Submission 枚举未声明 |
+| profiles | 昵称按 Unicode 码点计数，前端目前按 UTF-16 计数，统一到码点后由前端跟进 |
+| 登录回调 | 优先使用 SSO DisplayName，空值时使用用户名 |
+
+## 交付要求
+
+每个 PR 说明实际执行的检查、结果和剩余限制，并列出 Web 和 Admin 需要的接口变化。未执行的真实账号验收和部署明确标记为待验证。
+
+本主题依赖 `claude/beihang-content-access` 分支的规格改动。前端缺陷和审查结果见[前端审查处理](frontend-review.md)。
