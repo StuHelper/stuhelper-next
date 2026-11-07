@@ -149,6 +149,18 @@ export function verifyWorkspaceScenarios(directory, definitions, records, scope)
   }
 }
 
+export function verifyRuntimeDescriptor(definition, manifest) {
+  assert.equal(manifest.kind, 'module', `Expected runtime module: ${definition.id}`);
+  assert.equal(manifest.id, definition.id);
+  assert.equal(manifest.api, definition.api);
+  const dependencies = value => (value ?? []).map(v => typeof v === 'string' ? { id: v, api: 1 } : v).sort((a,b)=>a.id.localeCompare(b.id));
+  assert.deepEqual(dependencies(manifest.requires), dependencies(definition.required), `Required dependencies differ: ${definition.id}`);
+  assert.deepEqual(dependencies(manifest.optional), dependencies(definition.optional), `Optional dependencies differ: ${definition.id}`);
+  assert.deepEqual([...(manifest.capabilities??[])].sort(), [...(definition.capabilities??[])].sort(), `Capabilities differ: ${definition.id}`);
+  const capabilities = value => Object.fromEntries(Object.entries(value??{}).sort(([a],[b])=>a.localeCompare(b)).map(([key,deps])=>[key,dependencies(deps)]));
+  assert.deepEqual(capabilities(manifest.capability_requires), capabilities(definition.capability_requires), `Capability dependencies differ: ${definition.id}`);
+}
+
 export function contracts(directory = root, scope) {
   const records = projects(directory);
   const definitions = readYaml(path.join(directory, 'architecture/modules.yaml')).modules;
@@ -157,6 +169,11 @@ export function contracts(directory = root, scope) {
   const definition = definitions.find(module => module.id === 'platform');
   for (const key of ['id', 'api', 'capabilities', 'critical']) assert.deepEqual(descriptor[key], definition[key]);
   verifyWorkspaceScenarios(directory, definitions, records, scope);
+  for (const id of ['catalog','reviews','moderation','verification','profiles','billing','favorites','open-platform','resources']) {
+    const project=records.find(p=>p.name===id);
+    if (!project || scope && !scope.includes(id)) continue;
+    verifyRuntimeDescriptor(definitions.find(d=>d.id===id), readYaml(path.join(project.directory,'module.yaml')));
+  }
   for (const client of records.filter(project => project.tags.includes('frontend'))) {
     const source = readJSON(path.join(client.directory, 'contracts/platform.source.json'));
     verifySource(provider, client, source, (revision, filename) => providerSource(provider.directory, revision, filename));

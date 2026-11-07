@@ -79,7 +79,10 @@ modules:
     api: 1
     capabilities:
       - profiles.manage
-    capability_requires: {}
+      - profiles.public
+    capability_requires:
+      profiles.manage:
+        - identity
     scenario_tests:
       PC-08:
         - integration_test.go#TestProfileOwnershipReplayConcurrentRevisionAndRuntimeRole
@@ -157,7 +160,13 @@ modules:
       - verification.write
       - verification.admin
       - verification.capture
-    capability_requires: {}
+    capability_requires:
+      verification.read:
+        - identity
+      verification.write:
+        - identity
+      verification.admin:
+        - identity
     scenario_tests:
       PC-11:
         - identity_mask_test.go#TestOwnIdentityMasksComeFromVerifiedDataAndNeverLeakThroughFacts
@@ -196,7 +205,16 @@ modules:
       - catalog.read
       - catalog.import
       - catalog.enrollments
-    capability_requires: {}
+      - catalog.maintain
+    capability_requires:
+      catalog.read:
+        - identity
+      catalog.import:
+        - identity
+      catalog.enrollments:
+        - identity
+      catalog.maintain:
+        - identity
     scenario_tests:
       CO-02:
         - integration_test.go#TestImportRelationsClassificationAndMissingCredits
@@ -251,7 +269,9 @@ modules:
     api: 1
     capabilities:
       - moderation.tasks
-    capability_requires: {}
+    capability_requires:
+      moderation.tasks:
+        - identity
     scenario_tests:
       CM-01:
         - integration_test.go#TestPendingReportMergesEvidenceAndAuthorRequestsAreScoped
@@ -309,11 +329,11 @@ modules:
     required:
       - platform
       - catalog
-      - reviews
     optional:
       - resources
       - identity
       - verification
+      - reviews
     interface_owner: favorites
     contract_status: implemented
     specifications:
@@ -324,7 +344,13 @@ modules:
     api: 1
     capabilities:
       - favorites.manage
-    capability_requires: {}
+      - favorites.migrate
+    capability_requires:
+      favorites.manage:
+        - identity
+      favorites.migrate:
+        - identity
+        - reviews
     scenario_tests:
       FAV-01:
         - integration_test.go#TestFavoritesOwnershipFoldersAdmissionAndConcurrentReplay
@@ -360,7 +386,14 @@ modules:
     capabilities:
       - reviews.read
       - reviews.write
-    capability_requires: {}
+      - reviews.moderate
+    capability_requires:
+      reviews.read:
+        - identity
+      reviews.write:
+        - identity
+      reviews.moderate:
+        - identity
     scenario_tests:
       ACAD-04:
         - integration_test.go#TestContentAdmissionAndCurrentAccessCannotLeakIdentity
@@ -450,7 +483,13 @@ modules:
       - resources.read
       - resources.write
       - resources.manage
-    capability_requires: {}
+    capability_requires:
+      resources.read:
+        - identity
+      resources.write:
+        - identity
+      resources.manage:
+        - identity
     scenario_tests:
       RS-01:
         - integration_test.go#TestOriginConsentAndRequestsUseOutbox
@@ -501,7 +540,9 @@ modules:
     api: 1
     capabilities:
       - billing.closure
-    capability_requires: {}
+    capability_requires:
+      billing.closure:
+        - identity
     scenario_tests:
       PC-07:
         - closure_test.go#TestClosureClearanceRequiresKnownAssetsAndReconcilesUnknownSettlement

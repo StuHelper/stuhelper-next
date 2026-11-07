@@ -178,3 +178,14 @@ test('CLI accepts an explicit contract scope without relaxing other commands', (
   assert.equal(parseCommand(['snapshot','--write']).write,true);
   for (const args of [['contracts','--write'],['contracts','--scope='],['validate','--scope=platform'],['snapshot','--scope=platform'],['contracts','--scope=platform','extra']]) assert.throws(()=>parseCommand(args));
 });
+
+
+test('runtime module declarations reject library kinds and mismatched capability dependencies', async () => {
+  const {verifyRuntimeDescriptor}=await import('./workspace.mjs');
+  const definition={id:'catalog',api:1,required:['platform'],optional:['identity'],capabilities:['catalog.read'],capability_requires:{'catalog.read':['identity']}};
+  const manifest={id:'catalog',kind:'module',api:1,requires:[{id:'platform',api:1}],optional:[{id:'identity',api:1}],capabilities:['catalog.read'],capability_requires:{'catalog.read':[{id:'identity',api:1}]}};
+  verifyRuntimeDescriptor(definition,manifest);
+  assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,kind:'library'}),/runtime module/);
+  assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,requires:[]}),/Required dependencies/);
+  assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,capability_requires:{}}),/Capability dependencies/);
+});
