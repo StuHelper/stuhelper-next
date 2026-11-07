@@ -1,7 +1,7 @@
 ---
 type: spec
 status: InReview
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 原生客户端行为
@@ -18,7 +18,7 @@ updated: 2026-10-25
 
 微信登录只证明对应 appid 下的平台身份。绑定已有 SSO 账号必须有双方身份的有效证明与用户确认；缺失 unionid 时不推断跨应用身份。换绑/解绑需重新认证与审计。绑定凭证短时、一次性并关联发起端，不通过 URL、二维码或 postMessage 明文传递 access token。
 
-Web BFF（供浏览器使用的后端）的 cookie 使用 HttpOnly/Secure 等适用属性并执行 CSRF 防护；移动端采用系统安全存储。服务端依然是权限、学生资格和可见性规则的执行者。
+Web BFF（供浏览器使用的后端）的 cookie 使用 HttpOnly/Secure 等适用属性并执行 CSRF 防护；移动端采用系统安全存储。服务端依然是权限、学生认证和可见性规则的执行者。
 
 ## 功能与离线
 

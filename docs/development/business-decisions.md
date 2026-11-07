@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-26
+updated: 2026-11-08
 ---
 
 # 业务确认结果与延期事项
@@ -19,7 +19,7 @@ updated: 2026-10-26
 | 草稿与举报 | 多份跨端草稿，冲突选择版本，处理中举报可补证据，结案后可因新事实再举报 | [评价规格](../spec/academic-content.md) |
 | 内容运营 | 可配置审核、分类、敏感词、复核与批量预览，有效与优质内容有明确认定方式 | [内容管理](../spec/content-management.md) |
 | 账号与个人主页 | 学校与徽章默认公开可调整，绑定唯一归属，注销只处理本应用 | [个人中心](../spec/personal-center.md) |
-| 学生资格与实名 | 完整规则私有维护，公共模块只使用必要资格结论 | [认证对接](../spec/student-verification.md) |
+| 学生认证与实名 | 完整规则私有维护，公共模块只使用必要资格结论 | [认证对接](../spec/student-verification.md) |
 | 动作资格 | 全站默认和授权范围覆盖，可收紧或放宽，后续操作生效并保留既有记录 | [资格配置](../spec/action-eligibility.md) |
 | 资料与作品许可 | 原创/转载简化填写，版本先审，保留文件原名，目录只打包有权内容 | [资料共享](../spec/resource-sharing.md) |
 | 账户、会员与交易 | 已确认规则移入私有账务模块，金额与期限按配置管理 | [账务对接](../spec/wallet-and-points.md) |
@@ -35,7 +35,7 @@ updated: 2026-10-26
 | 存储冗余目标 | 首期总计三份完整副本，跨独立账号；首次发布门槛为两份，第三份异步补齐 | [放置与恢复](../spec/storage-placement.md) |
 | 存储执行器部署 | 首期同进程装配并设置后台任务与资源预算，执行器保留独立启动入口；按实测和运维需求启用独立进程或容器 | [部署规划](../design/storage-architecture.md#执行器部署与资源预算)、[实施计划](storage-module.md#执行器部署实施计划) |
 | 管理后台 | 可配置角色模板、对象范围、独立敏感权限及并发配置提示 | [管理操作](../spec/admin-operations.md) |
-| 客户端与迁移 | 当前仅 Web/Admin；保留 SSO 与学生认证数据，不迁移独立实名及其他旧业务数据 | [重写路线](rewrite-roadmap.md) |
+| 客户端与迁移 | 当前仅 Web/Admin；保留 SSO 与学生认证数据，不迁移实名认证及其他旧业务数据 | [重写路线](rewrite-roadmap.md) |
 | 品牌与产品边界 | 沿用 StuHelper 和纸飞机品牌，不建设作业实验系统或学校教务写入功能 | [业务范围](../design/business-scope.md) |
 | 仓库边界 | 按业务模块拆仓，认证、学校适配、账务与生产配置私有 | [多仓库设计](../design/module-repositories.md) |
 

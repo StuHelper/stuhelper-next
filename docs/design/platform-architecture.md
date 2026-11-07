@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 平台架构
@@ -38,7 +38,7 @@ SSO 可以独立登录、启动、更新和恢复。AI、Store 与现有 Payment
 
 ## 模块与数据所有权
 
-catalog 管理公共学校目录、课程、教师和课表，verification 管理学生资格与实名，campus-adapters 管理学校接入。三者通过接口协作，公共学校目录不保存认证材料或学校核验实现。
+catalog 管理公共学校目录、课程、教师和课表，verification 管理学生认证与实名认证，campus-adapters 管理学校接入。三者通过接口协作，公共学校目录不保存认证材料或学校核验实现。
 
 reviews 管理课程评价、导师评论及其回复、投票、收藏和草稿。教师评分由课程评价派生。community 管理社交动态和关注关系，关闭 community 不影响评价自身的互动。
 

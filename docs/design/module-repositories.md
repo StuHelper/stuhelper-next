@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-08
 ---
 
 # 按模块划分仓库
@@ -27,7 +27,7 @@ updated: 2026-10-29
 | 应用装配 | stuhelper-backend | private | main 入口、模块连接、正式二进制与镜像 |
 | 工程工具 | stuhelper-tooling | public | 共享 CLI、action、workflow 与 Lefthook 预设 |
 | profiles | stuhelper-profiles | public | 昵称、头像引用、简介、隐私偏好与业务账号生命周期 |
-| verification | stuhelper-verification | private | 学生资格、独立实名、审核材料与具体认证流程 |
+| verification | stuhelper-verification | private | 学生认证、实名认证、审核材料与具体认证流程 |
 | campus-adapters | stuhelper-campus-adapters | private | 学校认证协议、学校数据适配与来源映射 |
 | storage | stuhelper-storage | public | 存储实例、准入与容量预占、副本账本、校验修复、可靠任务、清理，以及用户账号托管申请流程 |
 | storage-contribution | stuhelper-storage-contribution | public | 贡献同意、额度与保留空间、期限、暂停退出、撤权及核验统计 |

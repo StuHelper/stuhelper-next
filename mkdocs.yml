@@ -62,7 +62,7 @@ nav:
   - 设计:
       - 项目概览: design/README.md
       - 重构定位与业务范围: design/business-scope.md
-      - 学生资格与实名身份: design/student-identity.md
+      - 学生认证与实名认证: design/student-identity.md
       - 积分与 Ivory 设计: design/wallet-and-points.md
       - 平台架构: design/platform-architecture.md
       - 框架运行: design/framework-runtime.md

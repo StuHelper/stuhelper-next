@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 旧业务文档抽取与模块迁移
@@ -26,7 +26,7 @@ updated: 2026-10-25
 
 | 仓库 | 接收内容 |
 | --- | --- |
-| [stuhelper-verification](https://github.com/StuHelper/stuhelper-verification) | 学生认证、独立实名及认证管理的详细设计与规格 |
+| [stuhelper-verification](https://github.com/StuHelper/stuhelper-verification) | 学生认证、实名认证及认证管理的详细设计与规格 |
 | [stuhelper-campus-adapters](https://github.com/StuHelper/stuhelper-campus-adapters) | 学校接入边界与适配模块设计 |
 | [stuhelper-billing](https://github.com/StuHelper/stuhelper-billing) | 货币、交易、会员与奖励及退款规格 |
 | [stuhelper-ops](https://github.com/StuHelper/stuhelper-ops) | 独立身份设计、兼容与迁移文档、官方候选工具及检查 |
@@ -36,7 +36,7 @@ updated: 2026-10-25
 
 ## 当前实施范围
 
-当前只推进 Web 与 stuhelper-admin。社交独立延期，微信小程序、Android、iOS 与 HarmonyOS 搁置。旧数据仅规划迁移完整 SSO 与学生认证数据及必要映射，不迁移独立实名结果和其他旧业务数据。本轮没有搬运或删除真实数据。
+当前只推进 Web 与 stuhelper-admin。社交独立延期，微信小程序、Android、iOS 与 HarmonyOS 搁置。旧数据仅规划迁移完整 SSO 与学生认证数据及必要映射，不迁移实名认证结果和其他旧业务数据。本轮没有搬运或删除真实数据。
 
 ## 检查与交付
 

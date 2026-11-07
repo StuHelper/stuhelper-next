@@ -1,7 +1,7 @@
 ---
 type: development
 status: InReview
-updated: 2026-10-29
+updated: 2026-11-08
 ---
 
 # 存储模块实施状态
@@ -36,7 +36,7 @@ updated: 2026-10-29
 | [旧存储架构](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/storage-architecture.md) | 逻辑对象、原生 driver、多账号、课程目录、修复与执行节点 | 提取模块边界及恢复机制；不搬迁旧数据库和调度实现 |
 | [旧分布式存储设计](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/distributed-storage-fabric.md) | 数据分类、存储策略、三 lane、故障域、容量预占和任务代次 | 以完整副本简化首期实现；旧默认值仅作为候选 |
 | [旧存储贡献业务](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/product-specs/storage-contribution.md) | 申请、续期、退出、贡献榜、透明度与多包下载 | 用户流程由 Next 现有规格承接，补上撤权和清理状态边界 |
-| [Next 资料共享](../spec/resource-sharing.md) | 校园资格、原创与转载、审核、购买权益、目录下载 | 继续作为业务依据，不使用旧版免费或版权规则替换 |
+| [Next 资料共享](../spec/resource-sharing.md) | 学生认证、原创与转载、审核、购买权益、目录下载 | 继续作为业务依据，不使用旧版免费或版权规则替换 |
 | [Next 存储贡献](../spec/storage-contribution.md) | 自愿贡献、容量与期限、迁走后退出、公开统计 | 扩展适用于通过验证的多种存储；用户实例可按分类与范围审批，生命周期、汇总 API、管理界面与在线托管已实现，真实联调待验收 |
 
 旧方案把受限主副本放在机构 S3/COS，并存在私密第二副本和加密的剩余工作。当前按文件保护要求与实例准入判断放置，协议和账号来源不自动决定密级；旧物理存储结论不直接成为新方案的限制。

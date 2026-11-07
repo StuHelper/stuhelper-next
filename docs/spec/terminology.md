@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-26
+updated: 2026-11-08
 ---
 
 # 统一业务术语
@@ -12,9 +12,9 @@ updated: 2026-10-26
 
 | 标准中文 | English | 接口标识 | 定义 | 替代表述 |
 | --- | --- | --- | --- | --- |
-| 有效校园资格 | Campus eligibility | `campus_eligibility` | 普通认证、已认证校友或未过期临时新生所提供的当前资格 | 有效学生资格、学生认证通过、已认证学生 |
-| 学生认证 | Student verification | `student_verification` | 核验学习经历和身份归属的流程及结果 | — |
-| 独立实名 | Identity verification | `identity_verification` | 独立的实名核验结果 | — |
+| 学生认证 | Student verification | `student_verification` | 核验用户与学校关系的流程及当前结果，类型分为在校学生、校友和新生 | 有效校园资格、校园资格、学生资格、有效学生资格、已认证学生 |
+| 实名认证 | Identity verification | `identity_verification` | 与学生认证分开保存的实名核验结果 | 独立实名 |
+| 已绑定手机号 | Phone bound | `phone_bound` | 用户在 identity 中已验证并绑定的手机号状态 | 手机号已绑定 |
 | 选课记录 | Course enrollment | `course_enrollment` | 从获准教务来源取得的本人课程与任课关系 | — |
 | 任课教师 | Course instructor | `instructor` | 本人某次选课实际关联的授课教师 | — |
 | 教学班 | Teaching class | `teaching_class` | 学期开课下的班级及授课来源对象 | — |
@@ -29,4 +29,4 @@ updated: 2026-10-26
 | 存储副本 | Storage replica | `storage_replica` | 同一逻辑对象版本在某个存储实例上的物理内容 | — |
 | 故障域 | Failure domain | `failure_domain` | 可能共同失效的一组资源，例如同一账号或同一贡献者控制的账号 | — |
 
-OIDC `scope` 表示身份协议中的请求范围；业务授权范围按业务接口表达。数据库 `schema`、事务 `outbox` 和事件 `revision` 保留技术含义。术语检查针对当前仓库文档正文中的替代表述，术语表自身保留用于检查的映射。
+OIDC `scope` 表示身份协议中的请求范围；业务授权范围按业务接口表达。数据库 `schema`、事务 `outbox` 和事件 `revision` 保留技术含义。资格条件接口标识 `campus_eligibility` 保持不变，含义为用户当前持有有效的学生认证。术语检查针对当前仓库文档正文中的替代表述，术语表自身保留用于检查的映射。

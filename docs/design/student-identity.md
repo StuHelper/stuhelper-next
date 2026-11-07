@@ -1,12 +1,12 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 身份能力与私有认证边界
 
-学生资格与独立实名是两个不同状态，登录由独立 SSO 提供。公共业务模块按动作规则查询所需资格，不读取认证材料或具体学校实现。
+学生认证与实名认证是两个不同状态，登录由独立 SSO 提供。公共业务模块按动作规则查询所需资格，不读取认证材料或具体学校实现。
 
 认证流程、学校方法、身份归属和材料管理的完整设计迁至 [私有认证设计](https://github.com/StuHelper/stuhelper-verification/blob/develop/docs/design/student-identity.md)。学校接入由私有 campus-adapters 模块维护。
 
