@@ -202,5 +202,3 @@ updated: 2026-11-08
 ## 配置与后续事项
 
 教师评分已确定为先算课程均分，再对课程等权平均。多份跨端草稿与处理中举报合并规则已确认。审核操作见[内容运营](content-management.md)，热门课程、教师和趋势见[内容发现](discovery-and-statistics.md)。
-
-本主题部分细化规则与前端文档基准存在差异，保持 InReview，详见[审查修复中的规格冲突](../development/backend-decisions.md#审查修复中的规格冲突inreview)。当前保留的候选描述不作为新增负责人决定。
