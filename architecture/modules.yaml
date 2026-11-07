@@ -356,6 +356,9 @@ modules:
         - integration_test.go#TestFavoritesOwnershipFoldersAdmissionAndConcurrentReplay
       FAV-02:
         - integration_test.go#TestLegacyImportResumesWithoutDuplicatesOrResurrection
+        - integration_test.go#TestReadsNeverInvokeUnavailableLegacyProvider
+      PC-07:
+        - closure_test.go#TestClosureDeletesCollectionsAtomicallyAndPreventsResurrection
   - id: reviews
     repository: StuHelper/stuhelper-reviews
     visibility: public
@@ -630,6 +633,10 @@ modules:
         - integration_test.go#TestHTTPRejectsForgedOwnersAndUsesOAuthExchange
       OP-06:
         - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+      OP-10:
+        - repair_test.go#TestCodeReplayRevokesIssuedTokenAndProfileIdentifiersArePairwise
+      RET-05:
+        - repair_test.go#TestCleanupIsBoundedPreservesLiveDataAndRollsBackFailures
       OP-07:
         - integration_test.go#TestSuspensionConsentBindingAndConcurrentQuota
       OP-08:
