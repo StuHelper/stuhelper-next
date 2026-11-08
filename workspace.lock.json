@@ -43,7 +43,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "d7f1d6a3b2b283e12e4a2e84d06975bf6d85c4a8",
+      "revision": "54cb948c4c2c041d8c41cc2846fc5c277607e8dd",
       "dirty": false
     },
     "catalog": {
@@ -83,7 +83,7 @@
     },
     "qq-binding": {
       "repository": "https://github.com/StuHelper/stuhelper-qq-binding.git",
-      "revision": "69c5fa90aeb14deae6de426aad4d764a36282b61",
+      "revision": "b5fed4771c45dceaa6cf7870af23983e8038a966",
       "dirty": false,
       "local_only": true
     }
