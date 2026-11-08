@@ -561,6 +561,8 @@ modules:
         - wallet_test.go#TestExpiredPurchaseRefundIncludesUnusedPointsWithoutDoubleDebit
       WP-23:
         - wallet_test.go#TestWalletClosureFreezesCreditsAndRoutesEnforceActor
+      WP-24:
+        - admin_reads_test.go#TestAdminReadsPermissionsPaginationEmptyAndAudit
   - id: community
     repository: StuHelper/stuhelper-community
     visibility: public
