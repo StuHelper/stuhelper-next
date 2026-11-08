@@ -3,12 +3,12 @@
   "projects": {
     "platform": {
       "repository": "https://github.com/StuHelper/stuhelper-platform.git",
-      "revision": "d9957f5977cfb041db497a803143cd1ed7c9cde4",
+      "revision": "b5597d67ae491e360bba36cbeca74867c2bedd31",
       "dirty": false
     },
     "verification": {
       "repository": "https://github.com/StuHelper/stuhelper-verification.git",
-      "revision": "5fa0c47b1b2def1f3d623ca13e0249ee6284a454",
+      "revision": "d7a113d4eda75b76d145b5a0a72d749ebd3a4c00",
       "dirty": false
     },
     "storage": {
@@ -28,12 +28,12 @@
     },
     "billing": {
       "repository": "https://github.com/StuHelper/stuhelper-billing.git",
-      "revision": "062259a1e8fab60f040ef6feaf93e5f9de02668e",
+      "revision": "b7ccf00e90ce9669898427fde7cfd0add622610f",
       "dirty": false
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "0dd17e044cdc906e0f5213fb7bdf9616d78bc698",
+      "revision": "ff514eb3521d938d5ae658b0413dbc1978f25eab",
       "dirty": false
     },
     "catalog": {
@@ -43,32 +43,32 @@
     },
     "open-platform": {
       "repository": "https://github.com/StuHelper/stuhelper-open-platform.git",
-      "revision": "dbbbba8a8a21431bc115e3d82af9fe94100a5855",
+      "revision": "88f0add78533da70145685ea710351f571ad9ad0",
       "dirty": false
     },
     "favorites": {
       "repository": "https://github.com/StuHelper/stuhelper-favorites.git",
-      "revision": "d3f3c82e270b969013ac93ec27057bc4a8662792",
+      "revision": "95fab84d1dc9a71a55524bd20c8f45636856b062",
       "dirty": false
     },
     "reviews": {
       "repository": "https://github.com/StuHelper/stuhelper-reviews.git",
-      "revision": "998d94c666c68e86a62b9bc6c2b00b1494a03dbb",
+      "revision": "da338ee129f5c2cd0ff05734549196cbaf66801e",
       "dirty": false
     },
     "moderation": {
       "repository": "https://github.com/StuHelper/stuhelper-moderation.git",
-      "revision": "087957ed4bcf88e528ef20f5813a7466ffa8f561",
+      "revision": "9419cecefba5b3ea73f85fb336a4867a3ef2f9d6",
       "dirty": false
     },
     "resources": {
       "repository": "https://github.com/StuHelper/stuhelper-resources.git",
-      "revision": "903f466ef07e1e415bf99ced7621b2755e725257",
+      "revision": "486431e928f9e4452f7f2b7e2597b5a0545c7416",
       "dirty": false
     },
     "profiles": {
       "repository": "https://github.com/StuHelper/stuhelper-profiles.git",
-      "revision": "1c08ec2b4a4c7f822beccbd31034c58b0537865a",
+      "revision": "2a9f8d3fcb7ff0a8a54b136b6c584c764af1f2c6",
       "dirty": false
     },
     "web": {
