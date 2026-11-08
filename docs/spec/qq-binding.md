@@ -45,7 +45,13 @@ Web 展示三项状态、各自操作入口及验证码提醒，不以一个标�
 | 场景 | 预期结果 |
 | --- | --- |
 | QQB-01 | 三项独立完成才满足整体条件；验证码单次、过期拒绝、唯一归属、解绑和注销原子执行，事件失败回滚 |
-| QQB-02 | OAuth state 校验会话与期限，重复回调拒绝，缺少 unionid 不保存绑定，来源失败返回明确错误 |
+| QQB-02 | OAuth state 校验会话与期限，确认幂等、取消授权、跨会话与过期拒绝，缺少 unionid 不保存绑定，来源失败返回明确错误 |
 | QQB-03 | 机器人凭据与平台校验、匿名及越权拒绝，响应不泄露验证码归属或其他项身份 |
 | QQB-04 | backend 装配真实绑定来源，缺项即未完成，来源故障返回 503，注销删除三项 |
 | QQB-05 | Koishi 只处理配置机器人的私聊验证码，使用适配器身份，重试使用同一幂等键，八语言回复包含本人验证码提醒 |
+
+QQ 互联 redirect_uri 使用私有配置中的 Web `/me/qq/callback` 完整 HTTPS 地址。页面读取 state、code 或 QQ 错误参数，有 code 时调用 POST `/api/v1/qq-binding/connect/confirm`，拒绝授权时调用 POST `/api/v1/qq-binding/connect/cancel`。
+
+确认请求体为 `{state, code}`，取消请求体为 `{state}`。两者需要当前登录会话与 Idempotency-Key，state 必须属于当前会话且未过期。相同请求重试返回原结果，取消使 state 失效且不访问 QQ。
+
+同一项使用新幂等键生成验证码或发起 OAuth 时，之前未用的验证码或 state 立即失效，其他项不受影响。相同幂等键重试返回原凭据。本项已绑定返回 409 qq_binding_already_bound；身份已属于其他账号才返回 qq_binding_ownership_conflict。

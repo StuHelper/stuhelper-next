@@ -704,6 +704,8 @@ modules:
         - integration_test.go#TestCodeRetentionReissueAndOutbox
       QQB-02:
         - integration_test.go#TestOAuthSessionStateUnionIDAndFailures
+        - integration_test.go#TestOAuthConfirmCancelReplayAndAlreadyBound
+        - integration_test.go#TestOAuthHTTPConfirmCancelAndRemovedCallback
       QQB-03:
         - integration_test.go#TestHTTPServiceAuthenticationAndIsolation
       QQB-05:
