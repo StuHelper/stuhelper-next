@@ -17,7 +17,7 @@ updated: 2026-11-08
 | moderation | 新举报要求内容准入；认证失效后仍可补充本人处理中举报的证据，只返回本人回执 |
 | resources | 预览与下载同权；投诉只需登录，提交时通过准入才保存标题快照；购买延期 |
 | profiles | 昵称 20 和简介 120 个 Unicode 码点；主页展示开关、7 天注销冷静期与可恢复处理进度 |
-| favorites | 课程、教师与资料收藏，以及收藏夹管理 |
+| favorites | 课程、教师与资料收藏、按目标集合查询本人收藏状态，以及收藏夹管理 |
 | qq-binding | 三项独立验证、私聊一次性码、直接 QQ OAuth、解绑与注销、审计及 outbox；本地仓库，远程未创建 |
 | open-platform | 应用审批、逐项同意、PKCE、短期令牌、撤回和通知反馈 |
 | billing | 积分与 Ivory 分账、余额和明细、奖励与追回、用户支付指引、充值确认、取消与到期、购买积分、退款和注销结清；真实支付未接入 |
@@ -27,11 +27,15 @@ updated: 2026-11-08
 
 ## 验证与剩余工作
 
-账务与全部提供方的 PostgreSQL CI 已通过。backend 固定组合使用 PR CI 验证。数据库验证使用隔离 PostgreSQL 和模块运行身份，正式构建设置 GOWORK=off。模块场景与测试函数登记在 architecture/modules.yaml。
+已有提供方的 PostgreSQL CI 已通过。qq-binding 的 GOWORK=off 本地检查与 Koishi 测试通过；backend 的 go.work 数据库组合测试通过，正式 CI 因 qq-binding 远程仓库缺失而无法下载依赖。
+
+数据库验证使用隔离 PostgreSQL 和模块运行身份。模块场景与测试函数登记在 architecture/modules.yaml。
 
 QQ 绑定状态与绑定状态和号码分别授权。公开主页仅对可信代理解析转发地址，按客户端地址使用进程内单一限流器，多实例各自计数。QQ 来源接入本地 qq-binding 候选；缺少模块或数据库故障返回 503。真实支付、真实账号、发行与部署未验收。会员交易、会员权益及资料购买未提供。
 
-Web/Admin 需要同步目录准入、profiles、本人记录、收藏夹、细粒度授权与账务客户端。公共集成在目录契约检查失败：Web 的 objects、objects/lookup、objects/{id} 和 objects/{id}/summary 快照仍允许匿名访问。前端需同步当前准入要求和来源记录，公共集成检查启用。
+Web a6aaab7 与 Admin d6fc971 的接口快照兼容性本地检查通过。公共集成因 locale-policy.yaml 与 architecture/locales.yaml 不一致失败，两份客户端语言配置也存在差异，构建和浏览器阶段未执行。
+
+Web/Admin 需同步统一语言配置、接入 QQ 三项绑定页面及管理处理、按目标查询收藏状态。真实 QQ 互联、机器人与相关浏览器流程尚待验收。
 
 ## 合并依赖
 
