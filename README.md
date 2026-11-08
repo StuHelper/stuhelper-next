@@ -39,8 +39,8 @@ pnpm run test:e2e
 
 ## 技术约定
 
-- 模块拥有自己的接口和数据，通过公开接口协作。必需依赖决定模块基础可用性，可选依赖通过能力级规则影响具体操作。
-- Casdoor 独立部署，保持既有 issuer、subject、用户标识和消费方绑定。
+- 模块拥有自己的接口和数据，通过公开接口协作。必需依赖用于判断模块基础可用性，可选依赖通过能力级规则影响具体操作。
+- Casdoor 独立部署，应用通过 issuer、subject 标识用户并保存消费方绑定。旧数据在新系统完成后另行转换导入，开发阶段不提供兼容结构。
 - Web 和 stuhelper-admin 默认中文，提供八种界面语言。国际化检查覆盖消息键、插值、复数和区域格式，翻译质量由人工审阅，阿拉伯语使用 RTL 布局。
 - 普通 CI 默认使用 GitHub 托管 runner。Docker/OCI 与 BJ1 Registry 任务使用 StuHelper 自建 runner，版本和验证规则见 [runner 规格](docs/spec/ci-runners.md)。
 - 短期分支通过 PR squash 合入 develop。正式发行由 develop 向 main 合并，经负责人授权后创建版本 tag、镜像和生产晋级。

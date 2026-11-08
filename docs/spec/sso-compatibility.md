@@ -10,7 +10,7 @@ updated: 2026-11-08
 
 注册、登录与找回由独立 SSO 提供。本应用当前设备和全部设备退出撤销本应用会话，其他应用按自身规则管理。原生公有客户端不保存 client secret。
 
-身份服务使用官方发行原件。SSO 接入配置与运行维护见[私有接入规格](https://github.com/StuHelper/stuhelper-ops/blob/develop/docs/spec/sso-compatibility.md)。旧系统数据转换在新系统完成后单独安排，开发阶段不提供兼容结构。
+身份服务使用官方发行原件。SSO 接入配置与运行维护见[私有接入规格](https://github.com/StuHelper/stuhelper-ops/blob/develop/docs/spec/sso-compatibility.md)。旧系统的 SSO、学生认证和 QQ 绑定数据在新系统完成后另行转换导入，开发阶段不提供兼容或导入结构。
 
 ## 应用会话验收
 

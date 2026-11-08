@@ -86,6 +86,7 @@ nav:
       - 通知中心: spec/notifications.md
       - 我的课程与课表: spec/my-courses.md
       - QQ 入群与群管理: spec/qq-group-services.md
+      - QQ 三项独立绑定: spec/qq-binding.md
       - 第三方开放平台: spec/open-platform.md
       - 存储贡献: spec/storage-contribution.md
       - 存储放置与恢复: spec/storage-placement.md

@@ -64,6 +64,9 @@ test('implemented scenarios reference an existing specification and executable t
   assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'AE-ACCESS-99': ['module_test.go#TestOptional'] } }, directory), /Unknown implemented scenario/);
   assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'ae-ACCESS-07': ['module_test.go#TestOptional'] } }, directory), /Invalid scenario/);
   assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-99': ['module_test.go#TestOptional'] } }, directory), /Unknown implemented scenario/);
+  fs.writeFileSync(path.join(directory, 'plugin.test.mjs'), "test('private messages', () => {});");
+  verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-06': ['plugin.test.mjs#private messages'] } }, directory);
+  assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-06': ['plugin.test.mjs#missing test'] } }, directory), /Missing scenario test/);
   fs.writeFileSync(path.join(directory, 'module_test.go'), '');
   assert.throws(() => verifyScenarios(directory, definition, directory), /Missing scenario test/);
 });

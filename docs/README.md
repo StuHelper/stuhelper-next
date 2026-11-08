@@ -1,7 +1,7 @@
 ---
 type: index
 status: Accepted
-updated: 2026-11-01
+updated: 2026-11-08
 ---
 
 # StuHelper Next 文档
@@ -18,7 +18,7 @@ StuHelper Next 是现有 StuHelper 的重构版本，Next 为过渡名称，未�
 | spec | 查询预期行为、边界与验收场景 | [功能与模块规格](spec/README.md) |
 | development | 查看调研依据、工作计划、进度和实际验证 | [开发工作](development/README.md) |
 | guide | 执行已有工具、检查或维护任务 | [操作指南](guide/README.md) |
-| adr | 追溯重要决定及取舍 | [决策记录](adr/README.md) |
+| adr | 说明架构选择及取舍 | [决策记录](adr/README.md) |
 
 首次阅读从项目设计进入；继续实施从开发工作进入。文档的 `Accepted` 表示其声明范围已确认，功能是否实现和验证须查看对应开发记录。
 

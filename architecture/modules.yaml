@@ -40,6 +40,7 @@ modules:
     contract_status: implemented
     specifications:
       - docs/spec/sso-compatibility.md
+      - docs/spec/qq-binding.md
     in_application: backend
     api: 1
     capabilities:
@@ -52,6 +53,9 @@ modules:
         - internal/sessionapp/session_test.go#TestSessionIsolationEncryptionAllDeviceLogoutAndUnavailableProvider
       SSO-03:
         - internal/sessionapp/session_test.go#TestSessionDatabaseIsolationAndMigrationPreserveActiveSessions
+      QQB-04:
+        - internal/qqbindingapp/assembly_test.go#TestQQBindingAssemblyOAuthBotsFactsAndClosure
+        - internal/qqbindingapp/assembly_test.go#TestQQBindingConfigRejectsUnknownFieldsAndPublicFiles
   - id: profiles
     repository: StuHelper/stuhelper-profiles
     visibility: public
@@ -66,6 +70,7 @@ modules:
       - reviews
       - resources
       - open-platform
+      - qq-binding
     interface_owner: profiles
     contract_status: implemented
     specifications:
@@ -581,6 +586,7 @@ modules:
       - profiles
       - verification
       - moderation
+      - qq-binding
     interface_owner: groups
     contract_status: design-only
     specifications:
@@ -616,7 +622,7 @@ modules:
       - verification
       - catalog
       - reviews
-      - groups
+      - qq-binding
     interface_owner: open-platform
     contract_status: implemented
     specifications:
@@ -671,6 +677,36 @@ modules:
     contract_status: design-only
     specifications:
       - docs/spec/notifications.md
+  - id: qq-binding
+    repository: StuHelper/stuhelper-qq-binding
+    visibility: private
+    implementation: in-progress
+    required:
+      - platform
+    optional:
+      - identity
+    interface_owner: qq-binding
+    contract_status: implemented
+    specifications:
+      - docs/spec/qq-binding.md
+    api: 1
+    capabilities:
+      - qq-binding.manage
+      - qq-binding.bot
+    capability_requires:
+      qq-binding.manage:
+        - identity
+    scenario_tests:
+      QQB-01:
+        - integration_test.go#TestIndependentBindingsCodesConflictAndClosure
+        - integration_test.go#TestCodeRetentionReissueAndOutbox
+      QQB-02:
+        - integration_test.go#TestOAuthSessionStateUnionIDAndFailures
+      QQB-03:
+        - integration_test.go#TestHTTPServiceAuthenticationAndIsolation
+      QQB-05:
+        - koishi/plugin.test.mjs#only direct codes from configured platforms are submitted with stable retry keys
+        - koishi/plugin.test.mjs#failure and rate responses do not reveal ownership and all locales carry warnings
 applications:
   - id: backend
     repository: StuHelper/stuhelper-backend

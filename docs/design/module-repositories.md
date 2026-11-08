@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-08
 ---
 
 # 按模块划分仓库
@@ -10,9 +10,9 @@ updated: 2026-10-29
 
 项目采用 multi repo。一个业务模块拥有自己的代码、规格、数据、公开接口和版本，其他模块通过接口或事件使用它。仓库按业务职责划分，不能只把前端与后端拆开后继续共享内部数据结构。
 
-可插拔表示模块可以启停、替换或独立升级，并且缺失时有明确的功能表现。仓库边界与运行进程分别设计。公开和私有业务 Go module 都可静态编译进私有 backend；独立进程由实际运行需求决定。官方 Casdoor 与 Koishi 独立部署。platform 的公开检查不读取私有源码。
+可插拔表示模块可以启停、替换或独立升级，并且缺失时有明确的功能表现。仓库边界与运行进程分别设计。公开和私有业务 Go module 都可静态编译进私有 backend；独立进程按实际运行需求选择。官方 Casdoor 与 Koishi 独立部署。platform 的公开检查不读取私有源码。
 
-本仓库保留跨模块架构、公共业务规格、接口目录和迁移进度。模块开始实现时，其详细设计、实现、模块内验收与迁移由自己的仓库维护。私有模块的具体设计本轮直接迁入私有仓库，公开页面只说明用户入口及必要对接范围。
+本仓库保留跨模块架构、公共业务规格、接口目录和迁移进度。模块开始实现时，其详细设计、实现、模块内验收与迁移由自己的仓库维护。私有模块的具体设计存放于私有仓库，公开页面只说明用户入口及必要对接范围。
 
 完整开发工作区由一份 Mani 清单登记。仓库可见性表达代码和文档的保密范围，GitHub 管理仓库访问权限。业务管理员、学校范围和普通用户权限由运行中的服务管理。各仓库按自身接口依赖独立构建，同进程模块通过 Go 接口与函数协作，独立服务通过网络 API 协作。
 
@@ -33,13 +33,15 @@ updated: 2026-10-29
 | storage-contribution | stuhelper-storage-contribution | public | 贡献同意、额度与保留空间、期限、暂停退出、撤权及核验统计 |
 | storage-bhpan | stuhelper-storage-bhpan | public | BHpan 登录、稳定身份、目录与文件传输协议；由 storage 的 adapter 桥接使用 |
 | catalog | stuhelper-catalog | public | 学校、院系、学期、课程、教师、开课与个人课表 |
-| reviews | stuhelper-reviews | public | 课程评价、导师评论、评分、回复、投票、收藏与草稿 |
+| reviews | stuhelper-reviews | public | 课程评价、导师评论、评分、回复、投票与草稿 |
 | resources | stuhelper-resources | public | 统一分类及字段、课程关联、资料版本、作品许可、审核、访问授权、目录与交付状态 |
 | billing | stuhelper-billing | private | 积分、Ivory、收费、会员售卖、奖励、退款与交易权益凭据 |
-| moderation | stuhelper-moderation | public | 内容审核、举报、申诉与处置决定，内容模块执行状态变化 |
+| moderation | stuhelper-moderation | public | 内容审核、举报、申诉与处置结果，内容模块执行状态变化 |
 | community | stuhelper-community | public | 动态、分区、关注、屏蔽及动态内互动 |
 | media | stuhelper-media | public | 通用文件、不可变版本、上传会话、业务引用、当前权限下载与文件清理协调 |
-| groups | stuhelper-groups | public | QQ 绑定业务接入、群准入、名片、消息治理与娱乐命令 |
+| qq-binding | stuhelper-qq-binding | 待授权（本地按私有范围管理） | 三项 QQ 身份、验证码、OAuth、绑定审计和事件；远程仓库未创建 |
+| favorites | stuhelper-favorites | public | 收藏、收藏夹及目标名称快照 |
+| groups | stuhelper-groups | public | 群准入、名片、消息治理与娱乐命令 |
 | information-query | stuhelper-information-query | public | 授权范围内的跨模块关联查询、批量与导出 |
 | open-platform | stuhelper-open-platform | public | 开发者应用审批、业务授权与撤回 |
 | search | stuhelper-search | public | 可重建搜索索引、热度与发现查询 |
@@ -75,11 +77,11 @@ media、storage、storage-contribution 与 storage-bhpan 已分别建仓并有�
 
 backend 的 credentials 与 bhpancustody 保存和使用敏感凭据，公共 storage 只保存凭据引用及修订。media 不持有账号密码，storage-contribution 不处理登录，也不因用户提交账号就自动取得贡献授权。
 
-上述划分区分逻辑文件、物理存储、账号接入和容量贡献。将来更换供应商时，业务文件引用保持稳定，只替换对应 adapter 和托管适配；是否进一步拆分账号托管仓库或进程，按实际复用及部署需要决定。
+上述划分区分逻辑文件、物理存储、账号接入和容量贡献。将来更换供应商时，业务文件引用使用稳定标识，只替换对应 adapter 和托管适配；是否进一步拆分账号托管仓库或进程，按实际复用及部署需要评估。
 
 ## 客户端与既有系统
 
-现有私有 `stuhelper-payment` 保留支付网关职责，账务模块通过其接口对接，不把积分、会员与资料业务塞入支付网关。现有 AI、Store 和 `stuhelper-docs` 均保留自己的用途，不因本次重构重新归属或被覆盖。
+现有私有 `stuhelper-payment` 保留支付网关职责，账务模块通过 PaymentProvider 端口接入支付，当前提供模拟与 disabled 模式，真实渠道尚未接入。积分、会员与资料业务属于各自模块。现有 AI、Store 和 `stuhelper-docs` 均保留自己的用途，不因本次重构重新归属或被覆盖。
 
 当前只推进 `stuhelper-web` 与 `stuhelper-admin`。微信小程序、Android、iOS 与 HarmonyOS 暂时搁置，对应仓库名称规划为 `stuhelper-wechat`、`stuhelper-android`、`stuhelper-ios` 和 `stuhelper-harmony`。
 
@@ -93,7 +95,7 @@ backend 的 credentials 与 bhpancustody 保存和使用敏感凭据，公共 st
 
 模块声明必需依赖与可选能力。必需依赖缺失时该模块不能启用，可选能力缺失只关闭相应功能。动作使用到资格、交易或文件能力时，还要检查相应服务是否可用。例如：
 
-- 不安装 community，课程评价的回复、投票和收藏继续可用，这些属于 reviews。
+- 不安装 community，课程评价的回复和投票由 reviews 提供，收藏由 favorites 提供。
 - 不安装 billing，免费资料继续按访问规则工作，售卖、会员购买与充值入口关闭。
 - verification 不可用，需要资格核验的操作返回暂不可用，不自动放宽为未认证也可执行。
 - notifications 或 search 不可用，不撤销已经完成的业务写入，投递与索引恢复按事件规则处理。
@@ -111,7 +113,7 @@ backend 的 credentials 与 bhpancustody 保存和使用敏感凭据，公共 st
 
 ## 文档与当前状态
 
-私有模块的详细规格分别放在对应仓库，公共规格仅保留必要的使用与对接说明。主架构仓库按负责人决定建立新的 Git 基线；有效业务规格、源码和第三方来源继续保留，其他代码仓库保留既有历史。
+私有模块的详细规格分别放在对应仓库，公共规格仅保留必要的使用与对接说明。业务规格和模块实施状态分别维护，源码与第三方来源具有独立记录。
 
 platform、Web 和 stuhelper-admin 的框架已实现，通用文件、存储、BHpan 托管及容量贡献已有代码与隔离验收。当前候选由配套 PR 和 workspace.lock.json 固定，合并、正式发行与生产部署分别报告，不能把主分支未合并的旧文档当成候选实现清单。
 

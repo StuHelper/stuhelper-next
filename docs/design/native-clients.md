@@ -1,12 +1,12 @@
 ---
 type: design
 status: InReview
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 原生多端设计
 
-项目负责人于 2026-10-24 确定当前只交付 Web 与 stuhelper-admin，其他端全部搁置。下文保留原生端参考设计，恢复实施前重新确认平台版本与交付安排。
+当前只交付 Web 与 stuhelper-admin，其他端全部搁置。下文保留原生端参考设计，恢复实施前重新确认平台版本与交付安排。
 
 ## 目标与范围
 
@@ -16,7 +16,7 @@ Web、小程序、Android、iOS、HarmonyOS 使用适合各平台的 UI、导航
 
 | 平台 | 建议技术 | 登录与平台能力 |
 | --- | --- | --- |
-| Web / Admin | TypeScript + Vue 3；公开内容需要 SEO 时采用 SSR/预渲染 | BFF HttpOnly/Secure cookie、CSRF、服务端会话，审核权限不在浏览器决定 |
+| Web / Admin | TypeScript + Vue 3；公开内容需要 SEO 时采用 SSR/预渲染 | BFF HttpOnly/Secure cookie、CSRF、服务端会话，审核权限由服务端检查 |
 | 微信小程序 | TypeScript + WXML/WXSS 原生组件 | 微信平台登录只建立平台身份；通过明确绑定接入 StuHelper SSO |
 | Android | Kotlin + Jetpack Compose | 系统浏览器/Custom Tabs + PKCE、App Links、系统安全存储和推送 |
 | iOS | Swift + SwiftUI | ASWebAuthenticationSession + PKCE、Universal Links、Keychain、APNs |

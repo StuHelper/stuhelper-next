@@ -1,20 +1,20 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-30
+updated: 2026-11-08
 ---
 
 # 旧业务文档迁移覆盖
 
 ## 目标与进度
 
-进度：业务来源整理与规则确认已完成。将旧仓库中仍需要的业务整理到 Next，逐项确认有实际产品取舍的规则，并为每组来源记录维护位置。迁移完成需要同时满足来源覆盖、业务决定和文档检查三项条件。
+进度：业务来源整理与规则确认已完成。将旧仓库中仍需要的业务整理到 Next，逐项确认有实际产品取舍的规则，并为每组来源记录维护位置。迁移完成需要同时满足来源覆盖、业务规则和文档检查三项条件。
 
 旧仓库来源基线为 `a0a998688a623da7811d04037efe0829c0783267`。来源清单记录文档路径、哈希和处理分类，保存在私有 ops 仓库的 `source-inventory.json`。
 
 盘点范围包括 `docs/` 和机器人目录中的 167 份 Markdown，涵盖产品规格、设计、指南、ADR、参考材料、内部记录和入口。下表核对已保留的产品行为，旧实现和旧运行证据保留在原仓库。
 
-本轮沿用已确认的业务迁移范围。旧部署、权限框架、数据库锁、后台任务和数据清理实现作为技术参考保留在原仓库，具体实现由新架构决定。旧历史文档中的批准状态不直接成为 Next 的业务决定。
+本轮沿用已确认的业务迁移范围。旧部署、权限框架、数据库锁、后台任务和数据清理实现作为技术参考保留在原仓库，具体实现由新架构定义。旧历史文档中的批准状态不直接成为 Next 的业务规则。
 
 ## 产品规格的去向
 
@@ -41,7 +41,7 @@ updated: 2026-10-30
 | [入群流程](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/admission-flow.md)、[历史成员资格检查](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/admission-membership-reconciliation.md) | 入群模式、现有成员检查、提醒、资格失效与处理结果 | [QQ 群服务](../spec/qq-group-services.md)。准入、动态口令与既有成员检查已确认 |
 | [群名片](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/koishi-group-card-governance.md) | 格式、自由昵称、检查、自动修改、提醒、次数与豁免 | [QQ 群服务](../spec/qq-group-services.md)。模板、性别条件分隔符、提醒和处罚开关已确认 |
 | [成员黑名单](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/member-blacklist-unification.md) | 单群或跨群限制、原因、期限、解除和重新入群 | [QQ 群服务](../spec/qq-group-services.md)。单群、多群、全平台范围及默认永久规则已确认 |
-| [群操作结果](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/governance-execution-convergence.md)、[保留与清理](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/governance-retention-lifecycle.md) | 举报处理、人工决定、执行结果、历史查看和成员限制 | 提取可见行为。重试、消息队列和清理算法由新技术设计决定 |
+| [群操作结果](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/governance-execution-convergence.md)、[保留与清理](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/governance-retention-lifecycle.md) | 举报处理、人工处理结果、执行结果、历史查看和成员限制 | 提取可见行为。重试、消息队列和清理算法由新技术设计定义 |
 | [举报图片证据](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/koishi-case-image-evidence.md) | 管理员查看并保存与举报有关的图片 | 查看与留存规则已确认，不新增撤回查看审计，不直接复制存储实现 |
 | [管理配置](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/admin-configuration-concurrency.md) | 管理员改配置、查看影响和处理别人同时修改的情况 | 配置范围、来源、并发冲突与操作记录已确认，不复制旧实现 |
 | [存储架构](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/storage-architecture.md)、[分布式存储](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/design/distributed-storage-fabric.md) | 上传、扫描、审核、文件与目录下载、容量和管理员面板 | 用户行为由资料与贡献规格承接；[新存储设计](../design/storage-architecture.md)补充密级、冗余与混合 adapter，具体方案待评审，未移植旧实现 |
@@ -51,7 +51,7 @@ updated: 2026-10-30
 
 历史设计快照用于寻找当前文档遗漏的功能。例如[早期群管中心](https://github.com/StuHelper/StuHelper/blob/a0a998688a623da7811d04037efe0829c0783267/docs/internal/design-snapshots/koishi/2026-04-19-koishi-moderation-center-design.md)提到欢迎提示、群规则模板、批量操作和 AI 自动动作。这些补查项目已与现行文档核对，并由项目负责人确认保留。旧的菜单结构、权限模型和技术归属不直接采用。
 
-已经废弃的入群入口、身份迁移与清理方案只保留历史链接。特别是旧学生认证文档中的一次性清空规则，与后续保留既有身份的记录存在历史差异。Next 已确认仅迁移 SSO 与学生认证数据，并明确不迁移独立实名结果和其他旧业务数据。
+旧数据转换导入在新系统完成后作为独立任务实施。开发阶段使用最终数据结构，不提供 SSO、学生认证或 QQ 绑定的兼容与导入代码。
 
 工程原则、前后端分层、错误处理、部署、备份、发布和 CI 文档分别由 Next 已有工程文档承接，后续按选定实现补充。旧系统的实际运行结果和故障记录保留在旧仓库，不改写成 Next 的验证结果。品牌沿用 StuHelper 与已确认的纸飞机资产，客户端实现时从核对过的源文件接入。
 
@@ -66,7 +66,7 @@ updated: 2026-10-30
 - [x] 补查历史记录中的功能，与现行文档核对是否仍适用。
 - [x] 每项候选业务都有明确结果：保留、舍弃，或由项目负责人明确延期。
 - [x] 保留业务的关键规则全部确认，并写入对应规格。
-- [x] 所有剩余数值都有明确配置规则或已确认默认值，避免把技术参数误当产品决定。
+- [x] 所有剩余数值都有明确配置规则或已确认默认值，避免把技术参数误当产品规则。
 - [x] 同步业务范围、索引、路线和待确认清单，清除互相矛盾或已过时的说明。
 - [x] 执行本地文档与仓库检查，并核实修改后的图表实际渲染。
 
@@ -76,10 +76,10 @@ updated: 2026-10-30
 
 ## 当前统一组合
 
-2026-10-30 已将本地完成的业务候选推送并合入 develop。`workspace.lock.json` 固定十六个仓库的合并提交，包含正式会话、公开昵称、学生认证、课程、评价、资料、审核与存储组合。
+当前候选源码由 workspace.lock.json 固定，提供方、backend 和客户端分别执行对应检查。
 
 合并时修复复核请求契约、认证申请恢复和异步竞争、管理凭证目标清理、审核队列分类、编辑页未保存保护，以及公共 CI 场景检查的检出范围。相应单元测试、浏览器回归和必需检查通过。
 
-统一应用已进入隔离预发布。正式 backend、Web 和管理端可启动，真实 SSO 跳转与两个独立存储账号的上传下载、字节比对和删除清理通过。环境配置与运行证据由私有 ops 仓库维护。
+隔离预发布的配置和运行证据由私有 ops 仓库维护。当前后端候选没有执行部署。
 
 预发布仍是新业务数据库。真实用户完成登录、学校课程与选课同步、真实学生认证到评价和资料操作的完整流程，以及异地恢复演练仍待验收。当前组合未晋级正式生产版本。

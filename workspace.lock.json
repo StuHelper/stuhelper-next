@@ -33,7 +33,7 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "d863c707e66d427238e133a3b3d0f41c333bb476",
+      "revision": "069ca18402c1fa011db45bc1e3fccb6de3d97415",
       "dirty": false
     },
     "catalog": {
@@ -43,7 +43,7 @@
     },
     "open-platform": {
       "repository": "https://github.com/StuHelper/stuhelper-open-platform.git",
-      "revision": "88f0add78533da70145685ea710351f571ad9ad0",
+      "revision": "93781d5a4a6938db3eab509f6566ea7514ba000a",
       "dirty": false
     },
     "favorites": {
@@ -68,7 +68,7 @@
     },
     "profiles": {
       "repository": "https://github.com/StuHelper/stuhelper-profiles.git",
-      "revision": "2a9f8d3fcb7ff0a8a54b136b6c584c764af1f2c6",
+      "revision": "76e21f16c298b6ecb5f2604b776db92706b75f0f",
       "dirty": false
     },
     "web": {
@@ -80,6 +80,12 @@
       "repository": "https://github.com/StuHelper/stuhelper-admin.git",
       "revision": "fbeafb644e071ee833ccbe5b9b989999468f8abb",
       "dirty": false
+    },
+    "qq-binding": {
+      "repository": "https://github.com/StuHelper/stuhelper-qq-binding.git",
+      "revision": "7474e649ae08e63f9d7c44bf53059aefd5e20f01",
+      "dirty": false,
+      "local_only": true
     }
   }
 }

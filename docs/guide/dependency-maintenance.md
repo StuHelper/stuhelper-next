@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 工具链与依赖维护
@@ -20,7 +20,7 @@ Renovate 适合需要共享更新预设、更多版本文件识别和集中更�
 
 ## 工程工具发行
 
-共享 CLI、action 与 reusable workflow 在 stuhelper-tooling 独立维护，以带注释的 `v<版本>` tag 分发。已发行 tag 保持不变。主架构仓库不再发行工具版本。
+共享 CLI、action 与 reusable workflow 在 stuhelper-tooling 独立维护，以带注释的 `v<版本>` tag 分发。已发行 tag 不得重新指向其他提交。主架构仓库不再发行工具版本。
 
 工具链升级先修改 `architecture/toolchains.yaml`，执行 `node scripts/workspace.mjs toolchains --write`，再更新受影响的 pnpm 锁文件。工具仓库独立测试通过后按授权创建新版本，消费者更新 Git 依赖、Actions 引用和锁文件。
 
@@ -32,7 +32,7 @@ pnpm 锁文件固定实际解析提交。首次更新使用 `pnpm install --no-f
 
 ## Web 脚手架
 
-新建 Vue 应用优先使用官方 `create-vue`。现有 Web 最初按 Vue、Vite 和 TypeScript 的最小配置建立，本次按 `create-vue` 3.24.0 的实际模板复核，采用官方 `@vue/tsconfig`、`@vue/eslint-config-typescript` 和 Node 24 配置。产品路由、接口和国际化代码继续由应用维护。
+新建 Vue 应用优先使用官方 `create-vue`。Web 采用 `create-vue` 3.24.0 模板中的官方 `@vue/tsconfig`、`@vue/eslint-config-typescript` 和 Node 24 配置。产品路由、接口和国际化代码继续由应用维护。
 
 脚手架适合生成初始结构，升级时仍需要核对依赖的兼容范围。本项目保留已验证的 Vue Router 4 与 TypeScript 5.9 组合，后续主版本升级独立验证。官方说明见 [Vue 快速上手](https://vuejs.org/guide/quick-start)和[工具链指南](https://vuejs.org/guide/scaling-up/tooling)。
 

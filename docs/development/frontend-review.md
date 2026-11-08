@@ -8,7 +8,7 @@ updated: 2026-11-08
 
 ## 当前状态
 
-本主题记录 Web 候选 `candidate/ui-a-apple` 的审查缺陷和接口差异。15 个前端缺陷已修复并有回归测试。接口差异需要后端配合，尚未完成。业务决定见[确认结果](business-decisions.md)。
+本主题记录 Web 候选 `candidate/ui-a-apple` 的审查缺陷和接口差异。15 个前端缺陷已修复并有回归测试。接口差异需要后端配合，尚未完成。业务规则见[当前规则](business-decisions.md)。
 
 ## 已修复的缺陷
 

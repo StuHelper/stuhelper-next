@@ -117,7 +117,7 @@ projects:
     path: workspace/open-platform
     url: https://github.com/StuHelper/stuhelper-open-platform.git
     branch: develop
-    tags: [backend, code, public]
+    tags: [ backend, code, public ]
   favorites:
     path: workspace/favorites
     url: https://github.com/StuHelper/stuhelper-favorites.git
@@ -158,6 +158,14 @@ projects:
       - backend
       - code
       - public
+  qq-binding:
+    path: workspace/qq-binding
+    url: https://github.com/StuHelper/stuhelper-qq-binding.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - private
 specs:
   default:
     parallel: false

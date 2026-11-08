@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-01
+updated: 2026-11-08
 ---
 
 # CI 与 runner 约定
@@ -74,6 +74,6 @@ Actions 使用明确版本 tag。共享 action 提供 Node、pnpm 与校验 chec
 
 ## PostgreSQL 检查版本
 
-项目负责人于 2026-11-01 确认，开发与 CI 使用软件源当前提供的最新稳定 PostgreSQL，不固定 18.6 或某个发行包修订。安装 postgresql 与 postgresql-client 元包，检查脚本从已安装元包解析实际主版本，并输出服务器版本。预发布版本不自动纳入普通检查。
+，开发与 CI 使用软件源当前提供的最新稳定 PostgreSQL，不固定 18.6 或某个发行包修订。安装 postgresql 与 postgresql-client 元包，检查脚本从已安装元包解析实际主版本，并输出服务器版本。预发布版本不自动纳入普通检查。
 
 本地可以通过 STUHELPER_TEST_PG_BIN 指定任务专用工具目录。测试仍使用独立数据库、运行身份和可清理资源。生产部署按实际验收后的明确镜像版本维护，开发依赖更新不触发生产升级。

@@ -105,10 +105,15 @@ export function verifyScenarios(directory, definition, checkout) {
     assert(tests.length, `No tests for implemented scenario: ${scenario}`);
     for (const reference of tests) {
       const [file, name] = reference.split('#');
-      assert(!path.isAbsolute(file) && !file.split('/').includes('..') && /_test\.go$/.test(file));
-      assert(/^Test[A-Za-z0-9_]+$/.test(name));
+      assert(!path.isAbsolute(file) && !file.split('/').includes('..'));
       const source = fs.readFileSync(path.join(checkout, file), 'utf8');
-      assert(source.includes(`func ${name}(t *testing.T)`), `Missing scenario test: ${scenario}/${reference}`);
+      if (/_test\.go$/.test(file)) {
+        assert(/^Test[A-Za-z0-9_]+$/.test(name));
+        assert(source.includes(`func ${name}(t *testing.T)`), `Missing scenario test: ${scenario}/${reference}`);
+      } else {
+        assert(/\.test\.mjs$/.test(file) && /^[A-Za-z0-9 ,_-]+$/.test(name));
+        assert(source.includes(`test('${name}',`), `Missing scenario test: ${scenario}/${reference}`);
+      }
     }
   }
 }

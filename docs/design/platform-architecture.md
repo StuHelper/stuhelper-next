@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 平台架构
@@ -40,11 +40,13 @@ SSO 可以独立登录、启动、更新和恢复。AI、Store 与现有 Payment
 
 catalog 管理公共学校目录、课程、教师和课表，verification 管理学生资格与实名，campus-adapters 管理学校接入。三者通过接口协作，公共学校目录不保存认证材料或学校核验实现。
 
-reviews 管理课程评价、导师评论及其回复、投票、收藏和草稿。教师评分由课程评价派生。community 管理社交动态和关注关系，关闭 community 不影响评价自身的互动。
+reviews 管理课程评价、导师评论及其回复、投票和草稿。favorites 管理收藏和收藏夹。教师评分由课程评价派生。community 管理社交动态和关注关系，关闭 community 不影响评价自身的互动。
 
 resources 管理资料、版本、访问与交付。billing 管理货币、交易及其产生的权益凭据。资料可以在未安装 billing 时提供免费能力，涉及收费的功能只有在所需能力可用时启用。
 
 platform 管理模块能力、动作资格配置与授权范围，并提供接收事实输入的公共规则求值接口。各业务模块的 Service 获取当前配置和所需事实，完成最终业务判断。Casdoor 目标组织的有效 `IsAdmin` 仍为全局管理员身份的权威来源，学校与业务范围通过业务授权记录管理。不能把普通 provider roles 当成管理授权，也不能由某个插件绕过服务端权限检查。
+
+qq-binding 拥有三项 QQ 身份、验证码、OAuth 状态、审计和 outbox。Koishi 插件通过受权接口提交私聊验证码，开放平台和群服务通过公开接口读取当前整体状态。
 
 ## 业务协作与一致性
 
@@ -73,6 +75,6 @@ platform 管理模块能力、动作资格配置与授权范围，并提供接�
 
 ## 实施状态与后续设计
 
-公共运行时与 Web/Admin 框架按[框架实现设计](framework-runtime.md)搭建，当前进度见[框架工作记录](../development/framework-bootstrap.md)。业务服务、跨模块事务和容量目标随业务实现补齐。OpenFGA 是否需要在首期引入，由具体授权用例决定。
+公共运行时与 Web/Admin 框架按[框架实现设计](framework-runtime.md)搭建，当前进度见[框架工作记录](../development/framework-bootstrap.md)。业务服务、跨模块事务和容量目标随业务实现补齐。OpenFGA 是否需要在首期引入，按具体授权用例评估。
 
 本设计遵循[多仓库决策](../adr/0004-modular-multi-repository.md)。现有已确认的业务规则继续迁移，不因仓库划分而删减功能。
