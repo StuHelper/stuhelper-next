@@ -28,12 +28,12 @@
     },
     "billing": {
       "repository": "https://github.com/StuHelper/stuhelper-billing.git",
-      "revision": "7fcbc6ef833b6c4839ca7e7786c217e87f7a52d0",
+      "revision": "806dc5dba1aba56c2b93ec333e597c67c0c8ac76",
       "dirty": false
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "7d7a39ca268ea42b4a5024a600787744d710d7bb",
+      "revision": "d863c707e66d427238e133a3b3d0f41c333bb476",
       "dirty": false
     },
     "catalog": {
