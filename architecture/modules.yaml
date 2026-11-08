@@ -583,7 +583,7 @@ modules:
   - id: groups
     repository: StuHelper/stuhelper-groups
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
@@ -592,14 +592,54 @@ modules:
       - moderation
       - qq-binding
     interface_owner: groups
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/qq-group-services.md
       - docs/spec/bot-entertainment.md
+    api: 1
+    capabilities:
+      - groups.read
+      - groups.manage
+      - groups.configure
+      - groups.messages.read
+      - groups.messages.send
+      - groups.messages.recall
+    capability_requires: {}
+    scenario_tests:
+      QQ-01:
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-02:
+        - facts_test.go#TestGroupFactsRejectsUnknownContradictoryAndFailedFacts
+        - integration_test.go#TestPasswordDoesNotGrantStudentEligibilityAndBlacklistScope
+      QQ-03:
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-04:
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-05:
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-06:
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-07:
+        - facts_test.go#TestGroupFactsFiltersFieldsAtServiceBoundary
+        - integration_test.go#TestRulesCardsReportAndBatchPreview
+      QQ-08:
+        - integration_test.go#TestRulesCardsReportAndBatchPreview
+      QQ-09:
+        - integration_test.go#TestAISuggestionsRequireEnabledActionsAndCurrentAuthorization
+      QQ-10:
+        - contract_test.go#TestAPIPrefixMatchesContractRoutesAndGeneratedClient
+        - integration_test.go#TestRetentionInboxRollbackAndNoRecallViewAudit
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
+      BE-01:
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
+      BE-02:
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
+      BE-03:
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
   - id: information-query
     repository: StuHelper/stuhelper-information-query
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
@@ -611,9 +651,33 @@ modules:
       - billing
       - groups
     interface_owner: information-query
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/information-query.md
+    api: 1
+    capabilities:
+      - information-query.query
+      - information-query.audit
+    capability_requires: {}
+    scenario_tests:
+      IQ-01:
+        - service_test.go#TestPlatformQQAndSeparateCandidates
+      IQ-02:
+        - service_test.go#TestScopeAndDomainIsolation
+      IQ-03:
+        - service_test.go#TestPlatformQQAndSeparateCandidates
+      IQ-04:
+        - service_test.go#TestScopeAndDomainIsolation
+      IQ-05:
+        - service_test.go#TestBotDefaultAndGroupDelivery
+      IQ-06:
+        - service_test.go#TestSensitiveMaskAuditAndFailure
+        - postgres/repository_test.go#TestIsolatedAuditPersistenceAndRuntimePrivileges
+      IQ-07:
+        - postgres/repository_test.go#TestSensitiveResponseRequiresCommittedAudit
+        - service_test.go#TestSensitiveMaskAuditAndFailure
+      IQ-08:
+        - service_test.go#TestBotDefaultAndGroupDelivery
   - id: open-platform
     repository: StuHelper/stuhelper-open-platform
     visibility: public
@@ -657,7 +721,7 @@ modules:
   - id: search
     repository: StuHelper/stuhelper-search
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
@@ -666,9 +730,25 @@ modules:
       - resources
       - community
     interface_owner: search
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/discovery-and-statistics.md
+    api: 1
+    capabilities:
+      - search.query
+      - search.projection
+    capability_requires: {}
+    scenario_tests:
+      DS-01:
+        - integration_test.go#TestVisibilityPaginationAndHotTargets
+      DS-04:
+        - integration_test.go#TestMyVotesHTTPAndTimeout
+      DS-HEAT:
+        - integration_test.go#TestHeatWeightsWindowAndTeachers
+      DS-TRANSACTION:
+        - integration_test.go#TestProjectionFailureRollback
+      DS-PROJECTION:
+        - integration_test.go#TestProjectionReplayRebuildAndIsolation
   - id: notifications
     repository: StuHelper/stuhelper-notifications
     visibility: public
@@ -684,7 +764,7 @@ modules:
     api: 1
     capabilities:
       - notifications.inbox
-      - notifications.deliver
+      - notifications.consume
     capability_requires: {}
     scenario_tests:
       NT-01:
@@ -703,6 +783,18 @@ modules:
       NT-07:
         - title_catalog_test.go#TestTitleCatalogAdmissionAndRejectedWrites
         - title_catalog_test.go#TestInteractionTitleUsesServerAggregateCount
+      NT-08:
+        - consume_test.go#TestConsumeRevisionOrderingAndOriginalResults
+        - consume_test.go#TestConsumeRollbackRestoresAggregateAndRevision
+        - consume_test.go#TestConsumeSuppressionAdvancesRevisionAndValidation
+        - consume_test.go#TestConsumeConcurrentSameRevision
+        - integration_test.go#TestConcurrentDeliveryAggregationPreferencesAndCleanup
+      NT-09:
+        - recipients_test.go#TestConsumeRecipientsDeduplicationPreferencesAndReplay
+        - recipients_test.go#TestConsumeRecipientsBoundsAndAllDelivered
+        - recipients_test.go#TestConsumeRecipientsRollbackAllWrites
+        - recipients_test.go#TestConsumeRecipientsConcurrentReplayAndOverlap
+        - recipients_test.go#TestBatchInboxMigrationPreservesExistingData
   - id: qq-binding
     repository: StuHelper/stuhelper-qq-binding
     visibility: private

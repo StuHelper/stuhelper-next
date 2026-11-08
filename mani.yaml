@@ -166,6 +166,30 @@ projects:
       - backend
       - code
       - public
+  information-query:
+    path: workspace/information-query
+    url: https://github.com/StuHelper/stuhelper-information-query.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  groups:
+    path: workspace/groups
+    url: https://github.com/StuHelper/stuhelper-groups.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  search:
+    path: workspace/search
+    url: https://github.com/StuHelper/stuhelper-search.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
   qq-binding:
     path: workspace/qq-binding
     url: https://github.com/StuHelper/stuhelper-qq-binding.git
