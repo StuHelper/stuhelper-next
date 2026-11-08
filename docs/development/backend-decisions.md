@@ -18,7 +18,7 @@ updated: 2026-11-08
 | resources | 预览与下载同权；投诉只需登录，提交时通过准入才保存标题快照；购买延期 |
 | profiles | 昵称 20 和简介 120 个 Unicode 码点；主页展示开关、7 天注销冷静期与可恢复处理进度 |
 | favorites | 课程、教师与资料收藏、按目标集合查询本人收藏状态，以及收藏夹管理 |
-| qq-binding | 三项独立验证、私聊一次性码、直接 QQ OAuth、解绑与注销、审计及 outbox；本地仓库，远程未创建 |
+| qq-binding | 三项独立验证、私聊一次性码、直接 QQ OAuth、解绑与注销、审计及 outbox；私有仓库 StuHelper/stuhelper-qq-binding |
 | open-platform | 应用审批、逐项同意、PKCE、短期令牌、撤回和通知反馈 |
 | billing | 积分与 Ivory 分账、余额和明细、奖励与追回、用户支付指引、充值确认、取消与到期、购买积分、退款和注销结清；真实支付未接入 |
 | platform | 模块生命周期、公共资格规则与安装历史；独立 PostgreSQL schema 与运行身份，短时缓存和审计清理 |
@@ -27,7 +27,7 @@ updated: 2026-11-08
 
 ## 验证与剩余工作
 
-已有提供方的 PostgreSQL CI 已通过。qq-binding 的 GOWORK=off 本地检查与 Koishi 测试通过；backend 的 go.work 数据库组合测试通过，正式 CI 因 qq-binding 远程仓库缺失而无法下载依赖。
+已有提供方的 PostgreSQL CI 已通过。qq-binding 的 GOWORK=off 本地检查与 Koishi 测试通过；backend 的 go.work 数据库组合测试通过。backend 已改为引用私有仓库中的 qq-binding 候选，正式 CI 需要 MODULES_READ_TOKEN 能读取该仓库。
 
 数据库验证使用隔离 PostgreSQL 和模块运行身份。模块场景与测试函数登记在 architecture/modules.yaml。
 
@@ -47,4 +47,4 @@ Web 候选已接入收藏、QQ 三项绑定、账号与安全、个人资料、�
 
 充值返回公开支付指引，只有提供方查询或验签回调确认成功才入账。取消先核实付款状态并关闭未付款支付单。开发环境提供模拟付款与失败入口，生产配置拒绝启用。
 
-qq-binding 使用本地 go.work 联调。远程仓库未创建，backend 正式 GOWORK=off 构建需要提供方发布后完成依赖解析。QQ 登录、真实机器人、真实 QQ 互联与群服务事件投递未验收。
+qq-binding 的模块检查在本仓库 CI 中使用隔离 PostgreSQL 运行。QQ 登录、真实机器人、真实 QQ 互联与群服务事件投递未验收。

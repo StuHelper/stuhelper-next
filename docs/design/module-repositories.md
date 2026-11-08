@@ -39,7 +39,7 @@ updated: 2026-11-08
 | moderation | stuhelper-moderation | public | 内容审核、举报、申诉与处置结果，内容模块执行状态变化 |
 | community | stuhelper-community | public | 动态、分区、关注、屏蔽及动态内互动 |
 | media | stuhelper-media | public | 通用文件、不可变版本、上传会话、业务引用、当前权限下载与文件清理协调 |
-| qq-binding | stuhelper-qq-binding | 待授权（本地按私有范围管理） | 三项 QQ 身份、验证码、OAuth、绑定审计和事件；远程仓库未创建 |
+| qq-binding | stuhelper-qq-binding | 私有 | 三项 QQ 身份、验证码、OAuth、绑定审计和事件 |
 | favorites | stuhelper-favorites | public | 收藏、收藏夹及目标名称快照 |
 | groups | stuhelper-groups | public | 群准入、名片、消息治理与娱乐命令 |
 | information-query | stuhelper-information-query | public | 授权范围内的跨模块关联查询、批量与导出 |
