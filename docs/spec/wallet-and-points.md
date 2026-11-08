@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-08
 ---
 
 # 账户与交易的公共对接说明
@@ -17,3 +17,11 @@ updated: 2026-10-25
 余额、交易与收款资料仅按本人或获授权管理员的权限返回。公开模块不读取私有账务数据库，不把交易载荷写入通用事件或日志。服务不可用时保留既有事实，明确返回当前不可执行。
 
 具体货币、计价、奖励、购买与退款规则维护在 [私有账务规格](https://github.com/StuHelper/stuhelper-billing/blob/develop/docs/spec/wallet-and-points.md)，资料交易关系见 [私有权益规格](https://github.com/StuHelper/stuhelper-billing/blob/develop/docs/spec/resource-entitlements.md)。
+
+| 场景 | 预期结果 |
+| --- | --- |
+| WP-19 | 充值通知验签，重复和并发只入账一次，事务失败不留下部分余额，未确认订单不阻塞后续处理 |
+| WP-20 | 退款结果不明时保留冻结，明确失败释放，人工付款完成后记录实际结果 |
+| WP-21 | 奖励按可信事件与历史规则处理，重复不发放，追回和后续抵扣按所属账本执行 |
+| WP-22 | 异常订单退款按私有规则计算，包括已到期但未消费的积分，退回原批次且不超过原价 |
+| WP-23 | 注销结清后禁止继续入账，未登录和越权请求被拒绝 |
