@@ -53,9 +53,14 @@ test('Web deep links and language selection retain the chosen language', async (
   await expect(page.getByRole('heading', { name: web.notFound.title })).toBeVisible();
   await page.getByRole('link', { name: web.notFound.home, exact: true }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(web.home.title);
-  await page.getByRole('combobox').selectOption('zh-CN');
+  // The language control is a listbox: open it, then choose a language by its own name.
+  const choose = async (value) => {
+    await page.getByRole('combobox', { name: web.language.label }).click();
+    await page.getByRole('option', { name: policy.languages[value].name, exact: true }).click();
+  };
+  await choose('zh-CN');
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
-  await page.getByRole('combobox').selectOption(locale);
+  await choose(locale);
   await layout(page, locale);
 });
 
