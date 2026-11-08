@@ -162,66 +162,12 @@ modules:
       verification.admin:
         - identity
     scenario_tests:
-      SV-01:
-        - integration_test.go#TestStudentAndIndependentIdentityMatch
-      SV-03:
-        - integration_test.go#TestStudentAndIndependentIdentityMatch
-      SV-04:
-        - integration_test.go#TestStudentAndIndependentIdentityMatch
-      SV-05:
-        - integration_test.go#TestStudentAndIndependentIdentityMatch
-      SV-06:
-        - integration_test.go#TestRemovalApprovalRetainsIdentityAndOtherSchool
-      SV-07:
-        - integration_test.go#TestNewcomerExpiryAlumniAndMultipleExperiences
-      SV-08:
-        - integration_test.go#TestNewcomerExpiryAlumniAndMultipleExperiences
-      SV-09:
-        - integration_test.go#TestNewcomerExpiryAlumniAndMultipleExperiences
-      SV-10:
-        - integration_test.go#TestNewcomerExpiryAlumniAndMultipleExperiences
-      SV-11:
-        - integration_test.go#TestSchoolCapabilityConfigurationAndNewcomerDates
-      SV-12:
-        - integration_test.go#TestManualCameraAndReviewScopeSupplement
-        - advanced_test.go#TestEncryptionRotationAndMaterialTicketBounds
-      SV-13:
-        - integration_test.go#TestNewcomerExpiryAlumniAndMultipleExperiences
-        - integration_test.go#TestSchoolCapabilityConfigurationAndNewcomerDates
-      SV-14:
-        - integration_test.go#TestNewcomerExpiryAlumniAndMultipleExperiences
-      SV-15:
-        - integration_test.go#TestRevocationPreservesHistoryAndOtherQualification
-      SV-16:
-        - integration_test.go#TestRemovalApprovalRetainsIdentityAndOtherSchool
-      SV-17:
-        - integration_test.go#TestOwnershipAndIdempotentConcurrency
-      SV-18:
-        - integration_test.go#TestTransactionsRollbackOnOutboxFailure
-        - advanced_test.go#TestPendingOperationCancellationAndRecoverableRetry
-      SV-19:
-        - integration_test.go#TestEmailOTPAndAuthenticatedInbound
-        - integration_test.go#TestWorkerTimeoutLookupAndRetention
-      SV-20:
-        - http_test.go#TestHTTPContractAuthorizationAndStrictRequests
-        - integration_test.go#TestRuntimeIsolationAndMigrationRerun
-      SV-22:
-        - advanced_test.go#TestOutboxManualRetryKeepsOriginalEventAndWorkerStops
-      SV-23:
-        - profiles_test.go#TestSchoolProfilesStoreActualFieldsAndPreserveUnknownFacts
-        - profiles_test.go#TestBUAAReferencesImportedDataWithoutWritingAnotherProfile
-      SV-24:
-        - profiles_test.go#TestProfileRefreshIsCurrentPerStudentAndRejectsOlderCollections
-      SV-25:
-        - profiles_test.go#TestProfileWriteRollbackAndCipherIntegrity
-        - profiles_test.go#TestProfileAuthorizationAuditAndEncryptionRotation
-        - profiles_test.go#TestProfileDeletionRetainsOtherStudyReferences
-      SV-26:
-        - school_flow_test.go#TestInteractiveSchoolChallengeBindsOwnerAndCommitsOnce
-        - school_flow_test.go#TestInteractiveProfileFailureCanRetryWithoutNewLogin
-        - school_flow_test.go#TestInteractiveConfigRevocationExpiryAndCancellation
-      SV-27:
-        - restore_test.go#TestBackupRestorePreservesQualificationsAndProfiles
+      PC-11:
+        - identity_mask_test.go#TestOwnIdentityMasksComeFromVerifiedDataAndNeverLeakThroughFacts
+        - identity_mask_test.go#TestShortIdentityValuesAndMissingMaskEvidenceAreRejected
+      PC-05:
+        - public_profile_test.go#TestPublicProfileFactsOnlyExposeSelectedCurrentAcademicFields
+        - public_profile_test.go#TestPublicProfileUsesCollegeNameWithoutGuessingMissingGrade
       SV-TEACHER-01:
         - teachers_test.go#TestTeacherApplicationReviewBindingAndDisclosureConsent
       SV-TEACHER-02:
@@ -231,12 +177,6 @@ modules:
         - teachers_test.go#TestTeacherApprovalFailureExpiryAndSelfReview
       SV-TEACHER-04:
         - teachers_test.go#TestTeacherSchemaPreservesStudentDataAndRuntimeIsolation
-      PC-05:
-        - public_profile_test.go#TestPublicProfileFactsOnlyExposeSelectedCurrentAcademicFields
-        - public_profile_test.go#TestPublicProfileUsesCollegeNameWithoutGuessingMissingGrade
-      PC-11:
-        - identity_mask_test.go#TestOwnIdentityMasksComeFromVerifiedDataAndNeverLeakThroughFacts
-        - identity_mask_test.go#TestShortIdentityValuesAndMissingMaskEvidenceAreRejected
   - id: catalog
     repository: StuHelper/stuhelper-catalog
     visibility: public
@@ -395,6 +335,7 @@ modules:
     specifications:
       - docs/spec/favorites.md
       - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
     eligibility_facts:
       content_access: verification
     api: 1
@@ -543,45 +484,39 @@ modules:
       resources.manage:
         - identity
     scenario_tests:
-      RES-01:
-        - integration_test.go#TestConfigurableTaxonomySnapshotsAndYearFilters
-        - integration_test.go#TestTaxonomyChangeDuringPreparationCanBeCorrected
-        - integration_test.go#TestInitialCategoriesMigrationPreservesOperatorChanges
-      RES-02:
-        - integration_test.go#TestPublicationContinuityAndStaleReview
-      RES-03:
-        - integration_test.go#TestIndependentRightsCampusRevocationAndUnlisting
-      RES-04:
-        - integration_test.go#TestConcurrentIdempotencyAndChangedPayload
-      RES-05:
-        - integration_test.go#TestDeniedInputsDoNotReachDependencies
-      RES-06:
-        - integration_test.go#TestDirectoryPackagesOmitUnauthorizedAndRecheckRights
-      RES-07:
+      RS-01:
         - integration_test.go#TestOriginConsentAndRequestsUseOutbox
-        - http_test.go#TestReceiptHTTPStatesMatchGeneratedContract
-      RES-08:
-        - integration_test.go#TestAmbiguousPublicationRecoveryAndRetryBudget
-        - integration_test.go#TestModerationDeliveryReplayAfterPublicationAndStateChanges
-      RES-09:
-        - integration_test.go#TestDatabaseIsolationAndAtomicAudit
-      RES-10:
-        - http_test.go#TestHTTPContractSDKAndUnknownInput
-      RES-11:
+      RS-03:
+        - integration_test.go#TestIndependentRightsCampusRevocationAndUnlisting
+      RS-05:
+        - integration_test.go#TestIndependentRightsCampusRevocationAndUnlisting
+      RS-11:
+        - integration_test.go#TestDirectoryPackagesOmitUnauthorizedAndRecheckRights
+      RS-13:
+        - integration_test.go#TestPublicationContinuityAndStaleReview
+      RS-18:
+        - integration_test.go#TestDirectoryPackagesOmitUnauthorizedAndRecheckRights
+      RS-19:
+        - integration_test.go#TestConfigurableTaxonomySnapshotsAndYearFilters
+      RS-20:
+        - integration_test.go#TestConfigurableTaxonomySnapshotsAndYearFilters
+      RS-21:
+        - integration_test.go#TestTaxonomyChangeDuringPreparationCanBeCorrected
+      RS-22:
+        - integration_test.go#TestDeniedInputsDoNotReachDependencies
+      RS-23:
         - integration_test.go#TestReviewInspectionIsScopedAndGrantListsIdentifySubjects
-      RES-12:
-        - integration_test.go#TestCategoryReadsRequireContentAdmissionAndKeepScopedAdministration
-      RES-13:
-        - references_test.go#TestOwnResourceNamesRequireUploadOwnershipAndKeepContentPrivate
-        - references_test.go#TestComplaintTitleSnapshotRequiresAdmissionAtSubmission
-      RES-14:
+      RS-26:
         - file_access_test.go#TestPreviewAndDownloadShareCurrentRightsAndExactMissingConditions
-      RES-15:
+      RS-24:
+        - http_test.go#TestReceiptHTTPStatesMatchGeneratedContract
+        - references_test.go#TestComplaintTitleSnapshotRequiresAdmissionAtSubmission
+      AE-ACCESS-05:
+        - references_test.go#TestOwnResourceNamesRequireUploadOwnershipAndKeepContentPrivate
+      AE-ACCESS-07:
+        - integration_test.go#TestCategoryReadsRequireContentAdmissionAndKeepScopedAdministration
+      PC-07:
         - closure_test.go#TestClosedUploaderKeepsFilesAndCopyrightWithoutPublicAccountLink
-      RES-16:
-        - integration_test.go#TestListReusesRequestAuthorizationButRechecksNextRequest
-      RES-17:
-        - integration_test.go#TestComplaintQuotaPreservesIdempotencyAndRejectsBeforeWriting
   - id: billing
     repository: StuHelper/stuhelper-billing
     visibility: private
@@ -686,6 +621,7 @@ modules:
     contract_status: implemented
     specifications:
       - docs/spec/open-platform.md
+      - docs/spec/data-retention.md
     api: 1
     capabilities:
       - open-platform.manage
