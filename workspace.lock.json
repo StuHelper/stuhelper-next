@@ -8,12 +8,12 @@
     },
     "web": {
       "repository": "https://github.com/StuHelper/stuhelper-web.git",
-      "revision": "b05e96eef298c40f5a6698fcfe0bfa47fc893885",
+      "revision": "ac5360261d80db0ab38564148c417b8060730536",
       "dirty": false
     },
     "admin": {
       "repository": "https://github.com/StuHelper/stuhelper-admin.git",
-      "revision": "9364646a7ffa706acee8a56140bdb3c208d0c6c5",
+      "revision": "d7bee6d8f7c4f2675bb86a37d67f3f2b329e2b21",
       "dirty": false
     },
     "verification": {
