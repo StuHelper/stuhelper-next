@@ -27,7 +27,8 @@ test('Web loads translated framework capabilities within the viewport', async ({
   const errors = collectErrors(page);
   await page.goto(`http://127.0.0.1:18781/?lang=${locale}`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(web.home.title);
-  await expect(page.getByRole('status')).toContainText(web.connection.ready);
+  // A working connection shows no status; only a failure is announced.
+  await expect(page.getByRole('region', { name: web.connection.label })).toHaveCount(0);
   await layout(page, locale);
   expect(errors).toEqual([]);
   if (process.env.FRAMEWORK_SCREENSHOTS) {
@@ -43,7 +44,7 @@ test('Web recovers from a network failure through a translated retry action', as
   await expect(page.getByRole('status')).toContainText(web.connection.errors.network);
   await page.unroute('**/api/v1/system/capabilities');
   await page.getByRole('button', { name: web.connection.retry }).click();
-  await expect(page.getByRole('status')).toContainText(web.connection.ready);
+  await expect(page.getByRole('region', { name: web.connection.label })).toHaveCount(0);
 });
 
 test('Web deep links and language selection retain the chosen language', async ({ page }, testInfo) => {
@@ -51,7 +52,7 @@ test('Web deep links and language selection retain the chosen language', async (
   await page.goto(`http://127.0.0.1:18781/unimplemented-module?lang=${locale}`);
   await expect(page.getByRole('heading', { name: web.notFound.title })).toBeVisible();
   await page.getByRole('link', { name: web.notFound.home, exact: true }).click();
-  await expect(page.getByRole('status')).toContainText(web.connection.ready);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText(web.home.title);
   await page.getByRole('combobox').selectOption('zh-CN');
   await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN');
   await page.getByRole('combobox').selectOption(locale);

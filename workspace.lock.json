@@ -8,7 +8,7 @@
     },
     "web": {
       "repository": "https://github.com/StuHelper/stuhelper-web.git",
-      "revision": "4c6d6d1e837497a70b19d93dcb32e770213fa101",
+      "revision": "fd5cc7e1474d009143a2cb1db18513b012953d42",
       "dirty": false
     },
     "admin": {
