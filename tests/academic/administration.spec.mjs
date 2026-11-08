@@ -133,9 +133,10 @@ test('catalog merge previews exact records before confirming',async({page},info)
   await panel.getByLabel(c.reason,{exact:true}).fill('Checked duplicate record.');
   await expect(panel.getByRole('button',{name:c.confirmMerge,exact:true})).toHaveCount(0);
   await panel.getByRole('button',{name:c.previewMerge,exact:true}).click();
-  // The plan lists the source and target records next to the chosen target.
-  await expect(panel.getByText('Test Course',{exact:true})).toBeVisible();
-  await expect(panel.getByText('Canonical Course',{exact:true})).toHaveCount(2);
+  // The plan shows the source and target records side by side.
+  const plan=panel.locator('.grid').filter({hasText:'Canonical Course'});
+  await expect(plan.getByText('Test Course',{exact:true})).toBeVisible();
+  await expect(plan.getByText('Canonical Course',{exact:true})).toBeVisible();
   await panel.getByRole('button',{name:c.confirmMerge,exact:true}).click();
   await expect(panel.getByText(c.merged,{exact:true})).toBeVisible();
   await expect(page.locator('.ant-drawer-title')).toHaveText('Canonical Course');
