@@ -352,6 +352,8 @@ modules:
     scenario_tests:
       FAV-01:
         - integration_test.go#TestFavoritesOwnershipFoldersAdmissionAndConcurrentReplay
+      FAV-02:
+        - target_filter_test.go#TestFavoritesTargetFilterOwnershipValidationAndPagination
       PC-07:
         - closure_test.go#TestClosureDeletesCollectionsAtomicallyAndPreventsResurrection
   - id: reviews
