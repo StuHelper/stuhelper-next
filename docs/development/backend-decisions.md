@@ -26,11 +26,11 @@ updated: 2026-11-08
 
 ## 验证与剩余工作
 
-账务及 backend 组合数据库检查已通过，最终候选组合等待 PR CI。数据库验证使用隔离 PostgreSQL 和模块运行身份，正式构建设置 GOWORK=off。模块场景与测试函数登记在 architecture/modules.yaml。
+账务与全部提供方的 PostgreSQL CI 已通过。backend 固定组合使用 PR CI 验证。数据库验证使用隔离 PostgreSQL 和模块运行身份，正式构建设置 GOWORK=off。模块场景与测试函数登记在 architecture/modules.yaml。
 
 QQ 绑定状态与绑定状态和号码分别授权。公开主页仅对可信代理解析转发地址，按客户端地址使用进程内单一限流器，多实例各自计数。可信 QQ 来源尚未接入，返回 503。真实支付、真实账号、发行与部署未验收。会员交易、会员权益及资料购买未提供。
 
-Web/Admin 需要同步目录准入、profiles、本人记录、收藏夹、细粒度授权与账务客户端。公共集成的客户端契约差异仍待处理，保持必需检查开启。
+Web/Admin 需要同步目录准入、profiles、本人记录、收藏夹、细粒度授权与账务客户端。公共集成在目录契约检查失败：Web 的 objects、objects/lookup、objects/{id} 和 objects/{id}/summary 快照仍允许匿名访问。前端需同步当前准入要求和来源记录，公共集成检查保持开启。
 
 ## 合并依赖
 
