@@ -3,22 +3,22 @@
   "projects": {
     "platform": {
       "repository": "https://github.com/StuHelper/stuhelper-platform.git",
-      "revision": "b5597d67ae491e360bba36cbeca74867c2bedd31",
+      "revision": "0efdba00ff59cddc9d7894092aace9b9212696f0",
       "dirty": false
     },
     "web": {
       "repository": "https://github.com/StuHelper/stuhelper-web.git",
-      "revision": "bfe711dfe68f65e79c0786b1355104a747f0f664",
+      "revision": "8007711f12dd45206bd97072832ae8e4202d41ad",
       "dirty": false
     },
     "admin": {
       "repository": "https://github.com/StuHelper/stuhelper-admin.git",
-      "revision": "4af0f435a9098f7f4819c66ed6a3a309eba1b885",
+      "revision": "cfb93e8a686fe19455b37d5b46aa8af1e603954f",
       "dirty": false
     },
     "verification": {
       "repository": "https://github.com/StuHelper/stuhelper-verification.git",
-      "revision": "d7a113d4eda75b76d145b5a0a72d749ebd3a4c00",
+      "revision": "270df4f39629ea1bfa0b344e26fc940b73534372",
       "dirty": false
     },
     "storage": {
@@ -38,12 +38,12 @@
     },
     "billing": {
       "repository": "https://github.com/StuHelper/stuhelper-billing.git",
-      "revision": "aa79600062c190294a1e4dff0908f66bf390d12e",
+      "revision": "b534402d583c70c43b2cadd383c6695df87596a1",
       "dirty": false
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "revision": "3b53734d1316a24cceef33bf96e2dd14734c0cb9",
+      "revision": "14cadf233fa5a2c5d5ffbe42c38612aa884504a9",
       "dirty": false
     },
     "catalog": {
@@ -83,7 +83,12 @@
     },
     "qq-binding": {
       "repository": "https://github.com/StuHelper/stuhelper-qq-binding.git",
-      "revision": "308eae8e39b785262deaec99262abdee09af12de",
+      "revision": "b08e0573fc72f66e72af20f291b5fa9cf8beef43",
+      "dirty": false
+    },
+    "notifications": {
+      "repository": "https://github.com/StuHelper/stuhelper-notifications.git",
+      "revision": "77d0b5f3b273f7eae41d9fe16805b20bd0cd5d73",
       "dirty": false
     }
   }

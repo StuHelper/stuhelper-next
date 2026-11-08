@@ -158,6 +158,14 @@ projects:
       - backend
       - code
       - public
+  notifications:
+    path: workspace/notifications
+    url: https://github.com/StuHelper/stuhelper-notifications.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
   qq-binding:
     path: workspace/qq-binding
     url: https://github.com/StuHelper/stuhelper-qq-binding.git

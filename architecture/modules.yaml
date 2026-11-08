@@ -672,15 +672,37 @@ modules:
   - id: notifications
     repository: StuHelper/stuhelper-notifications
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - profiles
     interface_owner: notifications
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/notifications.md
+    api: 1
+    capabilities:
+      - notifications.inbox
+      - notifications.deliver
+    capability_requires: {}
+    scenario_tests:
+      NT-01:
+        - integration_test.go#TestConcurrentDeliveryAggregationPreferencesAndCleanup
+      NT-02:
+        - integration_test.go#TestOwnershipPaginationReadAndTargetState
+      NT-03:
+        - integration_test.go#TestConcurrentDeliveryAggregationPreferencesAndCleanup
+      NT-04:
+        - integration_test.go#TestOwnershipPaginationReadAndTargetState
+      NT-05:
+        - integration_test.go#TestHTTPAuthenticationAndStrictPreferences
+      NT-06:
+        - integration_test.go#TestDeliveryRollbackAndRetentionBoundary
+        - integration_test.go#TestAggregationSeparatesTargetsParametersAndRecipients
+      NT-07:
+        - title_catalog_test.go#TestTitleCatalogAdmissionAndRejectedWrites
+        - title_catalog_test.go#TestInteractionTitleUsesServerAggregateCount
   - id: qq-binding
     repository: StuHelper/stuhelper-qq-binding
     visibility: private
