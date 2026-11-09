@@ -25,8 +25,8 @@ updated: 2026-11-09
 | platform | 模块生命周期、公共资格规则与安装历史；管理角色、范围授予与撤销；平台管理员拥有全部能力；汇总各模块操作记录 |
 | notifications | 站内通知、未读数、已读管理与互动偏好；当前目标权限检查；inbox 去重、旧修订忽略与多收件人原子写入 |
 | information-query | 按查询域和范围授权、敏感结果审计；backend 已接入本人账号键的 catalog 选课查询，缺失域明确返回不可用 |
-| search | 可重建索引、关键词搜索、热门与我的投票；backend 已装配 catalog 快照、事件投影及当前权限复核 |
-| groups | 群准入、宽限期、豁免、群规则、消息与娱乐功能的独立模块实现；backend 暂未装配 |
+| search | 可重建索引、关键词搜索、热门与我的投票；backend 已装配 catalog、reviews、resources 内容投影与 catalog、reviews、favorites 活动快照及当前权限复核 |
+| groups | 群准入、宽限期、豁免、群规则、消息与娱乐功能；backend 已装配本人查询、资格事件与维护任务，真实机器人未接入 |
 
 学校、认证徽章、学院、署名评价和资料默认公开，年级默认关闭。姓名显示末字，证件号显示首尾位，星号数量等于遮住的码点数。姓名少于 2 个码点或证件号少于 3 个码点时拒绝提交。
 
@@ -36,7 +36,7 @@ Web 已接入收藏、QQ 三项绑定、账号与安全、个人资料、积分�
 
 Web 已接入通知、周课表与日历导出、搜索、热门、我的投票和评分对比页面。评分对比从 reviews 读取各课程统计，search 提供搜索与发现入口。课表缺少结构化时间或作息时，页面保留已有信息，日历导出提示 schedule_incomplete。
 
-Web 搜索在认证状态就绪后重新执行查询，避免初始认证加载影响搜索结果。
+Web 搜索在认证状态就绪后重新执行查询。个人资料提供七项默认关闭的群名片许可，“我的群”展示本人群状态、截止时间、缺少条件和下一步入口；未知事实显示待确认。
 
 Admin 已接入角色授权、操作记录和信息查询，以及 QQ 绑定处理、开放平台应用审核、教师认证审核与资格撤销、账务管理。操作记录汇总九个模块的公开审计接口，信息查询明确展示不可用域。
 
@@ -44,13 +44,15 @@ Admin 学校作息配置按学校和学期设置第一周周一、IANA 时区与
 
 Admin QQ 群管理提供群列表、成员资格与管理命令、机器人操作状态、举报、规则命中和黑名单。结果未知的机器人操作显示待确认，只有服务端确认实际成功才显示成功。独立的群设置页维护准入、名片、消息规则与娱乐参数。
 
-Admin 演示原型页面已全部移除，学校作息和 QQ 群管理使用正式功能页面。groups 的 backend 装配与真实机器人验收仍待完成。
+Admin 演示原型页面已全部移除，学校作息和 QQ 群管理使用正式功能页面。groups 的真实 Koishi 接入与机器人验收仍待完成。
 
 账务管理包括退款审核与人工打款登记、按账号查询余额与明细、积分购买退款、奖励发放与撤销，以及渠道、积分方案和奖励规则配置。支付自动查询耗尽后订单进入 needs_review，由管理员登记结果或安排再次查询。
 
 ## 事件与操作记录
 
-backend 已装配 moderation、verification 到 notifications，以及 catalog 到 search 的 relay。业务事务提交后通过 pg_notify 唤醒，启动、重连与每 60 秒扫描补读。投递按主题保序，读取前排除退避主题，首次失败满 24 小时转人工处理。
+backend 已装配 moderation、verification 到 notifications，以及 catalog、reviews、resources、favorites 到 search 的 relay，groups 的资格消费与事件通道。
+
+业务事务提交后通过 pg_notify 唤醒，启动、重连与每 60 秒扫描补读。投递按主题保序，读取前排除退避主题，首次失败满 24 小时转人工处理。
 
 notifications 对完整收件人集合一次消费，全部通知、inbox 与修订同事务保存。search 同事务保存 inbox 与投影。重复事件返回原结果，旧修订不覆盖新状态。完整行为见[模块通信与一致性](../spec/module-protocol.md)。
 
@@ -60,18 +62,16 @@ notifications 对完整收件人集合一次消费，全部通知、inbox 与修
 
 实际候选提交由 workspace.lock.json 固定，模块场景与测试函数登记在 architecture/modules.yaml。提供方的数据库验证使用隔离 PostgreSQL 与模块运行身份，正式 backend 依赖由 go.mod 固定。源码检查、客户端接入和真实环境验收分别记录。
 
-information-query、groups、search 与 notifications 的模块声明和场景引用核对通过。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.3.0 的 module.yaml 登记管理接口测试。
+information-query、groups、search 与 notifications 的模块声明和场景引用核对通过。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.4.0 的 module.yaml 登记本人查询、管理接口与事件测试。
 
-下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/0285928a157e10ba5ba3f0013489f16f0397c696/README.md#事件-relay-与新查询模块) 对应。
+下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/94b8325d73a9ca03ec3075e84fa6dd37b6483cb1/README.md#事件-relay-与新查询模块) 对应。
 
 | 当前缺口 | 影响与剩余工作 |
 | --- | --- |
-| notifications 旧 inbox 升级 | 迁移拒绝含单收件人历史数据的旧 inbox 并保留数据，需提供方补充收件人重建与转换，不能清空 inbox 或修订绕过 |
 | catalog 课表通知 | 封闭标题目录没有课表变更通知，relay 不发送该类通知；上课提醒尚未接入 |
-| reviews/resources discovery | 缺少搜索 discovery 事件与完整快照，尚未接入搜索投影，不生成虚构热门统计事件 |
 | information-query 关联查询 | profiles、verification、reviews、resources、billing、groups 缺少可靠关联与范围查询适配，返回 unavailable_domains |
 | 认证操作目标 | 部分事件缺少可解析的 operation 引用，通知保留且目标显示 inaccessible |
-| groups 装配 | 独立模块已实现，backend 暂不装配 |
+| groups Koishi | 真实机器人未接入，执行与查询回执返回 unavailable，动作保留 pending 或 unknown |
 | 信息查询审计保留 | 提供方尚无有界保留期清理接口 |
 
 catalog 信息查询当前仅支持指定学校内按本人完整账号键查询选课，姓名、学号、QQ 与跨账号查询返回 unavailable。机器人信息查询默认关闭。个人日程编辑、真实学校数据、真实 QQ 互联、机器人与支付流程仍待验收。

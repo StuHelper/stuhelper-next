@@ -77,6 +77,7 @@ modules:
       - docs/spec/personal-center.md
     api: 1
     capabilities:
+      - profiles.group-card.read
       - profiles.manage
       - profiles.public
     capability_requires:
@@ -93,6 +94,9 @@ modules:
         - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
       PC-09:
         - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
+      PC-12:
+        - capability_test.go#TestGroupCardCapabilityRegistration
+        - group_card_test.go#TestGroupCardConsentAuthorizationAndTransaction
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
@@ -607,16 +611,27 @@ modules:
     capability_requires: {}
     scenario_tests:
       QQ-01:
+        - my_groups_test.go#TestMyGroupsOwnIsolationPaginationAndReadOnly
+        - my_groups_test.go#TestMyGroupsGeneratedClientAndRouteReservation
+        - delivery_membership_test.go#TestGroupsForOwnerPaginationAndBounds
         - api_v03_test.go#TestGroupSummaryCountsMaskingAndScope
         - api_v03_test.go#TestConfigurationRevisionPasswordAndReplay
         - api_v03_test.go#TestCandidateMigrationToFinalContractAndLeaseRecovery
         - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
       QQ-02:
+        - my_groups_test.go#TestMyGroupsMissingConditionsAndUnknownFacts
+        - my_groups_test.go#TestMyGroupsDependencyFailureReturnsNoPartialPage
+        - my_groups_test.go#TestMyGroupsPasswordRestrictionAndPublicProjection
         - facts_test.go#TestGroupFactsRejectsUnknownContradictoryAndFailedFacts
         - integration_test.go#TestPasswordDoesNotGrantStudentEligibilityAndBlacklistScope
       QQ-03:
+        - qq_binding_event_test.go#TestQQBindingActualEnvelopeRecomputeReplayAndOldRevision
+        - qq_binding_event_test.go#TestQQBindingEnvelopeValidationRejectsUnknownAndInconsistentFields
+        - delivery_membership_test.go#TestConsumeFanoutDeduplicationOldRevisionsAndConcurrency
         - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
       QQ-04:
+        - delivery_membership_test.go#TestConsumeFailureRollsBackInboxAllGroupsAndOutbox
+        - delivery_membership_test.go#TestConsumeApplicantsNoMembershipInvalidAndBoundedFanout
         - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
       QQ-05:
         - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
@@ -626,6 +641,8 @@ modules:
         - facts_test.go#TestGroupFactsFiltersFieldsAtServiceBoundary
         - integration_test.go#TestRulesCardsReportAndBatchPreview
       QQ-08:
+        - delivery_membership_test.go#TestPendingOutboxExclusionLimitOrderingAndConfirmation
+        - delivery_membership_test.go#TestRelayStopsFailedSubjectWithinBatchAndDeliversOthers
         - api_v03_test.go#TestEveryCollectionTypedPaginationAndAuthorization
         - api_v03_test.go#TestCommandDiscriminatorRequiresKindSpecificFields
         - api_v03_test.go#TestExplicitErrorResponsesAndBulkDiscriminator
@@ -734,6 +751,7 @@ modules:
       - catalog
       - reviews
       - resources
+      - favorites
       - community
     interface_owner: search
     contract_status: implemented
@@ -750,11 +768,16 @@ modules:
       DS-04:
         - integration_test.go#TestMyVotesHTTPAndTimeout
       DS-05:
-        - integration_test.go#TestHeatWeightsWindowAndTeachers
+        - activity_test.go#TestHeatWeightsWindowAndTeachers
+        - activity_test.go#TestActivityOwnership
       DS-06:
         - integration_test.go#TestProjectionFailureRollback
+        - activity_test.go#TestActivityReplayAndRebuild
       DS-07:
+        - integration_test.go#TestContentDocumentKinds
         - integration_test.go#TestProjectionReplayRebuildAndIsolation
+        - activity_test.go#TestActivityReplayAndRebuild
+        - activity_test.go#TestActivitySnapshotPagination
   - id: notifications
     repository: StuHelper/stuhelper-notifications
     visibility: public
@@ -879,6 +902,7 @@ applications:
       - moderation
       - media
       - resources
+      - groups
     capability_requires:
       storage.custody:
         - storage
@@ -890,6 +914,8 @@ applications:
       - docs/spec/internationalization.md
       - docs/spec/storage-contribution.md
       - docs/spec/resource-sharing.md
+      - docs/spec/qq-group-services.md
+      - docs/spec/personal-center.md
     scenario_tests:
       RS-25:
         - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
