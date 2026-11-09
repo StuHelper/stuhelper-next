@@ -24,7 +24,7 @@ updated: 2026-11-09
 | billing | 积分与 Ivory 分账、余额和明细、奖励与追回、用户支付指引、充值确认、取消与到期、购买积分、退款和注销结清；真实支付未接入 |
 | platform | 模块生命周期、公共资格规则与安装历史；管理角色、范围授予与撤销；平台管理员拥有全部能力；汇总各模块操作记录 |
 | notifications | 站内通知、未读数、已读管理与互动偏好；当前目标权限检查；inbox 去重、旧修订忽略与多收件人原子写入 |
-| information-query | 按查询域和范围授权、敏感结果审计；backend 已接入本人账号键的 catalog 选课查询，缺失域明确返回不可用 |
+| information-query | verification 与 qq-binding 解析线索，按候选分组查询多个业务域；独立域授权、敏感展开审计与独立身份清理 |
 | search | 可重建索引、关键词搜索、热门与我的投票；backend 已装配 catalog、reviews、resources 内容投影与 catalog、reviews、favorites 活动快照及当前权限复核 |
 | groups | 群准入、宽限期、豁免、群规则、消息与娱乐功能；backend 已装配本人查询、资格事件与维护任务，真实机器人未接入 |
 
@@ -38,7 +38,9 @@ Web 已接入通知、周课表与日历导出、搜索、热门、我的投票�
 
 Web 搜索在认证状态就绪后重新执行查询。个人资料提供七项默认关闭的群名片许可，“我的群”展示本人群状态、截止时间、缺少条件和下一步入口；未知事实显示待确认。
 
-Admin 已接入角色授权、操作记录和信息查询，以及 QQ 绑定处理、开放平台应用审核、教师认证审核与资格撤销、账务管理。操作记录汇总九个模块的公开审计接口，信息查询明确展示不可用域。
+Admin 已接入角色授权、操作记录和信息查询，以及 QQ 绑定处理、开放平台应用审核、教师认证审核与资格撤销、账务管理。操作记录汇总九个模块的公开审计接口。
+
+Admin 的信息查询 0.2.0 候选按对象分组展示，区分当前和历史绑定，并展示不可用域。该候选尚未通过全部浏览器检查，锁定组合仍使用 137b1f3，信息查询新契约的前后端组合尚待验证。
 
 Admin 学校作息配置按学校和学期设置第一周周一、IANA 时区与各节次起止时间。保存携带当前修订号，并发更正返回冲突，避免覆盖其他管理员的修改。
 
@@ -58,23 +60,34 @@ notifications 对完整收件人集合一次消费，全部通知、inbox 与修
 
 平台操作记录已接入 catalog、reviews、moderation、resources、verification、billing、qq-binding、open-platform 与 storage。提供方可用时返回完整结果，故障时通过 missing_modules 标记部分结果；运行身份仍按模块隔离。
 
+## 信息查询接入
+
+姓名和学号由 verification 解析，QQ 由 qq-binding 解析，业务域按完整账号键查询。重名候选、同一账号的不同来源及历史绑定分别分组；历史绑定保留 current=false 与变更时间。
+
+verification、profiles、reviews、resources、groups、billing 已装配公开查询适配。QQ 绑定归入 profiles 域，仍保留独立来源及授权。catalog 仅提供指定学校内本人选课查询。各域和敏感字段继续检查提供方当前业务权限。
+
+候选和敏感结果在查询审计提交成功后返回。审计默认保留 12 个自然月，运行身份负责读取与追加，独立维护身份负责有界清理。维护任务启动立即运行，随后每小时清理最多 1000 条，停机取消并等待退出。
+
+接口与权限规则见[全站信息关联查询](../spec/information-query.md)。批量预览和导出、争议保留自动排除及恢复演练尚未完成，机器人信息查询默认关闭。
+
 ## 验证与剩余工作
 
 实际候选提交由 workspace.lock.json 固定，模块场景与测试函数登记在 architecture/modules.yaml。提供方的数据库验证使用隔离 PostgreSQL 与模块运行身份，正式 backend 依赖由 go.mod 固定。源码检查、客户端接入和真实环境验收分别记录。
 
-information-query、groups、search 与 notifications 的模块声明和场景引用核对通过。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.4.0 的 module.yaml 登记本人查询、管理接口与事件测试。
+groups、search 与 notifications 已登记模块场景。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.4.0 的 module.yaml 登记本人查询、管理接口与事件测试。
 
-下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/94b8325d73a9ca03ec3075e84fa6dd37b6483cb1/README.md#事件-relay-与新查询模块) 对应。
+下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/b1215f32b200a1f2618d6e6e69f7bbf5f701240f/README.md#事件-relay-与新查询模块) 对应。
 
 | 当前缺口 | 影响与剩余工作 |
 | --- | --- |
 | catalog 课表通知 | 封闭标题目录没有课表变更通知，relay 不发送该类通知；上课提醒尚未接入 |
-| information-query 关联查询 | profiles、verification、reviews、resources、billing、groups 缺少可靠关联与范围查询适配，返回 unavailable_domains |
+| resources 购买解锁记录 | 尚无购买解锁记录来源，信息查询只返回资料与授权记录 |
+| billing 会员权益与退款收款人资料 | 尚无对应来源，信息查询只返回账务、订单、退款记录与支付参考号 |
+| catalog 跨账号查询 | 只支持指定学校内本人选课，线索解析到其他账号时返回 unavailable |
 | 认证操作目标 | 部分事件缺少可解析的 operation 引用，通知保留且目标显示 inaccessible |
 | groups Koishi | 真实机器人未接入，执行与查询回执返回 unavailable，动作保留 pending 或 unknown |
-| 信息查询审计保留 | 提供方尚无有界保留期清理接口 |
 
-catalog 信息查询当前仅支持指定学校内按本人完整账号键查询选课，姓名、学号、QQ 与跨账号查询返回 unavailable。机器人信息查询默认关闭。个人日程编辑、真实学校数据、真实 QQ 互联、机器人与支付流程仍待验收。
+个人日程编辑、真实学校数据、真实 QQ 互联、机器人与支付流程仍待验收。
 
 会员交易、会员权益与资料购买未提供。公开主页限流采用各进程独立计数。真实账号、发行、部署与恢复演练未验收。
 
