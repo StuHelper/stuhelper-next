@@ -77,6 +77,7 @@ modules:
       - docs/spec/personal-center.md
     api: 1
     capabilities:
+      - profiles.information-query
       - profiles.group-card.read
       - profiles.manage
       - profiles.public
@@ -159,6 +160,12 @@ modules:
       - docs/spec/personal-center.md
     api: 1
     capabilities:
+      - verification.information-query
+      - verification.information-identity
+      - verification.information-resolve
+      - verification.information-document
+      - verification.information-material
+      - verification.group-card.read
       - verification.read
       - verification.write
       - verification.admin
@@ -388,6 +395,8 @@ modules:
       content_access: verification
     api: 1
     capabilities:
+      - reviews.account-query
+      - reviews.anonymous-author-read
       - reviews.read
       - reviews.write
       - reviews.moderate
@@ -484,6 +493,7 @@ modules:
       content_access: verification
     api: 1
     capabilities:
+      - resources.account-query
       - resources.read
       - resources.write
       - resources.manage
@@ -543,6 +553,8 @@ modules:
       - docs/spec/personal-center.md
     api: 1
     capabilities:
+      - billing.account-query
+      - billing.refund-payee-read
       - billing.wallet
       - billing.closure
     capability_requires:
@@ -602,6 +614,7 @@ modules:
       - docs/spec/bot-entertainment.md
     api: 1
     capabilities:
+      - groups.account-query
       - groups.read
       - groups.manage
       - groups.configure
@@ -666,6 +679,7 @@ modules:
     required:
       - platform
     optional:
+      - qq-binding
       - profiles
       - verification
       - catalog
@@ -838,6 +852,10 @@ modules:
       - docs/spec/qq-binding.md
     api: 1
     capabilities:
+      - qq-binding.information-query
+      - qq-binding.information-identity
+      - qq-binding.information-resolve
+      - qq-binding.identity.resolve
       - qq-binding.manage
       - qq-binding.bot
     capability_requires:
