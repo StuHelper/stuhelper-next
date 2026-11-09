@@ -36,7 +36,15 @@ Web 已接入收藏、QQ 三项绑定、账号与安全、个人资料、积分�
 
 Web 已接入通知、周课表与日历导出、搜索、热门、我的投票和评分对比页面。评分对比从 reviews 读取各课程统计，search 提供搜索与发现入口。课表缺少结构化时间或作息时，页面保留已有信息，日历导出提示 schedule_incomplete。
 
+Web 搜索在认证状态就绪后重新执行查询，避免初始认证加载影响搜索结果。
+
 Admin 已接入角色授权、操作记录和信息查询，以及 QQ 绑定处理、开放平台应用审核、教师认证审核与资格撤销、账务管理。操作记录汇总九个模块的公开审计接口，信息查询明确展示不可用域。
+
+Admin 学校作息配置按学校和学期设置第一周周一、IANA 时区与各节次起止时间。保存携带当前修订号，并发更正返回冲突，避免覆盖其他管理员的修改。
+
+Admin QQ 群管理提供群列表、成员资格与管理命令、机器人操作状态、举报、规则命中和黑名单。结果未知的机器人操作显示待确认，只有服务端确认实际成功才显示成功。独立的群设置页维护准入、名片、消息规则与娱乐参数。
+
+Admin 演示原型页面已全部移除，学校作息和 QQ 群管理使用正式功能页面。groups 的 backend 装配与真实机器人验收仍待完成。
 
 账务管理包括退款审核与人工打款登记、按账号查询余额与明细、积分购买退款、奖励发放与撤销，以及渠道、积分方案和奖励规则配置。支付自动查询耗尽后订单进入 needs_review，由管理员登记结果或安排再次查询。
 
@@ -52,7 +60,7 @@ notifications 对完整收件人集合一次消费，全部通知、inbox 与修
 
 实际候选提交由 workspace.lock.json 固定，模块场景与测试函数登记在 architecture/modules.yaml。提供方的数据库验证使用隔离 PostgreSQL 与模块运行身份，正式 backend 依赖由 go.mod 固定。源码检查、客户端接入和真实环境验收分别记录。
 
-search 的 module.yaml 使用 DS-HEAT、DS-TRANSACTION、DS-PROJECTION 场景标识，已原样登记。工作区场景检查要求数字后缀，因此 search 的完整场景检查仍不通过，需提供方统一编号后同步登记。information-query、groups 与 notifications 的声明和场景引用核对通过。
+information-query、groups、search 与 notifications 的模块声明和场景引用核对通过。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.3.0 的 module.yaml 登记管理接口测试。
 
 下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/0285928a157e10ba5ba3f0013489f16f0397c696/README.md#事件-relay-与新查询模块) 对应。
 
