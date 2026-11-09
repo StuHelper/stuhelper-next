@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { test } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { goWorkspace, parseCommand, verifyWorkspaceScenarios, verifyScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
+import { goWorkspace, parseCommand, verifyWorkspaceScenarios, verifyScenarios, verifyClientScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
 
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -69,6 +69,27 @@ test('implemented scenarios reference an existing specification and executable t
   assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-06': ['plugin.test.mjs#missing test'] } }, directory), /Missing scenario test/);
   fs.writeFileSync(path.join(directory, 'module_test.go'), '');
   assert.throws(() => verifyScenarios(directory, definition, directory), /Missing scenario test/);
+});
+
+test('client manifests resolve TypeScript and browser tests against central specifications', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-client-scenarios-'));
+  t.after(() => fs.rmSync(directory, { recursive: true }));
+  fs.writeFileSync(path.join(directory, 'spec.md'), '| RES-CLIENT-01 | Retry original request |');
+  fs.writeFileSync(path.join(directory, 'api.test.ts'), "it('retries original request', async () => {});");
+  fs.writeFileSync(path.join(directory, 'purchase.spec.mjs'), 'memberTest("waits for delivery; then downloads", async () => {});');
+  const manifest = { id: 'web', scenario_tests: { 'RES-CLIENT-01': ['api.test.ts#retries original request', 'purchase.spec.mjs#waits for delivery; then downloads'] } };
+  const write = () => fs.writeFileSync(path.join(directory, 'module.json'), JSON.stringify(manifest));
+  const definition = { id: 'web', specifications: ['spec.md'] };
+  const client = { name: 'web', directory };
+  write();
+  verifyClientScenarios(directory, definition, client);
+  manifest.scenario_tests['RES-CLIENT-02'] = ['api.test.ts#retries original request'];
+  write();
+  assert.throws(() => verifyClientScenarios(directory, definition, client), /Unknown implemented scenario/);
+  delete manifest.scenario_tests['RES-CLIENT-02'];
+  manifest.scenario_tests['RES-CLIENT-01'] = ['purchase.spec.mjs#missing case'];
+  write();
+  assert.throws(() => verifyClientScenarios(directory, definition, client), /Missing scenario test/);
 });
 
 

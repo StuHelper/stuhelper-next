@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-10
 ---
 
 # 仓库检查与文档预览
@@ -52,3 +52,5 @@ pre-commit 检查暂存区快照，包括文件安全、脚本权限、语法和
 CI 保留 Markdown、元信息、链接和导航检查，不安装 MkDocs、不构建或部署文档站。专业 Python 工具可使用自己的标准库或明确依赖，不因此为文档引入 Python 工作区。
 
 公共组合工作流为场景检查显式传入 `--scope=platform,web,admin,catalog,reviews,moderation,storage,media,resources`，只检查该作业实际检出的提供方。省略 scope 时仍执行完整工作区场景检查，范围内缺失测试文件会失败。
+
+客户端场景由 Web/Admin 的 module.json 登记。contracts 按 architecture/modules.yaml 中的客户端规格列表核对编号，并检查对应 TypeScript 单元测试和 Playwright 测试的文件与名称。中央规格只定义行为，不复制客户端测试。

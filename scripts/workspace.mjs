@@ -111,11 +111,20 @@ export function verifyScenarios(directory, definition, checkout) {
         assert(/^Test[A-Za-z0-9_]+$/.test(name));
         assert(source.includes(`func ${name}(t *testing.T)`), `Missing scenario test: ${scenario}/${reference}`);
       } else {
-        assert(/\.test\.mjs$/.test(file) && /^[A-Za-z0-9 ,_-]+$/.test(name));
-        assert(source.includes(`test('${name}',`), `Missing scenario test: ${scenario}/${reference}`);
+        assert(/\.(?:test|spec)\.(?:mjs|[jt]sx?)$/.test(file) && name.length > 0);
+        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        assert(new RegExp(`\\b(?:test|it|memberTest)\\(\\s*(['"])${escaped}\\1\\s*,`).test(source), `Missing scenario test: ${scenario}/${reference}`);
       }
     }
   }
+}
+export function verifyClientScenarios(directory, definition, client) {
+  assert(definition, `Missing central application: ${client.name}`);
+  const manifest = readJSON(path.join(client.directory, 'module.json'));
+  assert.equal(manifest.id, definition.id);
+  assert(manifest.scenario_tests && Object.keys(manifest.scenario_tests).length, `Missing client scenarios: ${client.name}`);
+  // Clients own executable references; the workspace owns shared specification definitions.
+  verifyScenarios(directory, { ...definition, scenario_tests: manifest.scenario_tests }, client.directory);
 }
 export function verifyAcademicSource(provider, client, source, loadSource) {
   const module = provider.name;
@@ -168,7 +177,8 @@ export function verifyRuntimeDescriptor(definition, manifest) {
 
 export function contracts(directory = root, scope) {
   const records = projects(directory);
-  const definitions = readYaml(path.join(directory, 'architecture/modules.yaml')).modules;
+  const architecture = readYaml(path.join(directory, 'architecture/modules.yaml'));
+  const definitions = architecture.modules;
   const provider = records.find(project => project.name === 'platform');
   const descriptor = readYaml(path.join(provider.directory, 'module.yaml'));
   const definition = definitions.find(module => module.id === 'platform');
@@ -180,6 +190,7 @@ export function contracts(directory = root, scope) {
     verifyRuntimeDescriptor(definitions.find(d=>d.id===id), readYaml(path.join(project.directory,'module.yaml')));
   }
   for (const client of records.filter(project => project.tags.includes('frontend'))) {
+    if (!scope || scope.includes(client.name)) verifyClientScenarios(directory, architecture.applications.find(app => app.id === client.name), client);
     const source = readJSON(path.join(client.directory, 'contracts/platform.source.json'));
     verifySource(provider, client, source, (revision, filename) => providerSource(provider.directory, revision, filename));
     const prior = path.join(client.directory, 'contracts/platform.openapi.yaml');

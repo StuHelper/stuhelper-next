@@ -493,6 +493,10 @@ modules:
       content_access: verification
     api: 1
     capabilities:
+      - resources.unlock-eligibility
+      - resources.entitlements.consume
+      - resources.coverage.read
+      - resources.coverage.manage
       - resources.account-query
       - resources.read
       - resources.write
@@ -545,6 +549,7 @@ modules:
     required:
       - platform
     optional:
+      - resources
       - identity
     interface_owner: billing
     contract_status: implemented
@@ -555,9 +560,19 @@ modules:
     capabilities:
       - billing.account-query
       - billing.refund-payee-read
+      - billing.resource-price
+      - billing.resource-unlock
+      - billing.membership
+      - billing.manage
       - billing.wallet
       - billing.closure
     capability_requires:
+      billing.resource-unlock:
+        - resources
+        - identity
+      billing.membership:
+        - resources
+        - identity
       billing.wallet:
         - identity
       billing.closure:
@@ -934,6 +949,9 @@ applications:
       - docs/spec/resource-sharing.md
       - docs/spec/qq-group-services.md
       - docs/spec/personal-center.md
+      - docs/spec/wallet-and-points.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/my-courses.md
     scenario_tests:
       RS-25:
         - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
@@ -983,6 +1001,11 @@ applications:
       - docs/spec/storage-placement.md
       - docs/spec/storage-contribution.md
       - docs/spec/resource-sharing.md
+      - docs/spec/wallet-and-points.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/my-courses.md
+      - docs/spec/qq-group-services.md
+      - docs/spec/personal-center.md
     scenario_tests:
       RS-25:
         - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review

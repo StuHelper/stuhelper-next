@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-09
+updated: 2026-11-10
 ---
 
 # 全站信息关联查询
@@ -36,9 +36,9 @@ POST /api/v1/information-query/query 解析线索并返回分组记录，POST /a
 | verification | 身份、认证及学校范围内的历史凭据 |
 | profiles | 公开资料与 QQ 绑定，分别使用 profiles:profile: 和 profiles:qq: 记录前缀并保留来源 |
 | reviews | 账号关联的评价与讨论记录，匿名作者信息另行授权 |
-| resources | 资料与授权记录 |
+| resources | 资料、授权、购买来源和会员覆盖记录 |
 | groups | 入群申请、成员资格及群管理记录 |
-| billing | 账务、订单、退款记录及支付参考号 |
+| billing | 账务、资料订单与交付状态、会员期间及来源、退款记录与受独立权限保护的收款资料 |
 | catalog | 指定学校内本人的选课记录 |
 
 每个域先检查 `information-query.<domain>.read`，再由提供方独立检查业务能力和学校、群范围。普通成员和默认角色模板不自动获得这些能力。平台管理员及显式获授对应范围的管理员按当前授权查询。

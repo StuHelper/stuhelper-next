@@ -128,6 +128,7 @@ nav:
       - 检查与预览: guide/repository-checks.md
       - CI 操作: guide/ci-runners.md
       - SSO 候选解析: guide/sso-candidate.md
+      - 后端交易配置: guide/backend-commerce.md
       - 工具链与依赖维护: guide/dependency-maintenance.md
       - 写作模板: guide/TEMPLATE.md
   - 决策:
