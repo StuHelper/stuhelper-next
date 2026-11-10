@@ -1,7 +1,7 @@
 ---
 type: development
 status: InReview
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 存储模块实施状态
@@ -201,9 +201,7 @@ backend 已验证 media 配置入口、独立服务身份、上传至清理全�
 
 失效计数仅在供应商协议返回会话失效分类时增加，网络故障和普通权限拒绝不增加该计数。本轮平台授权截止时间尚未到达。原始响应未保留，因此精确令牌寿命和自然到期原因仍不确定；现有证据支持失效后的托管凭据重登恢复。
 
-当前草稿 PR 按 [BHpan #2](https://github.com/StuHelper/stuhelper-storage-bhpan/pull/2)、[Storage #1](https://github.com/StuHelper/stuhelper-storage/pull/1)、[Media #1](https://github.com/StuHelper/stuhelper-media/pull/1)、[Contribution #1](https://github.com/StuHelper/stuhelper-storage-contribution/pull/1)、[Backend #5](https://github.com/StuHelper/stuhelper-backend/pull/5)、[Web #9](https://github.com/StuHelper/stuhelper-web/pull/9)、[Admin #11](https://github.com/StuHelper/stuhelper-admin/pull/11)、[Next #8](https://github.com/StuHelper/stuhelper-next/pull/8) 顺序合并。源码依赖已固定，合并后须更新组合记录；当前未发行或部署。
-
-workspace.lock.json 固定 storage、storage-bhpan、media、storage-contribution、backend、web 与 admin 候选，其他模块保留已有组合。
+storage-bhpan、storage、media、storage-contribution、backend、web 与 admin 已发布，版本与提交见[后端实施状态](backend-decisions.md#发布版本)。backend 依赖固定为这些版本，当前尚未部署。
 
 backend 使用当前 storage 候选；Web/Admin 保留兼容的 storage d0f8661 与 contribution 822b6ff 契约快照。周期配置未改变 HTTP 契约、生成类型或浏览器 SDK，来源与摘要继续核验。
 

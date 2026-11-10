@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 业务规则与延期事项
@@ -52,7 +52,7 @@ updated: 2026-11-08
 | 昵称 | 最多 20 个 Unicode 码点，首次登录依次尝试 SSO 显示名和用户名，都不合规时由用户填写 | [个人中心](../spec/personal-center.md) |
 | 主页开关 | 学院、年级、署名评价、资料、学校和认证徽章都可关闭 | [个人中心](../spec/personal-center.md) |
 | 基础主页 | 游客可见，关联内容按各自权限显示 | [资格配置](../spec/action-eligibility.md) |
-| 开放平台范围 | 独立模块候选已实现、待合并；学生认证状态、学校、QQ、个人资料、课表、目录、公开评价分别审批和授权；目录与评价要求授权用户通过内容准入 | [开放平台](../spec/open-platform.md) |
+| 开放平台范围 | 独立模块已发布 v0.1.0，首次上线不启用；学生认证状态、学校、QQ、个人资料、课表、目录、公开评价分别审批和授权；目录与评价要求授权用户通过内容准入 | [开放平台](../spec/open-platform.md) |
 | 资料预览 | 与下载使用同一权限检查 | [资料共享](../spec/resource-sharing.md) |
 | 访问权 | 不新增申请或审批，按实际缺失条件提示；投诉入口独立，只要求登录 | [资料共享](../spec/resource-sharing.md) |
 | 受限资料购买 | 流程延期，不提供可执行的支付入口 | [资格配置](../spec/action-eligibility.md) |

@@ -1,14 +1,14 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # 后端候选实施状态
 
 ## 当前实现
 
-教师认证、内容准入、本人记录、资料访问、个人主页、注销、收藏与开放平台候选已实现、待合并。favorites 与 open-platform 为独立模块，各自拥有仓库、数据和接口。实际源码组合由 workspace.lock.json 记录，正式后端依赖由 backend/go.mod 固定。
+教师认证、内容准入、本人记录、资料访问、个人主页、注销、收藏与开放平台已实现并发布。favorites 与 open-platform 为独立模块，各自拥有仓库、数据和接口。发布提交由 workspace.lock.json 记录，正式后端依赖由 backend/go.mod 固定为下表版本。
 
 | 模块 | 当前能力 |
 | --- | --- |
@@ -29,6 +29,38 @@ updated: 2026-11-10
 | groups | 群准入、宽限期、豁免、群规则、消息与娱乐功能；backend 已装配本人查询、资格事件与维护任务，真实机器人未接入 |
 
 学校、认证徽章、学院、署名评价和资料默认公开，年级默认关闭。姓名显示末字，证件号显示首尾位，星号数量等于遮住的码点数。姓名少于 2 个码点或证件号少于 3 个码点时拒绝提交。
+
+## 发布版本
+
+各仓库的版本 tag 指向 main 上的合并提交，workspace.lock.json 记录相同提交。首次上线尚未部署，预发布与生产的运行版本由 stuhelper-ops 记录。
+
+| 仓库 | 版本 | 提交 |
+| --- | --- | --- |
+| platform | v0.2.0 | 1b232d4 |
+| web | v0.1.0 | ac138e5 |
+| admin | v0.1.0 | 567b073 |
+| verification | v0.1.0 | 5a1cd27 |
+| storage | v0.1.0 | 70d0785 |
+| media | v0.1.0 | 63928dd |
+| storage-contribution | v0.1.0 | 2437c26 |
+| billing | v0.1.0 | c40e84c |
+| backend | v0.1.0 | c77cb75 |
+| catalog | v0.1.0 | 55ba322 |
+| open-platform | v0.1.0 | 2d82043 |
+| favorites | v0.1.0 | 480ad90 |
+| reviews | v0.1.0 | 995e6d0 |
+| moderation | v0.1.0 | 3a64bf8 |
+| resources | v0.1.0 | 4bc9cc1 |
+| profiles | v0.1.0 | 83999a0 |
+| qq-binding | v0.1.0 | 20f61b5 |
+| notifications | v0.1.0 | e99fd52 |
+| information-query | v0.1.0 | 97f0030 |
+| search | v0.1.0 | ad20810 |
+| groups | v0.1.0 | 0538884 |
+| storage-bhpan | v0.1.0 | 669246c |
+| campus-adapters | v0.1.0 | 015ed5f |
+| ops | v0.1.1 | 20c5365 |
+| tooling | v0.1.4 | c93e2f0 |
 
 ## 客户端接入
 
@@ -82,11 +114,11 @@ verification、profiles、reviews、resources、groups、billing 已装配公开
 
 ## 验证与剩余工作
 
-实际候选提交由 workspace.lock.json 固定，模块场景与测试函数登记在 architecture/modules.yaml。提供方的数据库验证使用隔离 PostgreSQL 与模块运行身份，正式 backend 依赖由 go.mod 固定。源码检查、客户端接入和真实环境验收分别记录。
+发布提交由 workspace.lock.json 记录，模块场景与测试函数登记在 architecture/modules.yaml。提供方的数据库验证使用隔离 PostgreSQL 与模块运行身份，正式 backend 依赖由 go.mod 固定。源码检查、客户端接入和真实环境验收分别记录。
 
 groups、search 与 notifications 已登记模块场景。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.4.0 的 module.yaml 登记本人查询、管理接口与事件测试。
 
-下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/2f29f35b85c081765245335936af7f4e602bfe28/README.md#事件-relay-与新查询模块) 对应。
+下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/v0.1.0/README.md#事件-relay-与新查询模块) 对应。
 
 | 当前缺口 | 影响与剩余工作 |
 | --- | --- |
@@ -102,7 +134,7 @@ groups、search 与 notifications 已登记模块场景。search 使用 DS-01、
 
 ## 合并依赖
 
-先合入提供方，再将 backend 固定到可拉取的合并提交并验证正式组合。Web/Admin 完成契约与行为接入后验证公共应用组合。所有候选为草稿，合并、发行与部署另行授权。
+提供方先发布，backend 再把依赖固定为提供方版本并验证正式组合。Web 与 Admin 的契约来源记录提供方版本对应的提交。各仓库已合入 main 并创建版本 tag，部署另行授权。
 
 充值返回公开支付指引，只有提供方查询或验签回调确认成功才入账。取消先核实付款状态并关闭未付款支付单。开发环境提供模拟付款与失败入口，生产配置拒绝启用。
 
