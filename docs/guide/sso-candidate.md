@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # SSO 候选工具的位置

@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 重构定位与业务范围

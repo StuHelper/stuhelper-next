@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 前端审查处理

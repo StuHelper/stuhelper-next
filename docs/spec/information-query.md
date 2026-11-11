@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # 全站信息关联查询

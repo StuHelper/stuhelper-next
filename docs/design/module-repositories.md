@@ -1,7 +1,7 @@
 ---
 type: design
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 按模块划分仓库

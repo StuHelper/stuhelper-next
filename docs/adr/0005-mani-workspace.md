@@ -1,7 +1,7 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 0005：使用 Mani 管理开发工作区

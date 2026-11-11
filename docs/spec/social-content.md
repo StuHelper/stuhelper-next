@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Draft
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 社交与内容治理

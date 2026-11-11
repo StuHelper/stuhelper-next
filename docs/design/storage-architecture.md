@@ -1,7 +1,7 @@
 ---
 type: design
 status: InReview
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 通用文件与分布式存储

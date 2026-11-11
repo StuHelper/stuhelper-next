@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-09
+updated: 2026-11-11
 ---
 
 # 通知中心

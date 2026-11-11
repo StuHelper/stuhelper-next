@@ -1,7 +1,7 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 0002：按任务选择 CI runner

@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # 账户与交易的公共对接说明

@@ -1,7 +1,7 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 0004：按业务模块采用多仓库

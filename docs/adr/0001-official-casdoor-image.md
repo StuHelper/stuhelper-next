@@ -1,7 +1,7 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 0001：独立运行官方 Casdoor 镜像

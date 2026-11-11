@@ -1,4 +1,4 @@
-import { test,expect } from '../session-fixture.mjs';
+import { test,expect,administrator,mockCapabilities } from '../session-fixture.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 const admin=process.env.ADMIN_PATH||path.resolve('workspace/admin');
@@ -13,9 +13,11 @@ const entry={id:'review',root_id:'review',school_id:'school',input,author_handle
 const originalTask={id:'task',school_id:'school',submission:{object_id:'review',kind:'review',reason:'content_review',evidence:[]},object_revision:1,revision:1,state:'waiting',created_at:'2026-10-27T00:00:00Z',updated_at:'2026-10-27T00:00:00Z'};
 const fulfill=(route,value,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(value)});
 async function fixture(page){
+  await mockCapabilities(page);
   await page.route('**/api/v1/**',route=>{
     const u=new URL(route.request().url()),p=u.pathname;
-    if(p==='/api/v1/auth/session')return route.fallback();
+    if(p==='/api/v1/auth/session')return fulfill(route,administrator);
+    if(p==='/api/v1/system/capabilities')return route.fallback();
     if(p==='/api/v1/catalog/objects')return fulfill(route,{items:u.searchParams.get('kind')==='school'?[school]:u.searchParams.get('kind')==='course'?[course]:[],next:''});
     if(p==='/api/v1/catalog/objects/course/summary')return fulfill(route,{object:course,school,department:null,categories:[],natures:[],course_count:1,teacher_count:0,offering_count:0});
     if(p==='/api/v1/reviews/admin/entries')return fulfill(route,{items:[entry],next:''});
@@ -149,6 +151,8 @@ test('directory import requires a valid preview and sends its confirmation token
   await page.route('**/api/v1/catalog/imports/preview',route=>fulfill(route,{valid:true,code:'',preview_token:'snapshot-token',changes:[{id:'course',kind:'course',state:'new',fields:[]}]}));
   await page.route('**/api/v1/catalog/imports/confirm',route=>{confirmed=route.request().postDataJSON();return fulfill(route,{id:'import',objects:1,enrollments:0,preserved_corrections:0})});
   await page.goto(`${base}/catalog/imports?lang=${info.project.metadata.locale}`);
+  // School selection comes from the session; wait before choosing a school-bound file.
+  await expect(page.getByLabel(c.importFile,{exact:true})).toBeEnabled();
   await page.getByLabel(c.importFile,{exact:true}).setInputFiles({name:'directory.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(payload))});
   await expect(page.getByRole('button',{name:c.confirmImport,exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:c.previewImport,exact:true}).click();

@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # 动作资格配置

@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 学生认证的公共对接说明

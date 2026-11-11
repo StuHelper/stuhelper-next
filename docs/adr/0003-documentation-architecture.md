@@ -1,7 +1,7 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 0003：采用 project-docs-starter 文档架构

@@ -1,7 +1,7 @@
 ---
 type: development
 status: InReview
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # StuHelper Next 重写路线

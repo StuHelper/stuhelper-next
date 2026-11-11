@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-09
+updated: 2026-11-11
 ---
 
 # QQ 绑定、入群认证与群聊管理

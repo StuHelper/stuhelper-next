@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 收藏与收藏夹

@@ -1,7 +1,7 @@
 ---
 type: design
 status: InReview
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 原生多端设计

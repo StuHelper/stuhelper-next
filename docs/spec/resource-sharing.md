@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # 资料共享与访问权益

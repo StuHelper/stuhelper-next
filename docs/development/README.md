@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # 开发工作

@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-08
+updated: 2026-11-11
 ---
 
 # SSO 迁移进度与私有文档
