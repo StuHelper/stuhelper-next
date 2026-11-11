@@ -216,20 +216,24 @@ export function contracts(directory = root, scope) {
 
 export function snapshot(directory = root, write = false) {
   const record = { schema_version: 1, projects: {} };
+  const lockPath = path.join(directory, 'workspace.lock.json');
+  const locked = fs.existsSync(lockPath) ? readJSON(lockPath) : undefined;
   for (const project of projects(directory).filter(project => fs.existsSync(path.join(project.directory, '.git')))) {
     assert.equal(fs.realpathSync(git(project.directory, 'rev-parse', '--show-toplevel')), fs.realpathSync(project.directory));
     const canonical = url => url.replace(/^git@github\.com:/, 'https://github.com/').replace(/\.git$/, '').toLowerCase();
     assert.equal(canonical(git(project.directory, 'remote', 'get-url', 'origin')), canonical(project.url), `Unexpected origin: ${project.name}`);
     const dirty = Boolean(git(project.directory, 'status', '--porcelain'));
     assert(!write || !dirty, `Commit candidate changes before recording ${project.name}`);
-    record.projects[project.name] = { repository: project.url, revision: git(project.directory, 'rev-parse', 'HEAD'), dirty };
+    const revision = git(project.directory, 'rev-parse', 'HEAD');
+    const tag = locked?.projects?.[project.name]?.revision === revision && !dirty ? locked.projects[project.name].tag : undefined;
+    record.projects[project.name] = { repository: project.url, revision, dirty, ...(tag ? { tag } : {}) };
   }
   const rendered = `${JSON.stringify(record, null, 2)}\n`;
   if (write) fs.writeFileSync(path.join(directory, 'workspace.lock.json'), rendered);
   console.log(rendered);
   if (process.env.GITHUB_STEP_SUMMARY) {
-    const lines = Object.entries(record.projects).map(([name, value]) => `| ${name} | ${value.revision} | ${value.dirty} |`);
-    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Tested source combination\n\n| Repository | Commit | Dirty |\n| --- | --- | --- |\n${lines.join('\n')}\n`);
+    const lines = Object.entries(record.projects).map(([name, value]) => `| ${name} | ${value.tag || '—'} | ${value.revision} | ${value.dirty} |`);
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Tested source combination\n\n| Repository | Tag | Commit | Dirty |\n| --- | --- | --- | --- |\n${lines.join('\n')}\n`);
   }
   return record;
 }

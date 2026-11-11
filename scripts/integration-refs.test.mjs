@@ -19,7 +19,7 @@ test('ordinary integration uses develop and candidate PRs require explicit clean
 test('candidate summary preserves locked providers outside public integration and rejects unsafe records', () => {
   const snapshot = { schema_version: 1, projects: Object.fromEntries(['backend', 'web', 'search', 'qq-binding'].map((name, index) => [name, { repository: `https://github.com/StuHelper/stuhelper-${name}.git`, revision: String(index + 1).repeat(40), dirty: false }])) };
   const summary = lockedCandidateSummary(snapshot);
-  for (const [name, record] of Object.entries(snapshot.projects)) assert(summary.includes(`| ${name} | ${record.revision} |`));
+  for (const [name, record] of Object.entries(snapshot.projects)) assert(summary.includes(`| ${name} | — | ${record.revision} |`));
   assert(summary.includes('actually checked out and tested are listed separately'));
   assert.throws(() => lockedCandidateSummary({ schema_version: 1, projects: {} }));
   for (const change of [{ dirty: true }, { revision: 'develop' }, { repository: 'https://github.com/other/backend.git' }]) {
@@ -28,3 +28,13 @@ test('candidate summary preserves locked providers outside public integration an
     assert.throws(() => lockedCandidateSummary(invalid));
   }
 });
+
+ test('release integration pins every event to published commits and records tags', () => {
+  const projects = Object.fromEntries(['platform','web','admin','catalog','reviews','moderation','storage','media','resources'].map(name => [name,{repository:`https://github.com/StuHelper/stuhelper-${name}.git`,tag:name==='platform'?'v0.2.0':'v0.1.0',revision:'a'.repeat(40),dirty:false}]));
+  const snapshot={schema_version:1,release:'v0.1.0',projects};
+  for(const env of [{GITHUB_EVENT_NAME:'push',GITHUB_REF:'refs/heads/main'},{GITHUB_EVENT_NAME:'pull_request',GITHUB_HEAD_REF:'develop'},{GITHUB_EVENT_NAME:'workflow_dispatch'}]) assert.equal(integrationRefs(env,snapshot).web,projects.web.revision);
+  assert.equal(integrationRefs({WEB:'b'.repeat(40)},snapshot).web,'b'.repeat(40));
+  assert(lockedCandidateSummary(snapshot).includes(`| platform | v0.2.0 | ${projects.platform.revision} |`));
+  delete projects.web.tag;
+  assert.throws(()=>integrationRefs({},snapshot),/Missing release tag/);
+ });

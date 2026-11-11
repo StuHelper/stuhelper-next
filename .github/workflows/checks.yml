@@ -12,6 +12,6 @@ concurrency:
   cancel-in-progress: true
 jobs:
   check:
-    uses: StuHelper/stuhelper-tooling/.github/workflows/node-checks.yml@v0.1.0
+    uses: StuHelper/stuhelper-tooling/.github/workflows/node-checks.yml@v0.1.4
     with:
       name: Architecture checks

@@ -127,6 +127,13 @@ test('source records accept official checkout URLs but reject a different reposi
   fs.writeFileSync(path.join(checkout, 'source.txt'), 'source\n'); git('add', '.'); git('commit', '-qm', 'fixture');
   git('remote', 'add', 'origin', 'https://github.com/StuHelper/stuhelper-platform');
   assert.equal(snapshot(directory, true).projects.platform.revision, git('rev-parse', 'HEAD'));
+  const locked = JSON.parse(fs.readFileSync(path.join(directory, 'workspace.lock.json')));
+  locked.projects.platform.tag = 'v0.2.0';
+  fs.writeFileSync(path.join(directory, 'workspace.lock.json'), JSON.stringify(locked));
+  assert.equal(snapshot(directory).projects.platform.tag, 'v0.2.0');
+  locked.projects.platform.revision = 'b'.repeat(40);
+  fs.writeFileSync(path.join(directory, 'workspace.lock.json'), JSON.stringify(locked));
+  assert.equal(snapshot(directory).projects.platform.tag, undefined);
   git('remote', 'set-url', 'origin', 'git@github.com:StuHelper/stuhelper-platform.git');
   snapshot(directory, true);
   git('remote', 'set-url', 'origin', 'https://github.com/other/stuhelper-platform.git');

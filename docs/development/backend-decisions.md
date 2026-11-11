@@ -62,6 +62,12 @@ updated: 2026-11-11
 | ops | v0.1.1 | 20c5365 |
 | tooling | v0.1.4 | c93e2f0 |
 
+首次部署启用 platform、identity、profiles、verification、catalog、reviews、moderation、storage、storage-contribution、media、resources、search、favorites、notifications 及其事件 relay。
+
+billing、groups、qq-binding、open-platform、information-query 不启用，不配置价格或套餐。
+
+社区学校由配置指定，默认 4111010006。学校查询支持完整标识码、五位学校代码、名称与已登记别名。生产使用空库，旧评课与资料不迁移。
+
 ## 客户端接入
 
 Web 已接入收藏、QQ 三项绑定、账号与安全、个人资料、积分与 Ivory、授权应用、开放平台开发者页、OAuth 授权页和教师认证页。授权页要求 PKCE S256，用户逐项勾选后才可同意。钱包只展示服务端启用的充值渠道。
@@ -122,6 +128,10 @@ groups、search 与 notifications 已登记模块场景。search 使用 DS-01、
 
 | 当前缺口 | 影响与剩余工作 |
 | --- | --- |
+| verification 实名入口限流 | 学号未规范化会使同一学号的大小写形式分别计数；开放北航实名方法前须修复 |
+| storage 已知问题 | 配额刷新与上传扣减存在并发覆盖；删除收尾、共享暂存锁释放及暂停实例的在途写入仍需修复 |
+| resources 已知问题 | 发布结果不明后的媒体引用、任务租约代次、目录子项上限、幂等重放顺序和打包权限过滤仍需修复 |
+| backend 镜像发行 | v0.1.0 镜像工作流因 Registry 域名解析失败；当前部署制品使用固定源码本机构建，runner DNS 待处理 |
 | catalog 课表通知 | 封闭标题目录没有课表变更通知，relay 不发送该类通知；上课提醒尚未接入 |
 | catalog 跨账号查询 | 只支持指定学校内本人选课，线索解析到其他账号时返回 unavailable |
 | 认证操作目标 | 部分事件缺少可解析的 operation 引用，通知保留且目标显示 inaccessible |
@@ -130,7 +140,7 @@ groups、search 与 notifications 已登记模块场景。search 使用 DS-01、
 
 个人日程编辑、真实学校数据、真实 QQ 互联、机器人与支付流程仍待验收。
 
-公开主页限流采用各进程独立计数。真实账号、发行、部署与恢复演练未验收。
+公开主页限流采用各进程独立计数。源码版本已发布；真实账号、部署与恢复演练未验收。
 
 ## 合并依赖
 
