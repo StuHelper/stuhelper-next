@@ -2,7 +2,7 @@
 
 StuHelper 的重构工程，采用 Go 平台、Vue Web、stuhelper-admin 和按业务划分的独立仓库。Next 是过渡名称。Casdoor 使用官方发行版本，各业务通过 OIDC 和官方 API 接入。
 
-**当前阶段：核心校园业务已通过统一应用的隔离组合验收。** platform 提供应用框架，课程目录、评价、审核、存储、贡献和学习资料已有独立仓库实现。Web 与 stuhelper-admin 提供八语言页面，backend 装配各模块并使用独立数据库身份。
+**当前阶段：提供方、后端和客户端已发布首个正式源码组合，生产尚未部署。** platform 提供应用框架，课程目录、评价、审核、存储、贡献和学习资料已有独立仓库实现。Web 与 stuhelper-admin 提供八语言页面，backend 装配各模块并使用独立数据库身份。
 
 资料分类及字段由管理员配置，课程只引用统一分类。上传、审核、当前权限下载和目录打包已有候选实现。状态见[资料模块](docs/development/resources.md)、[存储模块](docs/development/storage-module.md)与[评课社区](docs/development/academic-community.md)。正式登录、学生资格和公开昵称已接入统一候选。真实外部账号与生产接入分别验收，结果见[框架状态](docs/development/framework-bootstrap.md#统一业务组合验收)。
 
@@ -33,14 +33,14 @@ pnpm run test:e2e
 
 根仓库 `make check` 独立检查架构、工具链清单、工作区配置、文档和 Actions。已检出模块的版本与锁文件由跨仓 `toolchains` 检查严格验证。运行 `make hooks` 启用 Lefthook 暂存区检查，本地可多次提交后批量推送，同一任务持续更新同一 PR。
 
-各代码仓库独立构建与检查，通用工具由 stuhelper-tooling 发行。公开应用联调使用 platform 示例与 Web/Admin，候选输入采用完整提交 SHA，并记录实际组合。私有 backend 按 go.mod 单独构建正式应用。
+各代码仓库独立构建与检查，通用工具由 stuhelper-tooling 发行。公开应用联调使用 platform 示例与 Web/Admin，发布组合由 workspace.lock.json 固定 tag 与完整提交 SHA，CI 记录锁定及实际测试组合。私有 backend 按 go.mod 单独构建正式应用。
 
 `mani.yaml` 统一登记模块仓库及主检出路径。公开与私有区分源码和文档的可见性，GitHub 管理仓库访问权限。任务工作树位于 `workspace/worktrees/<任务>/<仓库名>`，主检出位于 `workspace/<仓库名>`。
 
 ## 技术约定
 
-- 模块拥有自己的接口和数据，通过公开接口协作。必需依赖决定模块基础可用性，可选依赖通过能力级规则影响具体操作。
-- Casdoor 独立部署，保持既有 issuer、subject、用户标识和消费方绑定。
+- 模块拥有自己的接口和数据，通过公开接口协作。必需依赖用于判断模块基础可用性，可选依赖通过能力级规则影响具体操作。
+- Casdoor 独立部署，应用通过 issuer、subject 标识用户并保存消费方绑定。首次生产部署使用空库，旧评课与资料不迁移。
 - Web 和 stuhelper-admin 默认中文，提供八种界面语言。国际化检查覆盖消息键、插值、复数和区域格式，翻译质量由人工审阅，阿拉伯语使用 RTL 布局。
 - 普通 CI 默认使用 GitHub 托管 runner。Docker/OCI 与 BJ1 Registry 任务使用 StuHelper 自建 runner，版本和验证规则见 [runner 规格](docs/spec/ci-runners.md)。
 - 短期分支通过 PR squash 合入 develop。正式发行由 develop 向 main 合并，经负责人授权后创建版本 tag、镜像和生产晋级。

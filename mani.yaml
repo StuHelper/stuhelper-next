@@ -80,7 +80,9 @@ projects:
     url: https://github.com/StuHelper/stuhelper-billing.git
     branch: develop
     tags:
-      - documents
+      - backend
+      - code
+      - private
   ops:
     path: workspace/ops
     url: https://github.com/StuHelper/stuhelper-ops.git
@@ -106,6 +108,19 @@ projects:
   catalog:
     path: workspace/catalog
     url: https://github.com/StuHelper/stuhelper-catalog.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  open-platform:
+    path: workspace/open-platform
+    url: https://github.com/StuHelper/stuhelper-open-platform.git
+    branch: develop
+    tags: [ backend, code, public ]
+  favorites:
+    path: workspace/favorites
+    url: https://github.com/StuHelper/stuhelper-favorites.git
     branch: develop
     tags:
       - backend
@@ -143,6 +158,46 @@ projects:
       - backend
       - code
       - public
+  notifications:
+    path: workspace/notifications
+    url: https://github.com/StuHelper/stuhelper-notifications.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  information-query:
+    path: workspace/information-query
+    url: https://github.com/StuHelper/stuhelper-information-query.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  groups:
+    path: workspace/groups
+    url: https://github.com/StuHelper/stuhelper-groups.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  search:
+    path: workspace/search
+    url: https://github.com/StuHelper/stuhelper-search.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - public
+  qq-binding:
+    path: workspace/qq-binding
+    url: https://github.com/StuHelper/stuhelper-qq-binding.git
+    branch: develop
+    tags:
+      - backend
+      - code
+      - private
 specs:
   default:
     parallel: false

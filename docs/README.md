@@ -1,14 +1,14 @@
 ---
 type: index
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-11
 ---
 
 # StuHelper Next 文档
 
 StuHelper Next 是现有 StuHelper 的重构版本，Next 为过渡名称，未来以 StuHelper 名称继续维护。已确认保留的校园业务、身份规则和货币设计从[业务范围](design/business-scope.md)进入；采用独立官方 Casdoor SSO 与按业务模块划分的多仓库，当前只推进 Web 和 stuhelper-admin。
 
-学生认证、课程与导师评价、资料审核下载已有统一候选，并通过正式应用的隔离组合验收。真实外部账号、生产交付与迁移仍待验收，详见[框架状态](development/framework-bootstrap.md)。
+学生认证、课程与导师评价、资料审核下载已发布正式源码版本，并通过正式应用的隔离组合验收。真实外部账号、预发布更新和生产交付仍待验收，详见[框架状态](development/framework-bootstrap.md)。
 
 本项目按 [project-docs-starter](https://github.com/lihaotong0712/project-docs-starter/tree/1c4c6bb1bd401b803ea986b404932926cfc95eb0) 的五类文档架构组织资料。写作规则见[文档维护约定](authoring.md)。
 
@@ -18,6 +18,8 @@ StuHelper Next 是现有 StuHelper 的重构版本，Next 为过渡名称，未�
 | spec | 查询预期行为、边界与验收场景 | [功能与模块规格](spec/README.md) |
 | development | 查看调研依据、工作计划、进度和实际验证 | [开发工作](development/README.md) |
 | guide | 执行已有工具、检查或维护任务 | [操作指南](guide/README.md) |
-| adr | 追溯重要决定及取舍 | [决策记录](adr/README.md) |
+| adr | 说明架构选择及取舍 | [决策记录](adr/README.md) |
 
 首次阅读从项目设计进入；继续实施从开发工作进入。文档的 `Accepted` 表示其声明范围已确认，功能是否实现和验证须查看对应开发记录。
+
+课程、教师和资料收藏的归属、收藏夹规则与旧记录迁移见[收藏规格](spec/favorites.md)。

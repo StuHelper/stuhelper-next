@@ -81,10 +81,12 @@ nav:
       - 学生认证与实名: spec/student-verification.md
       - 资料与访问权益: spec/resource-sharing.md
       - 积分与 Ivory 余额: spec/wallet-and-points.md
+      - 收藏与收藏夹: spec/favorites.md
       - 个人中心: spec/personal-center.md
       - 通知中心: spec/notifications.md
       - 我的课程与课表: spec/my-courses.md
       - QQ 入群与群管理: spec/qq-group-services.md
+      - QQ 三项独立绑定: spec/qq-binding.md
       - 第三方开放平台: spec/open-platform.md
       - 存储贡献: spec/storage-contribution.md
       - 存储放置与恢复: spec/storage-placement.md
@@ -108,6 +110,8 @@ nav:
       - 工作导航: development/README.md
       - 项目重写路线: development/rewrite-roadmap.md
       - 框架状态: development/framework-bootstrap.md
+      - 前端审查处理: development/frontend-review.md
+      - 业务决定后端实施: development/backend-decisions.md
       - 存储模块实施准备: development/storage-module.md
       - 课程与评课社区: development/academic-community.md
       - 学习资料实施: development/resources.md
@@ -115,6 +119,8 @@ nav:
       - 旧业务整理与确认: development/business-design-extraction.md
       - 旧业务迁移覆盖: development/business-migration-coverage.md
       - 确认结果与延期事项: development/business-decisions.md
+      - 业务决定的后端实施: development/backend-decisions.md
+      - 前端审查处理: development/frontend-review.md
       - 写作模板: development/TEMPLATE.md
   - 指南:
       - 操作导航: guide/README.md
@@ -122,6 +128,7 @@ nav:
       - 检查与预览: guide/repository-checks.md
       - CI 操作: guide/ci-runners.md
       - SSO 候选解析: guide/sso-candidate.md
+      - 后端交易配置: guide/backend-commerce.md
       - 工具链与依赖维护: guide/dependency-maintenance.md
       - 写作模板: guide/TEMPLATE.md
   - 决策:

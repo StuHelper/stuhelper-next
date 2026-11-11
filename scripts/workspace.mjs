@@ -100,17 +100,31 @@ export function verifySource(provider, client, source, loadSource) {
 export function verifyScenarios(directory, definition, checkout) {
   const specs = definition.specifications.map(file => fs.readFileSync(path.join(directory, file), 'utf8')).join('\n');
   for (const [scenario, tests] of Object.entries(definition.scenario_tests ?? {})) {
-    assert(/^[A-Z]+-\d+$/.test(scenario), `Invalid scenario: ${scenario}`);
+    assert(/^[A-Z]+(?:-[A-Z]+)*-\d+$/.test(scenario), `Invalid scenario: ${scenario}`);
     assert(new RegExp(`\\|\\s*${scenario}\\s*(?:\\||：|:)`).test(specs), `Unknown implemented scenario: ${scenario}`);
     assert(tests.length, `No tests for implemented scenario: ${scenario}`);
     for (const reference of tests) {
       const [file, name] = reference.split('#');
-      assert(!path.isAbsolute(file) && !file.split('/').includes('..') && /_test\.go$/.test(file));
-      assert(/^Test[A-Za-z0-9_]+$/.test(name));
+      assert(!path.isAbsolute(file) && !file.split('/').includes('..'));
       const source = fs.readFileSync(path.join(checkout, file), 'utf8');
-      assert(source.includes(`func ${name}(t *testing.T)`), `Missing scenario test: ${scenario}/${reference}`);
+      if (/_test\.go$/.test(file)) {
+        assert(/^Test[A-Za-z0-9_]+$/.test(name));
+        assert(source.includes(`func ${name}(t *testing.T)`), `Missing scenario test: ${scenario}/${reference}`);
+      } else {
+        assert(/\.(?:test|spec)\.(?:mjs|[jt]sx?)$/.test(file) && name.length > 0);
+        const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        assert(new RegExp(`\\b(?:test|it|memberTest)\\(\\s*(['"])${escaped}\\1\\s*,`).test(source), `Missing scenario test: ${scenario}/${reference}`);
+      }
     }
   }
+}
+export function verifyClientScenarios(directory, definition, client) {
+  assert(definition, `Missing central application: ${client.name}`);
+  const manifest = readJSON(path.join(client.directory, 'module.json'));
+  assert.equal(manifest.id, definition.id);
+  assert(manifest.scenario_tests && Object.keys(manifest.scenario_tests).length, `Missing client scenarios: ${client.name}`);
+  // Clients own executable references; the workspace owns shared specification definitions.
+  verifyScenarios(directory, { ...definition, scenario_tests: manifest.scenario_tests }, client.directory);
 }
 export function verifyAcademicSource(provider, client, source, loadSource) {
   const module = provider.name;
@@ -149,15 +163,34 @@ export function verifyWorkspaceScenarios(directory, definitions, records, scope)
   }
 }
 
+export function verifyRuntimeDescriptor(definition, manifest) {
+  assert.equal(manifest.kind, 'module', `Expected runtime module: ${definition.id}`);
+  assert.equal(manifest.id, definition.id);
+  assert.equal(manifest.api, definition.api);
+  const dependencies = value => (value ?? []).map(v => typeof v === 'string' ? { id: v, api: 1 } : v).sort((a,b)=>a.id.localeCompare(b.id));
+  assert.deepEqual(dependencies(manifest.requires), dependencies(definition.required), `Required dependencies differ: ${definition.id}`);
+  assert.deepEqual(dependencies(manifest.optional), dependencies(definition.optional), `Optional dependencies differ: ${definition.id}`);
+  assert.deepEqual([...(manifest.capabilities??[])].sort(), [...(definition.capabilities??[])].sort(), `Capabilities differ: ${definition.id}`);
+  const capabilities = value => Object.fromEntries(Object.entries(value??{}).sort(([a],[b])=>a.localeCompare(b)).map(([key,deps])=>[key,dependencies(deps)]));
+  assert.deepEqual(capabilities(manifest.capability_requires), capabilities(definition.capability_requires), `Capability dependencies differ: ${definition.id}`);
+}
+
 export function contracts(directory = root, scope) {
   const records = projects(directory);
-  const definitions = readYaml(path.join(directory, 'architecture/modules.yaml')).modules;
+  const architecture = readYaml(path.join(directory, 'architecture/modules.yaml'));
+  const definitions = architecture.modules;
   const provider = records.find(project => project.name === 'platform');
   const descriptor = readYaml(path.join(provider.directory, 'module.yaml'));
   const definition = definitions.find(module => module.id === 'platform');
   for (const key of ['id', 'api', 'capabilities', 'critical']) assert.deepEqual(descriptor[key], definition[key]);
   verifyWorkspaceScenarios(directory, definitions, records, scope);
+  for (const id of ['catalog','reviews','moderation','verification','profiles','billing','favorites','open-platform','resources']) {
+    const project=records.find(p=>p.name===id);
+    if (!project || scope && !scope.includes(id)) continue;
+    verifyRuntimeDescriptor(definitions.find(d=>d.id===id), readYaml(path.join(project.directory,'module.yaml')));
+  }
   for (const client of records.filter(project => project.tags.includes('frontend'))) {
+    if (!scope || scope.includes(client.name)) verifyClientScenarios(directory, architecture.applications.find(app => app.id === client.name), client);
     const source = readJSON(path.join(client.directory, 'contracts/platform.source.json'));
     verifySource(provider, client, source, (revision, filename) => providerSource(provider.directory, revision, filename));
     const prior = path.join(client.directory, 'contracts/platform.openapi.yaml');
@@ -183,20 +216,24 @@ export function contracts(directory = root, scope) {
 
 export function snapshot(directory = root, write = false) {
   const record = { schema_version: 1, projects: {} };
+  const lockPath = path.join(directory, 'workspace.lock.json');
+  const locked = fs.existsSync(lockPath) ? readJSON(lockPath) : undefined;
   for (const project of projects(directory).filter(project => fs.existsSync(path.join(project.directory, '.git')))) {
     assert.equal(fs.realpathSync(git(project.directory, 'rev-parse', '--show-toplevel')), fs.realpathSync(project.directory));
     const canonical = url => url.replace(/^git@github\.com:/, 'https://github.com/').replace(/\.git$/, '').toLowerCase();
     assert.equal(canonical(git(project.directory, 'remote', 'get-url', 'origin')), canonical(project.url), `Unexpected origin: ${project.name}`);
     const dirty = Boolean(git(project.directory, 'status', '--porcelain'));
     assert(!write || !dirty, `Commit candidate changes before recording ${project.name}`);
-    record.projects[project.name] = { repository: project.url, revision: git(project.directory, 'rev-parse', 'HEAD'), dirty };
+    const revision = git(project.directory, 'rev-parse', 'HEAD');
+    const tag = locked?.projects?.[project.name]?.revision === revision && !dirty ? locked.projects[project.name].tag : undefined;
+    record.projects[project.name] = { repository: project.url, revision, dirty, ...(tag ? { tag } : {}) };
   }
   const rendered = `${JSON.stringify(record, null, 2)}\n`;
   if (write) fs.writeFileSync(path.join(directory, 'workspace.lock.json'), rendered);
   console.log(rendered);
   if (process.env.GITHUB_STEP_SUMMARY) {
-    const lines = Object.entries(record.projects).map(([name, value]) => `| ${name} | ${value.revision} | ${value.dirty} |`);
-    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Tested source combination\n\n| Repository | Commit | Dirty |\n| --- | --- | --- |\n${lines.join('\n')}\n`);
+    const lines = Object.entries(record.projects).map(([name, value]) => `| ${name} | ${value.tag || '—'} | ${value.revision} | ${value.dirty} |`);
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Tested source combination\n\n| Repository | Tag | Commit | Dirty |\n| --- | --- | --- | --- |\n${lines.join('\n')}\n`);
   }
   return record;
 }

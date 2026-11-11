@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-10-29
+updated: 2026-11-11
 ---
 
 # CI 与 runner 约定
@@ -71,3 +71,9 @@ Actions 使用明确版本 tag。共享 action 提供 Node、pnpm 与校验 chec
 | CI-14 | hook 只检查暂存快照，失败和中断不改动索引 |
 | CI-15 | 子命令非零退出码保留到检查结果 |
 | CI-16 | Registry 验证只使用 Next 应用命名空间的唯一临时 tag，核验 manifest digest 后清理本次制品 |
+
+## PostgreSQL 检查版本
+
+，开发与 CI 使用软件源当前提供的最新稳定 PostgreSQL，不固定 18.6 或某个发行包修订。安装 postgresql 与 postgresql-client 元包，检查脚本从已安装元包解析实际主版本，并输出服务器版本。预发布版本不自动纳入普通检查。
+
+本地可以通过 STUHELPER_TEST_PG_BIN 指定任务专用工具目录。测试仍使用独立数据库、运行身份和可清理资源。生产部署按实际验收后的明确镜像版本维护，开发依赖更新不触发生产升级。

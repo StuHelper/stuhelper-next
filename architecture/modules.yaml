@@ -16,16 +16,12 @@ modules:
       - docs/spec/action-eligibility.md
       - docs/spec/data-retention.md
     scenario_tests:
-      MOD-06:
-        - module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness
-      MOD-07:
-        - module/remote_test.go#TestRemoteDegradedStartupRecoveryAndBoundedProbes
-        - module/remote_test.go#TestRemoteSlowStartupBudget
-      MOD-08:
-        - module/remote_test.go#TestRemoteCredentialRotationAndMissingConfiguration
-        - module/remote_test.go#TestRemoteDegradedStartupRecoveryAndBoundedProbes
-      MOD-09:
-        - module/module_test.go#TestOptionalCapabilitiesAndCriticalReadiness
+      PLAT-CONFIG-01:
+        - postgres/integration_test.go#TestConfigurationConcurrencyReplayRollbackAndRetention
+        - eligibility/cache_test.go#TestRuleCacheExpiryInvalidationAndFailure
+        - eligibility/cache_test.go#TestRuleCacheDoesNotReinsertInvalidatedInFlightRead
+      PLAT-HISTORY-01:
+        - postgres/integration_test.go#TestInstallationFactsAreDurableMonotoneAndUnknownFailsClosed
     api: 1
     capabilities:
       - platform.status
@@ -44,6 +40,7 @@ modules:
     contract_status: implemented
     specifications:
       - docs/spec/sso-compatibility.md
+      - docs/spec/qq-binding.md
     in_application: backend
     api: 1
     capabilities:
@@ -56,6 +53,9 @@ modules:
         - internal/sessionapp/session_test.go#TestSessionIsolationEncryptionAllDeviceLogoutAndUnavailableProvider
       SSO-03:
         - internal/sessionapp/session_test.go#TestSessionDatabaseIsolationAndMigrationPreserveActiveSessions
+      QQB-04:
+        - internal/qqbindingapp/assembly_test.go#TestQQBindingAssemblyOAuthBotsFactsAndClosure
+        - internal/qqbindingapp/assembly_test.go#TestQQBindingConfigRejectsUnknownFieldsAndPublicFiles
   - id: profiles
     repository: StuHelper/stuhelper-profiles
     visibility: public
@@ -65,17 +65,39 @@ modules:
     optional:
       - identity
       - media
+      - verification
+      - billing
+      - reviews
+      - resources
+      - open-platform
+      - qq-binding
     interface_owner: profiles
     contract_status: implemented
     specifications:
       - docs/spec/personal-center.md
     api: 1
     capabilities:
+      - profiles.information-query
+      - profiles.group-card.read
       - profiles.manage
-    capability_requires: {}
+      - profiles.public
+    capability_requires:
+      profiles.manage:
+        - identity
     scenario_tests:
       PC-08:
         - integration_test.go#TestProfileOwnershipReplayConcurrentRevisionAndRuntimeRole
+      PC-05:
+        - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
+      PC-10:
+        - public_test.go#TestPublicProfileDefaultsUnicodeCompletionAndVisibility
+      PC-07:
+        - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
+      PC-09:
+        - closure_test.go#TestClosureCoolingCancellationSettlementFailureAndConcurrentRecovery
+      PC-12:
+        - capability_test.go#TestGroupCardCapabilityRegistration
+        - group_card_test.go#TestGroupCardConsentAuthorizationAndTransaction
   - id: campus-adapters
     repository: StuHelper/stuhelper-campus-adapters
     visibility: private
@@ -130,17 +152,47 @@ modules:
     optional:
       - identity
       - campus-adapters
+      - catalog
     interface_owner: verification
     contract_status: implemented
     specifications:
       - docs/spec/student-verification.md
+      - docs/spec/personal-center.md
     api: 1
     capabilities:
+      - verification.information-query
+      - verification.information-identity
+      - verification.information-resolve
+      - verification.information-document
+      - verification.information-material
+      - verification.group-card.read
       - verification.read
       - verification.write
       - verification.admin
       - verification.capture
-    capability_requires: {}
+    capability_requires:
+      verification.read:
+        - identity
+      verification.write:
+        - identity
+      verification.admin:
+        - identity
+    scenario_tests:
+      PC-11:
+        - identity_mask_test.go#TestOwnIdentityMasksComeFromVerifiedDataAndNeverLeakThroughFacts
+        - identity_mask_test.go#TestShortIdentityValuesAndMissingMaskEvidenceAreRejected
+      PC-05:
+        - public_profile_test.go#TestPublicProfileFactsOnlyExposeSelectedCurrentAcademicFields
+        - public_profile_test.go#TestPublicProfileUsesCollegeNameWithoutGuessingMissingGrade
+      SV-TEACHER-01:
+        - teachers_test.go#TestTeacherApplicationReviewBindingAndDisclosureConsent
+      SV-TEACHER-02:
+        - teachers_test.go#TestTeacherApprovalConcurrencyUniqueBindingAndRollback
+        - teachers_test.go#TestTeacherMultipleBindingsFollowCatalogMergeAndRejectOwnershipConflict
+      SV-TEACHER-03:
+        - teachers_test.go#TestTeacherApprovalFailureExpiryAndSelfReview
+      SV-TEACHER-04:
+        - teachers_test.go#TestTeacherSchemaPreservesStudentDataAndRuntimeIsolation
   - id: catalog
     repository: StuHelper/stuhelper-catalog
     visibility: public
@@ -149,24 +201,37 @@ modules:
       - platform
     optional:
       - campus-adapters
+      - verification
+      - identity
     interface_owner: catalog
     contract_status: implemented
     specifications:
       - docs/spec/catalog-operations.md
       - docs/spec/my-courses.md
       - docs/spec/academic-content.md
+      - docs/spec/action-eligibility.md
     api: 1
     capabilities:
       - catalog.read
       - catalog.import
       - catalog.enrollments
-    capability_requires: {}
+      - catalog.maintain
+    capability_requires:
+      catalog.read:
+        - identity
+      catalog.import:
+        - identity
+      catalog.enrollments:
+        - identity
+      catalog.maintain:
+        - identity
     scenario_tests:
       CO-02:
         - integration_test.go#TestImportRelationsClassificationAndMissingCredits
       CO-04:
         - integration_test.go#TestImportIdempotencyConcurrencyAndRollback
       CO-05:
+        - schedule_test.go#TestOwnedScheduleReadsOnlyCurrentEnrollmentMeetings
         - integration_test.go#TestCourseTeacherJoinsAndEnrollmentAssignments
       CO-07:
         - integration_test.go#TestSchoolScopePublicProjectionAndBoundedHTTP
@@ -185,35 +250,60 @@ modules:
         - operations_test.go#TestMergeKeepsOldLinksOfferingsAndEnrollmentsAndSupportsDeactivation
       CO-10:
         - operations_test.go#TestImportPreviewRollsBackAndRejectsChangedConfirmation
+      AE-ACCESS-05:
+        - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
+        - references_test.go#TestOwnEnrollmentNamesSurviveAdmissionExpiryWithoutPublicDetails
+      AE-ACCESS-06:
+        - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
+      AE-ACCESS-07:
+        - content_test.go#TestContentReadAdmissionCoversEveryHTTPReadAndPreservesOwnEnrollment
+    eligibility_facts:
+      content_access: verification
   - id: moderation
     repository: StuHelper/stuhelper-moderation
     visibility: public
     implementation: in-progress
     required:
       - platform
-    optional: []
+    optional:
+      - verification
+      - identity
     interface_owner: moderation
     contract_status: implemented
     specifications:
       - docs/spec/content-management.md
+      - docs/spec/academic-content.md
+      - docs/spec/action-eligibility.md
+    eligibility_facts:
+      content_access: verification
     api: 1
     capabilities:
       - moderation.tasks
-    capability_requires: {}
+    capability_requires:
+      moderation.tasks:
+        - identity
     scenario_tests:
       CM-01:
+        - complaints_test.go#TestResourceComplaintPortDeduplicatesRetriesAndRejectsPublicBypass
         - integration_test.go#TestPendingReportMergesEvidenceAndAuthorRequestsAreScoped
       CM-02:
         - integration_test.go#TestDecisionDeliveryRecoversUnknownResultAndRejectsStaleRevision
       CM-05:
         - integration_test.go#TestPolicyScopeReplayAndPrivateDecisionProjection
         - policies_test.go#TestEffectivePolicyAndAdminInitiatedReviewAreScoped
+        - policies_test.go#TestResourcePolicyDefaultsToReviewAndUsesScopedQueue
       CM-10:
         - operations_test.go#TestAppealRequiresContentOwnerAndAnotherReviewer
+        - contract_test.go#TestGeneratedAppealSubmissionPreservesRequestFields
       CM-12:
         - operations_test.go#TestBatchPreviewAndRetryPreservePerItemResults
       CM-13:
         - operations_test.go#TestAffectedAuthorSeesDecisionWithoutReportersPrivateEvidence
+      ACAD-15:
+        - report_test.go#TestNewReportsRequireAdmissionButOwnPendingEvidenceRemainsAvailable
+        - report_test.go#TestPendingEvidenceCannotOverwriteConcurrentDecision
+      CM-15:
+        - complaints_test.go#TestComplaintRateLimitIsPerAccountAndReplayDoesNotConsumeQuota
   - id: media
     repository: StuHelper/stuhelper-media
     visibility: public
@@ -245,6 +335,38 @@ modules:
     contract_status: library
     specifications:
       - docs/spec/storage-contribution.md
+  - id: favorites
+    repository: StuHelper/stuhelper-favorites
+    visibility: public
+    implementation: in-progress
+    required:
+      - platform
+      - catalog
+    optional:
+      - resources
+      - identity
+      - verification
+    interface_owner: favorites
+    contract_status: implemented
+    specifications:
+      - docs/spec/favorites.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
+    eligibility_facts:
+      content_access: verification
+    api: 1
+    capabilities:
+      - favorites.manage
+    capability_requires:
+      favorites.manage:
+        - identity
+    scenario_tests:
+      FAV-01:
+        - integration_test.go#TestFavoritesOwnershipFoldersAdmissionAndConcurrentReplay
+      FAV-02:
+        - target_filter_test.go#TestFavoritesTargetFilterOwnershipValidationAndPagination
+      PC-07:
+        - closure_test.go#TestClosureDeletesCollectionsAtomicallyAndPreventsResurrection
   - id: reviews
     repository: StuHelper/stuhelper-reviews
     visibility: public
@@ -254,6 +376,7 @@ modules:
       - catalog
       - moderation
     optional:
+      - favorites
       - profiles
       - verification
       - identity
@@ -262,19 +385,31 @@ modules:
     specifications:
       - docs/spec/academic-content.md
       - docs/spec/content-management.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
       identity_verified: verification
       course_enrollment: catalog
+      content_access: verification
     api: 1
     capabilities:
+      - reviews.account-query
+      - reviews.anonymous-author-read
       - reviews.read
       - reviews.write
-    capability_requires: {}
+      - reviews.moderate
+    capability_requires:
+      reviews.read:
+        - identity
+      reviews.write:
+        - identity
+      reviews.moderate:
+        - identity
     scenario_tests:
       ACAD-04:
-        - integration_test.go#TestAnonymousPreviewAndCurrentAccessCannotLeakIdentity
+        - integration_test.go#TestContentAdmissionAndCurrentAccessCannotLeakIdentity
       ACAD-05:
         - integration_test.go#TestCourseTermEligibilityAndImmutableTeacherAttribution
       ACAD-13:
@@ -311,10 +446,27 @@ modules:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
       ACAD-40:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+        - presentation_test.go#TestPresentationHTTPPreservesRatingTexts
       CM-09:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
       CM-14:
         - management_test.go#TestPresentationConfigAndAttributionChangesAreScopedAndVersioned
+      AE-ACCESS-05:
+        - own_references_test.go#TestOwnNamesAndValidatedDraftAssociationsSurviveAdmissionExpiry
+        - own_references_test.go#TestOwnReferenceHTTPDoesNotOpenPublicContent
+        - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
+        - content_security_regression_test.go#TestVoteReceiptsDoNotExposeTargetContentAfterAdmissionExpires
+      AE-ACCESS-07:
+        - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
+        - content_test.go#TestContentListsStatisticsAndComposerRespectServedSchool
+      ACAD-16:
+        - content_test.go#TestContentHTTPReadAdmissionAndOwnRecordException
+      ACAD-15:
+        - interaction_test.go#TestExpiredAdmissionAllowsOnlyOwnVoteRemoval
+      PC-07:
+        - closure_test.go#TestClosureRetainsAnonymousVotes
+        - closure_test.go#TestClosedOwnerKeepsContentWithoutProfileOrDisclosures
+        - closure_test.go#TestClosureRejectsPublicationAlreadyWaitingForExternalModeration
   - id: resources
     repository: StuHelper/stuhelper-resources
     visibility: public
@@ -332,16 +484,30 @@ modules:
     contract_status: implemented
     specifications:
       - docs/spec/resource-sharing.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/personal-center.md
     eligibility_facts:
       campus_eligibility: verification
       phone_bound: identity
       identity_verified: verification
+      content_access: verification
     api: 1
     capabilities:
+      - resources.unlock-eligibility
+      - resources.entitlements.consume
+      - resources.coverage.read
+      - resources.coverage.manage
+      - resources.account-query
       - resources.read
       - resources.write
       - resources.manage
-    capability_requires: {}
+    capability_requires:
+      resources.read:
+        - identity
+      resources.write:
+        - identity
+      resources.manage:
+        - identity
     scenario_tests:
       RS-01:
         - integration_test.go#TestOriginConsentAndRequestsUseOutbox
@@ -365,20 +531,69 @@ modules:
         - integration_test.go#TestDeniedInputsDoNotReachDependencies
       RS-23:
         - integration_test.go#TestReviewInspectionIsScopedAndGrantListsIdentifySubjects
+      RS-26:
+        - file_access_test.go#TestPreviewAndDownloadShareCurrentRightsAndExactMissingConditions
       RS-24:
         - http_test.go#TestReceiptHTTPStatesMatchGeneratedContract
+        - references_test.go#TestComplaintTitleSnapshotRequiresAdmissionAtSubmission
+      AE-ACCESS-05:
+        - references_test.go#TestOwnResourceNamesRequireUploadOwnershipAndKeepContentPrivate
+      AE-ACCESS-07:
+        - integration_test.go#TestCategoryReadsRequireContentAdmissionAndKeepScopedAdministration
+      PC-07:
+        - closure_test.go#TestClosedUploaderKeepsFilesAndCopyrightWithoutPublicAccountLink
   - id: billing
     repository: StuHelper/stuhelper-billing
     visibility: private
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
+      - resources
       - identity
     interface_owner: billing
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/wallet-and-points.md
+      - docs/spec/personal-center.md
+    api: 1
+    capabilities:
+      - billing.account-query
+      - billing.refund-payee-read
+      - billing.resource-price
+      - billing.resource-unlock
+      - billing.membership
+      - billing.manage
+      - billing.wallet
+      - billing.closure
+    capability_requires:
+      billing.resource-unlock:
+        - resources
+        - identity
+      billing.membership:
+        - resources
+        - identity
+      billing.wallet:
+        - identity
+      billing.closure:
+        - identity
+    scenario_tests:
+      WP-18:
+        - closure_test.go#TestClosureClearanceRequiresKnownAssetsAndReconcilesUnknownSettlement
+      WP-19:
+        - wallet_test.go#TestTopupCallbackConcurrencyIsolationAndAtomicRollback
+        - wallet_test.go#TestReconcileAdvancesPastUnresolvedPayments
+      WP-20:
+        - wallet_test.go#TestRefundFreezeUnknownResultFailureAndManualProgress
+      WP-21:
+        - wallet_test.go#TestRewardHistoryExpiryRevocationDebtAndDuplicateEvents
+      WP-22:
+        - wallet_test.go#TestPurchaseFIFORoundingConcurrentReplayAndRefundCaps
+        - wallet_test.go#TestExpiredPurchaseRefundIncludesUnusedPointsWithoutDoubleDebit
+      WP-23:
+        - wallet_test.go#TestWalletClosureFreezesCreditsAndRoutesEnforceActor
+      WP-24:
+        - admin_reads_test.go#TestAdminReadsPermissionsPaginationEmptyAndAudit
   - id: community
     repository: StuHelper/stuhelper-community
     visibility: public
@@ -399,25 +614,87 @@ modules:
   - id: groups
     repository: StuHelper/stuhelper-groups
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - profiles
       - verification
       - moderation
+      - qq-binding
     interface_owner: groups
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/qq-group-services.md
       - docs/spec/bot-entertainment.md
+    api: 1
+    capabilities:
+      - groups.account-query
+      - groups.read
+      - groups.manage
+      - groups.configure
+      - groups.messages.read
+      - groups.messages.send
+      - groups.messages.recall
+    capability_requires: {}
+    scenario_tests:
+      QQ-01:
+        - my_groups_test.go#TestMyGroupsOwnIsolationPaginationAndReadOnly
+        - my_groups_test.go#TestMyGroupsGeneratedClientAndRouteReservation
+        - delivery_membership_test.go#TestGroupsForOwnerPaginationAndBounds
+        - api_v03_test.go#TestGroupSummaryCountsMaskingAndScope
+        - api_v03_test.go#TestConfigurationRevisionPasswordAndReplay
+        - api_v03_test.go#TestCandidateMigrationToFinalContractAndLeaseRecovery
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-02:
+        - my_groups_test.go#TestMyGroupsMissingConditionsAndUnknownFacts
+        - my_groups_test.go#TestMyGroupsDependencyFailureReturnsNoPartialPage
+        - my_groups_test.go#TestMyGroupsPasswordRestrictionAndPublicProjection
+        - facts_test.go#TestGroupFactsRejectsUnknownContradictoryAndFailedFacts
+        - integration_test.go#TestPasswordDoesNotGrantStudentEligibilityAndBlacklistScope
+      QQ-03:
+        - qq_binding_event_test.go#TestQQBindingActualEnvelopeRecomputeReplayAndOldRevision
+        - qq_binding_event_test.go#TestQQBindingEnvelopeValidationRejectsUnknownAndInconsistentFields
+        - delivery_membership_test.go#TestConsumeFanoutDeduplicationOldRevisionsAndConcurrency
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-04:
+        - delivery_membership_test.go#TestConsumeFailureRollsBackInboxAllGroupsAndOutbox
+        - delivery_membership_test.go#TestConsumeApplicantsNoMembershipInvalidAndBoundedFanout
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-05:
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-06:
+        - integration_test.go#TestQQAdmissionGraceRestorationExtensionExemptionAndRemoval
+      QQ-07:
+        - facts_test.go#TestGroupFactsFiltersFieldsAtServiceBoundary
+        - integration_test.go#TestRulesCardsReportAndBatchPreview
+      QQ-08:
+        - delivery_membership_test.go#TestPendingOutboxExclusionLimitOrderingAndConfirmation
+        - delivery_membership_test.go#TestRelayStopsFailedSubjectWithinBatchAndDeliversOthers
+        - api_v03_test.go#TestEveryCollectionTypedPaginationAndAuthorization
+        - api_v03_test.go#TestCommandDiscriminatorRequiresKindSpecificFields
+        - api_v03_test.go#TestExplicitErrorResponsesAndBulkDiscriminator
+        - integration_test.go#TestRulesCardsReportAndBatchPreview
+      QQ-09:
+        - integration_test.go#TestAISuggestionsRequireEnabledActionsAndCurrentAuthorization
+      QQ-10:
+        - contract_test.go#TestAPIPrefixMatchesContractRoutesAndGeneratedClient
+        - integration_test.go#TestRetentionInboxRollbackAndNoRecallViewAudit
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
+      BE-01:
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
+      BE-02:
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
+      BE-03:
+        - integration_test.go#TestBEEntertainmentDisabledSelfOnlyCooldownAndNoViolation
   - id: information-query
     repository: StuHelper/stuhelper-information-query
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
+      - qq-binding
       - profiles
       - verification
       - catalog
@@ -426,51 +703,193 @@ modules:
       - billing
       - groups
     interface_owner: information-query
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/information-query.md
+    api: 1
+    capabilities:
+      - information-query.query
+      - information-query.audit
+    capability_requires: {}
+    scenario_tests:
+      IQ-01:
+        - service_test.go#TestPlatformQQAndSeparateCandidates
+      IQ-02:
+        - service_test.go#TestScopeAndDomainIsolation
+      IQ-03:
+        - service_test.go#TestPlatformQQAndSeparateCandidates
+      IQ-04:
+        - service_test.go#TestScopeAndDomainIsolation
+      IQ-05:
+        - service_test.go#TestBotDefaultAndGroupDelivery
+      IQ-06:
+        - service_test.go#TestSensitiveMaskAuditAndFailure
+        - postgres/repository_test.go#TestIsolatedAuditPersistenceAndRuntimePrivileges
+      IQ-07:
+        - postgres/repository_test.go#TestSensitiveResponseRequiresCommittedAudit
+        - service_test.go#TestSensitiveMaskAuditAndFailure
+      IQ-08:
+        - service_test.go#TestBotDefaultAndGroupDelivery
   - id: open-platform
     repository: StuHelper/stuhelper-open-platform
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
-    optional:
       - identity
-      - verification
       - profiles
-      - groups
+    optional:
+      - verification
+      - catalog
+      - reviews
+      - qq-binding
     interface_owner: open-platform
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/open-platform.md
+      - docs/spec/data-retention.md
+    api: 1
+    capabilities:
+      - open-platform.manage
+      - open-platform.data
+    capability_requires: {}
+    scenario_tests:
+      OP-01:
+        - integration_test.go#TestApplicationApprovalAndPerScopeAuthorization
+      OP-11:
+        - repair_test.go#TestQQTiersRequireIndependentApprovalConsentAndTrustedSource
+        - projection_test.go#TestQQProjectionNeverLeaksNumberForStatus
+      OP-02:
+        - integration_test.go#TestApplicationApprovalAndPerScopeAuthorization
+      OP-03:
+        - integration_test.go#TestSuspensionConsentBindingAndConcurrentQuota
+        - integration_test.go#TestRevocationExpiryQuotaAndClosureFence
+      OP-04:
+        - integration_test.go#TestHTTPRejectsForgedOwnersAndUsesOAuthExchange
+      OP-10:
+        - repair_test.go#TestCodeReplayRevokesIssuedTokenAndProfileIdentifiersArePairwise
+      RET-05:
+        - repair_test.go#TestCleanupIsBoundedPreservesLiveDataAndRollsBackFailures
   - id: search
     repository: StuHelper/stuhelper-search
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - catalog
       - reviews
       - resources
+      - favorites
       - community
     interface_owner: search
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/discovery-and-statistics.md
+    api: 1
+    capabilities:
+      - search.query
+      - search.projection
+    capability_requires: {}
+    scenario_tests:
+      DS-01:
+        - integration_test.go#TestVisibilityPaginationAndHotTargets
+      DS-04:
+        - integration_test.go#TestMyVotesHTTPAndTimeout
+      DS-05:
+        - activity_test.go#TestHeatWeightsWindowAndTeachers
+        - activity_test.go#TestActivityOwnership
+      DS-06:
+        - integration_test.go#TestProjectionFailureRollback
+        - activity_test.go#TestActivityReplayAndRebuild
+      DS-07:
+        - integration_test.go#TestContentDocumentKinds
+        - integration_test.go#TestProjectionReplayRebuildAndIsolation
+        - activity_test.go#TestActivityReplayAndRebuild
+        - activity_test.go#TestActivitySnapshotPagination
   - id: notifications
     repository: StuHelper/stuhelper-notifications
     visibility: public
-    implementation: not-implemented
+    implementation: in-progress
     required:
       - platform
     optional:
       - profiles
     interface_owner: notifications
-    contract_status: design-only
+    contract_status: implemented
     specifications:
       - docs/spec/notifications.md
+    api: 1
+    capabilities:
+      - notifications.inbox
+      - notifications.consume
+    capability_requires: {}
+    scenario_tests:
+      NT-01:
+        - integration_test.go#TestConcurrentDeliveryAggregationPreferencesAndCleanup
+      NT-02:
+        - integration_test.go#TestOwnershipPaginationReadAndTargetState
+      NT-03:
+        - integration_test.go#TestConcurrentDeliveryAggregationPreferencesAndCleanup
+      NT-04:
+        - integration_test.go#TestOwnershipPaginationReadAndTargetState
+      NT-05:
+        - integration_test.go#TestHTTPAuthenticationAndStrictPreferences
+      NT-06:
+        - integration_test.go#TestDeliveryRollbackAndRetentionBoundary
+        - integration_test.go#TestAggregationSeparatesTargetsParametersAndRecipients
+      NT-07:
+        - title_catalog_test.go#TestTitleCatalogAdmissionAndRejectedWrites
+        - title_catalog_test.go#TestInteractionTitleUsesServerAggregateCount
+      NT-08:
+        - consume_test.go#TestConsumeRevisionOrderingAndOriginalResults
+        - consume_test.go#TestConsumeRollbackRestoresAggregateAndRevision
+        - consume_test.go#TestConsumeSuppressionAdvancesRevisionAndValidation
+        - consume_test.go#TestConsumeConcurrentSameRevision
+        - integration_test.go#TestConcurrentDeliveryAggregationPreferencesAndCleanup
+      NT-09:
+        - recipients_test.go#TestConsumeRecipientsDeduplicationPreferencesAndReplay
+        - recipients_test.go#TestConsumeRecipientsBoundsAndAllDelivered
+        - recipients_test.go#TestConsumeRecipientsRollbackAllWrites
+        - recipients_test.go#TestConsumeRecipientsConcurrentReplayAndOverlap
+        - recipients_test.go#TestBatchInboxMigrationPreservesExistingData
+  - id: qq-binding
+    repository: StuHelper/stuhelper-qq-binding
+    visibility: private
+    implementation: in-progress
+    required:
+      - platform
+    optional:
+      - identity
+    interface_owner: qq-binding
+    contract_status: implemented
+    specifications:
+      - docs/spec/qq-binding.md
+    api: 1
+    capabilities:
+      - qq-binding.information-query
+      - qq-binding.information-identity
+      - qq-binding.information-resolve
+      - qq-binding.identity.resolve
+      - qq-binding.manage
+      - qq-binding.bot
+    capability_requires:
+      qq-binding.manage:
+        - identity
+    scenario_tests:
+      QQB-01:
+        - integration_test.go#TestIndependentBindingsCodesConflictAndClosure
+        - integration_test.go#TestCodeRetentionReissueAndOutbox
+      QQB-02:
+        - integration_test.go#TestOAuthSessionStateUnionIDAndFailures
+        - integration_test.go#TestOAuthConfirmCancelReplayAndAlreadyBound
+        - integration_test.go#TestOAuthHTTPConfirmCancelAndRemovedCallback
+      QQB-03:
+        - integration_test.go#TestHTTPServiceAuthenticationAndIsolation
+      QQB-05:
+        - koishi/plugin.test.mjs#only direct codes from configured platforms are submitted with stable retry keys
+        - koishi/plugin.test.mjs#failure and rate responses do not reveal ownership and all locales carry warnings
+        - koishi/plugin.test.mjs#409 replies distinguish an occupied account slot from foreign ownership
 applications:
   - id: backend
     repository: StuHelper/stuhelper-backend
@@ -480,16 +899,26 @@ applications:
       - docs/spec/module-lifecycle.md
       - docs/spec/sso-compatibility.md
       - docs/spec/resource-sharing.md
+      - docs/spec/open-platform.md
+      - docs/spec/personal-center.md
     optional:
       - catalog
       - reviews
       - moderation
       - media
       - resources
+      - open-platform
+      - profiles
+      - billing
+      - favorites
     capability_requires:
       resources.read:
         - resources
     scenario_tests:
+      OP-05:
+        - internal/openplatformapp/integration_test.go#TestOpenPlatformComposesCurrentContentAdmissionAndMinimalOwnedData
+      PC-07:
+        - internal/resourceapp/closure_combination_test.go#TestClosureComposesAssetsSessionsAuthorizationsAndContentWithoutChangingCopyright
       RS-03:
         - internal/resourceapp/integration_test.go#TestResourceCompositionCatalogReviewMediaArchiveAndRevocation
       RS-23:
@@ -506,6 +935,7 @@ applications:
       - moderation
       - media
       - resources
+      - groups
     capability_requires:
       storage.custody:
         - storage
@@ -515,8 +945,14 @@ applications:
         - resources
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/module-lifecycle.md
       - docs/spec/storage-contribution.md
       - docs/spec/resource-sharing.md
+      - docs/spec/qq-group-services.md
+      - docs/spec/personal-center.md
+      - docs/spec/wallet-and-points.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/my-courses.md
     scenario_tests:
       RS-25:
         - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
@@ -562,10 +998,16 @@ applications:
         - resources
     specifications:
       - docs/spec/internationalization.md
+      - docs/spec/module-lifecycle.md
       - docs/spec/admin-operations.md
       - docs/spec/storage-placement.md
       - docs/spec/storage-contribution.md
       - docs/spec/resource-sharing.md
+      - docs/spec/wallet-and-points.md
+      - docs/spec/action-eligibility.md
+      - docs/spec/my-courses.md
+      - docs/spec/qq-group-services.md
+      - docs/spec/personal-center.md
     scenario_tests:
       RS-25:
         - tests/e2e/resources.spec.mjs#owned file reuse avoids content transfer and keeps separate review
