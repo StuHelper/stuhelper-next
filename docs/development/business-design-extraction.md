@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-11
 ---
 
 # 旧业务文档抽取与模块迁移
@@ -32,7 +32,7 @@ updated: 2026-10-25
 | [stuhelper-ops](https://github.com/StuHelper/stuhelper-ops) | 独立身份设计、兼容与迁移文档、官方候选工具及检查 |
 | [stuhelper-ops](https://github.com/StuHelper/stuhelper-ops) | 生产组合设计、来源清单、旧确认快照与数据迁移范围 |
 
-公开仓库保留必要用户入口与对接说明。具体认证方法、学校数据方案、账务规则与生产配置不再在公共文档重复。按项目负责人决定，公共仓库保持 public，已有公开历史不重写。
+公开仓库保留必要用户入口与对接说明。具体认证方法、学校数据方案、账务规则与生产配置不再在公共文档重复。公共仓库为 public，私有实现由各自仓库维护。
 
 ## 当前实施范围
 

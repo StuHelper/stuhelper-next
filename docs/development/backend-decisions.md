@@ -1,0 +1,153 @@
+---
+type: development
+status: Accepted
+updated: 2026-11-11
+---
+
+# 后端候选实施状态
+
+## 当前实现
+
+教师认证、内容准入、本人记录、资料访问、个人主页、注销、收藏与开放平台已实现并发布。favorites 与 open-platform 为独立模块，各自拥有仓库、数据和接口。发布提交由 workspace.lock.json 记录，正式后端依赖由 backend/go.mod 固定为下表版本。
+
+| 模块 | 当前能力 |
+| --- | --- |
+| verification | 教师本人申请、补充材料、人工审核与多档案绑定；档案只能属于一个账号；本人实名字段由服务端脱敏 |
+| catalog | 当前内容准入、本人记录名称、结构化排课、学校学期作息、周课表查询与 iCalendar 导出 |
+| reviews | 当前内容准入、本人记录与经过验证的草稿关联；课程与教师评分统计、课程对比的数据来源 |
+| moderation | 新举报要求内容准入；认证失效后仍可补充本人处理中举报的证据，只返回本人回执 |
+| resources | 预览与下载同权；投诉只需登录，提交时通过准入才保存标题快照；资料购买来源、会员覆盖与交付回执已接入 |
+| profiles | 昵称 20 和简介 120 个 Unicode 码点；主页展示开关、7 天注销冷静期与可恢复处理进度 |
+| favorites | 课程、教师与资料收藏、按目标集合查询本人收藏状态，以及收藏夹管理 |
+| qq-binding | 三项独立验证、私聊一次性码、直接 QQ OAuth、解绑与注销、审计及 outbox；私有仓库 StuHelper/stuhelper-qq-binding |
+| open-platform | 应用审批、逐项同意、PKCE、短期令牌、撤回和通知反馈 |
+| billing | 积分与 Ivory 分账、余额和明细、奖励与追回、用户支付指引、充值确认、取消与到期、购买积分、资料解锁、会员、商品退款、加密收款资料与注销结清；真实支付未接入 |
+| platform | 模块生命周期、公共资格规则与安装历史；管理角色、范围授予与撤销；平台管理员拥有全部能力；汇总各模块操作记录 |
+| notifications | 站内通知、未读数、已读管理与互动偏好；当前目标权限检查；inbox 去重、旧修订忽略与多收件人原子写入 |
+| information-query | verification 与 qq-binding 解析线索，按候选分组查询多个业务域；独立域授权、敏感展开审计与独立身份清理 |
+| search | 可重建索引、关键词搜索、热门与我的投票；backend 已装配 catalog、reviews、resources 内容投影与 catalog、reviews、favorites 活动快照及当前权限复核 |
+| groups | 群准入、宽限期、豁免、群规则、消息与娱乐功能；backend 已装配本人查询、资格事件与维护任务，真实机器人未接入 |
+
+学校、认证徽章、学院、署名评价和资料默认公开，年级默认关闭。姓名显示末字，证件号显示首尾位，星号数量等于遮住的码点数。姓名少于 2 个码点或证件号少于 3 个码点时拒绝提交。
+
+## 发布版本
+
+各仓库的版本 tag 指向 main 上的合并提交，workspace.lock.json 记录相同提交。首次上线尚未部署，预发布与生产的运行版本由 stuhelper-ops 记录。
+
+| 仓库 | 版本 | 提交 |
+| --- | --- | --- |
+| platform | v0.2.0 | 1b232d4 |
+| web | v0.1.0 | ac138e5 |
+| admin | v0.1.0 | 567b073 |
+| verification | v0.1.0 | 5a1cd27 |
+| storage | v0.1.0 | 70d0785 |
+| media | v0.1.0 | 63928dd |
+| storage-contribution | v0.1.0 | 2437c26 |
+| billing | v0.1.0 | c40e84c |
+| backend | v0.1.0 | c77cb75 |
+| catalog | v0.1.0 | 55ba322 |
+| open-platform | v0.1.0 | 2d82043 |
+| favorites | v0.1.0 | 480ad90 |
+| reviews | v0.1.0 | 995e6d0 |
+| moderation | v0.1.0 | 3a64bf8 |
+| resources | v0.1.0 | 4bc9cc1 |
+| profiles | v0.1.0 | 83999a0 |
+| qq-binding | v0.1.0 | 20f61b5 |
+| notifications | v0.1.0 | e99fd52 |
+| information-query | v0.1.0 | 97f0030 |
+| search | v0.1.0 | ad20810 |
+| groups | v0.1.0 | 0538884 |
+| storage-bhpan | v0.1.0 | 669246c |
+| campus-adapters | v0.1.0 | 015ed5f |
+| ops | v0.1.1 | 20c5365 |
+| tooling | v0.1.4 | c93e2f0 |
+
+首次部署启用 platform、identity、profiles、verification、catalog、reviews、moderation、storage、storage-contribution、media、resources、search、favorites、notifications 及其事件 relay。
+
+billing、groups、qq-binding、open-platform、information-query 不启用，不配置价格或套餐。
+
+社区学校由配置指定，默认 4111010006。学校查询支持完整标识码、五位学校代码、名称与已登记别名。生产使用空库，旧评课与资料不迁移。
+
+## 客户端接入
+
+Web 已接入收藏、QQ 三项绑定、账号与安全、个人资料、积分与 Ivory、授权应用、开放平台开发者页、OAuth 授权页和教师认证页。授权页要求 PKCE S256，用户逐项勾选后才可同意。钱包只展示服务端启用的充值渠道。
+
+Web 已接入通知、周课表与日历导出、搜索、热门、我的投票和评分对比页面。评分对比从 reviews 读取各课程统计，search 提供搜索与发现入口。课表缺少结构化时间或作息时，页面保留已有信息，日历导出提示 schedule_incomplete。
+
+Web 搜索在认证状态就绪后重新执行查询。个人资料提供七项默认关闭的群名片许可，“我的群”展示本人群状态、截止时间、缺少条件和下一步入口；未知事实显示待确认。
+
+Admin 已接入角色授权、操作记录和信息查询，以及 QQ 绑定处理、开放平台应用审核、教师认证审核与资格撤销、账务管理。操作记录汇总九个模块的公开审计接口。
+
+Admin 的信息查询 0.2.0 候选按对象分组展示，区分当前和历史绑定，并展示不可用域。各域按当前权限返回结果，敏感展开要求独立权限与成功审计。
+
+Admin 学校作息配置按学校和学期设置第一周周一、IANA 时区与各节次起止时间。保存携带当前修订号，并发更正返回冲突，避免覆盖其他管理员的修改。
+
+Admin QQ 群管理提供群列表、成员资格与管理命令、机器人操作状态、举报、规则命中和黑名单。结果未知的机器人操作显示待确认，只有服务端确认实际成功才显示成功。独立的群设置页维护准入、名片、消息规则与娱乐参数。
+
+Admin 演示原型页面已全部移除，学校作息和 QQ 群管理使用正式功能页面。groups 的真实 Koishi 接入与机器人验收仍待完成。
+
+账务管理包括退款审核与人工打款登记、按账号查询余额与明细、积分购买退款、奖励发放与撤销，以及渠道、积分方案和奖励规则配置。支付自动查询耗尽后订单进入 needs_review，由管理员登记结果或安排再次查询。
+
+Admin 已提供会员套餐、覆盖范围、资料定价、会员授予、商品退款、收款资料查看和动作资格配置页面。Web 提供资料解锁与会员购买、续费，展示实际覆盖、付款账户、余额差额及交付状态。
+
+## 交易与会员组合
+
+backend 已装配 billing 扣费、resources 权益消费与回执。paid 表示等待交付，granted 后订单成为 fulfilled，rejected 自动退回原账户。管理员商品退款只撤销对应购买来源，会员投影按修订更新并在下载时判断到期。
+
+resources.purchase 与 membership.purchase 独立读取平台资格配置，资料下载继续使用自己的规则。会员购买还要求实际覆盖配置；已有资料访问权不扣费，规则或事实来源故障不放行。
+
+退款收款资料使用 AES-256-GCM 加密，管理员点击后按独立能力读取，审计成功才返回。私有密钥、billing relay DSN、运行权限与清理参数见[后端交易配置](../guide/backend-commerce.md)。
+
+## 事件与操作记录
+
+backend 已装配 moderation、verification 到 notifications，以及 catalog、reviews、resources、favorites 到 search 的 relay，groups 的资格消费与事件通道。billing 与 resources 的交易事件共用统一 relay。
+
+业务事务提交后通过 pg_notify 唤醒，启动、重连与每 60 秒扫描补读。投递按主题保序，读取前排除退避主题，首次失败满 24 小时转人工处理。
+
+notifications 对完整收件人集合一次消费，全部通知、inbox 与修订同事务保存。search 同事务保存 inbox 与投影。重复事件返回原结果，旧修订不覆盖新状态。完整行为见[模块通信与一致性](../spec/module-protocol.md)。
+
+平台操作记录已接入 catalog、reviews、moderation、resources、verification、billing、qq-binding、open-platform 与 storage。提供方可用时返回完整结果，故障时通过 missing_modules 标记部分结果；运行身份仍按模块隔离。
+
+## 信息查询接入
+
+姓名和学号由 verification 解析，QQ 由 qq-binding 解析，业务域按完整账号键查询。重名候选、同一账号的不同来源及历史绑定分别分组；历史绑定保留 current=false 与变更时间。
+
+verification、profiles、reviews、resources、groups、billing 已装配公开查询适配。QQ 绑定归入 profiles 域，仍保留独立来源及授权。catalog 仅提供指定学校内本人选课查询。各域和敏感字段继续检查提供方当前业务权限。
+
+候选和敏感结果在查询审计提交成功后返回。审计默认保留 12 个自然月，运行身份负责读取与追加，独立维护身份负责有界清理。维护任务启动立即运行，随后每小时清理最多 1000 条，停机取消并等待退出。
+
+接口与权限规则见[全站信息关联查询](../spec/information-query.md)。批量预览和导出、争议保留自动排除及恢复演练尚未完成，机器人信息查询默认关闭。
+
+## 验证与剩余工作
+
+发布提交由 workspace.lock.json 记录，模块场景与测试函数登记在 architecture/modules.yaml。提供方的数据库验证使用隔离 PostgreSQL 与模块运行身份，正式 backend 依赖由 go.mod 固定。源码检查、客户端接入和真实环境验收分别记录。
+
+groups、search 与 notifications 已登记模块场景。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.4.0 的 module.yaml 登记本人查询、管理接口与事件测试。
+
+下表与 [backend 当前缺口表](https://github.com/StuHelper/stuhelper-backend/blob/v0.1.0/README.md#事件-relay-与新查询模块) 对应。
+
+| 当前缺口 | 影响与剩余工作 |
+| --- | --- |
+| verification 实名入口限流 | 学号未规范化会使同一学号的大小写形式分别计数；开放北航实名方法前须修复 |
+| storage 已知问题 | 配额刷新与上传扣减存在并发覆盖；删除收尾、共享暂存锁释放及暂停实例的在途写入仍需修复 |
+| resources 已知问题 | 发布结果不明后的媒体引用、任务租约代次、目录子项上限、幂等重放顺序和打包权限过滤仍需修复 |
+| backend 镜像发行 | v0.1.0 镜像工作流因 Registry 域名解析失败；当前部署制品使用固定源码本机构建，runner DNS 待处理 |
+| catalog 课表通知 | 封闭标题目录没有课表变更通知，relay 不发送该类通知；上课提醒尚未接入 |
+| catalog 跨账号查询 | 只支持指定学校内本人选课，线索解析到其他账号时返回 unavailable |
+| 认证操作目标 | 部分事件缺少可解析的 operation 引用，通知保留且目标显示 inaccessible |
+| groups Koishi | 真实机器人未接入，执行与查询回执返回 unavailable，动作保留 pending 或 unknown |
+| 退款收款资料保留期限 | 默认至少三年并跳过未完成退款及 legal_hold，实际财务保留期限待负责人确认 |
+
+个人日程编辑、真实学校数据、真实 QQ 互联、机器人与支付流程仍待验收。
+
+公开主页限流采用各进程独立计数。源码版本已发布；真实账号、部署与恢复演练未验收。
+
+## 合并依赖
+
+提供方先发布，backend 再把依赖固定为提供方版本并验证正式组合。Web 与 Admin 的契约来源记录提供方版本对应的提交。各仓库已合入 main 并创建版本 tag，部署另行授权。
+
+充值返回公开支付指引，只有提供方查询或验签回调确认成功才入账。取消先核实付款状态并关闭未付款支付单。开发环境提供模拟付款与失败入口，生产配置拒绝启用。
+
+qq-binding 的模块检查在本仓库 CI 中使用隔离 PostgreSQL 运行。QQ 登录、真实机器人、真实 QQ 互联与群服务事件投递未验收。
+
+账务管理读取提供退款列表、包含停用项的渠道、方案与最新规则，以及按账号查询的钱包、最近订单和明细。读取要求 billing.manage，分页上限 100，账号数据与审计同事务返回。billing 独立检查和 backend 固定远程依赖的 GOWORK=off 完整检查通过。接口由私有 billing 仓库的 OpenAPI 定义。

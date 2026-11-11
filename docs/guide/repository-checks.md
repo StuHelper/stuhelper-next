@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-11
 ---
 
 # 仓库检查与文档预览
@@ -45,8 +45,16 @@ pre-commit 检查暂存区快照，包括文件安全、脚本权限、语法和
 
 契约来源检查缺少声明提交时，按完整 SHA 从提供方 origin 补取 Git 对象，不切换分支或修改源码。客户端可以继续使用兼容的旧版契约。
 
+workspace.lock.json 声明 release 时，公开集成在 PR、push 和手动运行中均使用锁定的发布提交。每项记录 tag 与完整 SHA，CI summary 分别列出完整发布组合和实际检出测试的仓库。手动提供完整 SHA 可覆盖单项，实际组合会显示该差异。
+
+没有 release 标记时，普通集成继续解析 develop，已登记的候选 PR 使用候选锁文件。发布锁文件通过核验远端注释 tag 后维护，不使用本地候选 snapshot --write 覆盖。
+
 ## 文档预览
 
 本地安装 uv 后运行 `make docs`，命令使用 `uvx --with mkdocs-material --with mkdocs-mermaid-zoom mkdocs serve`。MkDocs 配置只服务开发预览，文档没有独立 uv 项目或锁文件。
 
 CI 保留 Markdown、元信息、链接和导航检查，不安装 MkDocs、不构建或部署文档站。专业 Python 工具可使用自己的标准库或明确依赖，不因此为文档引入 Python 工作区。
+
+公共组合工作流为场景检查显式传入 `--scope=platform,web,admin,catalog,reviews,moderation,storage,media,resources`，只检查该作业实际检出的提供方。省略 scope 时仍执行完整工作区场景检查，范围内缺失测试文件会失败。
+
+客户端场景由 Web/Admin 的 module.json 登记。contracts 按 architecture/modules.yaml 中的客户端规格列表核对编号，并检查对应 TypeScript 单元测试和 Playwright 测试的文件与名称。中央规格只定义行为，不复制客户端测试。

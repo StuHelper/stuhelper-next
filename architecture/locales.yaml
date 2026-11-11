@@ -31,16 +31,38 @@ same_text_exceptions:
       brand.name:
         value: StuHelper
         reason: 品牌名称或通用格式标记保持原文。
-      language.chinese:
-        value: 简体中文
-        reason: 品牌名称或通用格式标记保持原文。
-      language.english:
-        value: English
-        reason: 品牌名称或通用格式标记保持原文。
       notFound.code:
         value: "404"
         reason: 品牌名称或通用格式标记保持原文。
-    languages: {}
+      qq.parts.connect.title:
+        value: QQ Connect
+        reason: QQ Connect 是腾讯产品名称，各语言保持原文。
+    languages:
+      fr-FR:
+        academic.subject.sections:
+          value: Sections
+          reason: 法语 Sections 表示内容分区，与英语同形。
+        resources.editor.description:
+          value: Description
+          reason: 法语 Description 是简介字段的常用名称，与英语同形。
+        verification.photo:
+          value: Photo {index}
+          reason: 法语 Photo 表示照片，与英语同形。
+        demo.interactions:
+          value: Interactions
+          reason: 法语 Interactions 表示互动，与英语同形。
+        demo.points:
+          value: Points
+          reason: 法语 Points 表示积分，与英语同形。
+        demo.pageOf:
+          value: Page {p0} / {p1}
+          reason: 法语 Page 表示页，与英语同形。
+        demo.pageNo:
+          value: Page {p0}
+          reason: 法语 Page 表示页，与英语同形。
+        demo.notifications:
+          value: Notifications
+          reason: 法语 Notifications 表示通知，与英语同形。
   admin:
     shared:
       authentication.qq:
@@ -105,6 +127,24 @@ same_text_exceptions:
         page.framework.title:
           value: Administration
           reason: 本语言的正确词语与英文拼写相同。
+        page.resources.description:
+          value: Description
+          reason: 法语 Description 是简介字段的常用名称，与英语同形。
+        page.resources.min:
+          value: Minimum
+          reason: 法语 Minimum 表示最小值，与英语同形。
+        page.resources.max:
+          value: Maximum
+          reason: 法语 Maximum 表示最大值，与英语同形。
+        page.resources.options:
+          value: Options
+          reason: 法语 Options 表示选项，与英语同形。
+        page.common.operation:
+          value: Actions
+          reason: 法语 Actions 表示操作列，与英语同形。
+        page.overview.module:
+          value: Module
+          reason: 法语 Module 表示平台模块，与英语同形。
       es-ES:
         preferences.vertical:
           value: Vertical
@@ -119,5 +159,5 @@ same_text_exceptions:
           value: General
           reason: 本语言的正确词语与英文拼写相同。
         common.no:
-          value: No
+          value: "No"
           reason: 本语言的正确词语与英文拼写相同。

@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { test } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { goWorkspace, verifyScenarios, verifySource } from './workspace.mjs';
+import { goWorkspace, parseCommand, verifyWorkspaceScenarios, verifyScenarios, verifyClientScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
 
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -57,9 +57,39 @@ test('implemented scenarios reference an existing specification and executable t
   fs.writeFileSync(path.join(directory, 'module_test.go'), 'func TestOptional(t *testing.T) {}');
   const definition = { specifications: ['spec.md'], scenario_tests: { 'MOD-06': ['module_test.go#TestOptional'] } };
   verifyScenarios(directory, definition, directory);
+  fs.writeFileSync(path.join(directory, 'spec.md'), '| MOD-06：condition | result |');
+  verifyScenarios(directory, definition, directory);
+  fs.appendFileSync(path.join(directory, 'spec.md'), '\n| AE-ACCESS-07：denied | closed |\n| SV-TEACHER-01 | verified |');
+  for (const id of ['AE-ACCESS-07', 'SV-TEACHER-01']) verifyScenarios(directory, { ...definition, scenario_tests: { [id]: ['module_test.go#TestOptional'] } }, directory);
+  assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'AE-ACCESS-99': ['module_test.go#TestOptional'] } }, directory), /Unknown implemented scenario/);
+  assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'ae-ACCESS-07': ['module_test.go#TestOptional'] } }, directory), /Invalid scenario/);
   assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-99': ['module_test.go#TestOptional'] } }, directory), /Unknown implemented scenario/);
+  fs.writeFileSync(path.join(directory, 'plugin.test.mjs'), "test('private messages', () => {});");
+  verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-06': ['plugin.test.mjs#private messages'] } }, directory);
+  assert.throws(() => verifyScenarios(directory, { ...definition, scenario_tests: { 'MOD-06': ['plugin.test.mjs#missing test'] } }, directory), /Missing scenario test/);
   fs.writeFileSync(path.join(directory, 'module_test.go'), '');
   assert.throws(() => verifyScenarios(directory, definition, directory), /Missing scenario test/);
+});
+
+test('client manifests resolve TypeScript and browser tests against central specifications', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-client-scenarios-'));
+  t.after(() => fs.rmSync(directory, { recursive: true }));
+  fs.writeFileSync(path.join(directory, 'spec.md'), '| RES-CLIENT-01 | Retry original request |');
+  fs.writeFileSync(path.join(directory, 'api.test.ts'), "it('retries original request', async () => {});");
+  fs.writeFileSync(path.join(directory, 'purchase.spec.mjs'), 'memberTest("waits for delivery; then downloads", async () => {});');
+  const manifest = { id: 'web', scenario_tests: { 'RES-CLIENT-01': ['api.test.ts#retries original request', 'purchase.spec.mjs#waits for delivery; then downloads'] } };
+  const write = () => fs.writeFileSync(path.join(directory, 'module.json'), JSON.stringify(manifest));
+  const definition = { id: 'web', specifications: ['spec.md'] };
+  const client = { name: 'web', directory };
+  write();
+  verifyClientScenarios(directory, definition, client);
+  manifest.scenario_tests['RES-CLIENT-02'] = ['api.test.ts#retries original request'];
+  write();
+  assert.throws(() => verifyClientScenarios(directory, definition, client), /Unknown implemented scenario/);
+  delete manifest.scenario_tests['RES-CLIENT-02'];
+  manifest.scenario_tests['RES-CLIENT-01'] = ['purchase.spec.mjs#missing case'];
+  write();
+  assert.throws(() => verifyClientScenarios(directory, definition, client), /Missing scenario test/);
 });
 
 
@@ -97,6 +127,13 @@ test('source records accept official checkout URLs but reject a different reposi
   fs.writeFileSync(path.join(checkout, 'source.txt'), 'source\n'); git('add', '.'); git('commit', '-qm', 'fixture');
   git('remote', 'add', 'origin', 'https://github.com/StuHelper/stuhelper-platform');
   assert.equal(snapshot(directory, true).projects.platform.revision, git('rev-parse', 'HEAD'));
+  const locked = JSON.parse(fs.readFileSync(path.join(directory, 'workspace.lock.json')));
+  locked.projects.platform.tag = 'v0.2.0';
+  fs.writeFileSync(path.join(directory, 'workspace.lock.json'), JSON.stringify(locked));
+  assert.equal(snapshot(directory).projects.platform.tag, 'v0.2.0');
+  locked.projects.platform.revision = 'b'.repeat(40);
+  fs.writeFileSync(path.join(directory, 'workspace.lock.json'), JSON.stringify(locked));
+  assert.equal(snapshot(directory).projects.platform.tag, undefined);
   git('remote', 'set-url', 'origin', 'git@github.com:StuHelper/stuhelper-platform.git');
   snapshot(directory, true);
   git('remote', 'set-url', 'origin', 'https://github.com/other/stuhelper-platform.git');
@@ -123,4 +160,63 @@ test('contract provenance retrieves the declared historical commit from a fresh 
   assert.equal(providerSource(checkout, declared, 'contracts/api.yaml'), 'version: old\n');
   assert.equal(git(checkout, 'rev-parse', 'HEAD'), current);
   assert.equal(git(checkout, 'status', '--porcelain'), '');
+});
+
+test('academic snapshots reject forged digests, provider revisions and missing mappings', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-academic-contract-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(directory, 'contracts'));
+  fs.mkdirSync(path.join(directory, 'src/api'), { recursive: true });
+  const contract = JSON.stringify({ openapi: '3.1.0', info: { version: '0.1.0' } });
+  const generated = 'export interface paths {}';
+  fs.writeFileSync(path.join(directory, 'contracts/catalog.openapi.json'), contract);
+  fs.writeFileSync(path.join(directory, 'src/api/catalog.gen.ts'), generated);
+  const source = { repository: 'StuHelper/stuhelper-catalog', revision: 'a'.repeat(40), version: '0.1.0', files: { 'contracts/catalog.openapi.json': 'contracts/catalog.openapi.json', 'sdk/catalog.gen.ts': 'src/api/catalog.gen.ts' }, sha256: { 'contracts/catalog.openapi.json': digest(contract), 'src/api/catalog.gen.ts': digest(generated) } };
+  const provider = { name: 'catalog' }, client = { directory };
+  const load = (revision, filename) => { assert.equal(revision, source.revision); return filename.startsWith('contracts/') ? contract : generated; };
+  verifyAcademicSource(provider, client, source, load);
+  assert.throws(() => verifyAcademicSource(provider, client, { ...source, files: {} }, load));
+  assert.throws(() => verifyAcademicSource(provider, client, { ...source, revision: 'branch' }, load));
+  assert.throws(() => verifyAcademicSource(provider, client, { ...source, sha256: {} }, load), /digest/);
+  assert.throws(() => verifyAcademicSource(provider, client, source, () => 'different source'), /Snapshot differs/);
+  const adminGenerated = 'apps/web-antd/src/api/catalog.gen.ts';
+  fs.mkdirSync(path.dirname(path.join(directory, adminGenerated)), { recursive: true });
+  fs.writeFileSync(path.join(directory, adminGenerated), generated);
+  const adminSource = { ...source, files: { ...source.files, 'sdk/catalog.gen.ts': adminGenerated }, sha256: { 'contracts/catalog.openapi.json': digest(contract), [adminGenerated]: digest(generated) } };
+  verifyAcademicSource(provider, { ...client, name: 'admin' }, adminSource, load);
+  assert.throws(() => verifyAcademicSource(provider, { ...client, name: 'admin' }, source, load));
+});
+
+
+test('scenario verification obeys the explicit integration checkout scope', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'stuhelper-scope-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(directory, 'spec.md'), '| MOD-01 | public |\n| MOD-02 | private |\n');
+  fs.mkdirSync(path.join(directory, 'public'));
+  fs.writeFileSync(path.join(directory, 'public', 'module_test.go'), 'func TestPublic(t *testing.T) {}');
+  const definitions = [{ id: 'platform', repository: 'StuHelper/stuhelper-platform', specifications: ['spec.md'], scenario_tests: {'MOD-01':['module_test.go#TestPublic']} }, {id:'identity',repository:'StuHelper/stuhelper-backend',specifications:['spec.md'],scenario_tests:{'MOD-02':['private_test.go#TestPrivate']}}];
+  const records = ['platform','backend'].map(name => ({name,url:`https://github.com/StuHelper/stuhelper-${name}.git`,directory:path.join(directory,name==='platform'?'public':'missing-private')}));
+  assert.doesNotThrow(() => verifyWorkspaceScenarios(directory, definitions, records, ['platform']));
+  assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records), /ENOENT|Missing scenario test/);
+  assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records, ['typo']), /Unknown scenario checkout/);
+  fs.rmSync(path.join(directory,'public','module_test.go'));
+  assert.throws(() => verifyWorkspaceScenarios(directory, definitions, records, ['platform']), /ENOENT|Missing scenario test/);
+});
+
+
+test('CLI accepts an explicit contract scope without relaxing other commands', () => {
+  assert.deepEqual(parseCommand(['contracts','--scope=platform,web,admin']), {command:'contracts',scope:['platform','web','admin'],write:false});
+  assert.equal(parseCommand(['snapshot','--write']).write,true);
+  for (const args of [['contracts','--write'],['contracts','--scope='],['validate','--scope=platform'],['snapshot','--scope=platform'],['contracts','--scope=platform','extra']]) assert.throws(()=>parseCommand(args));
+});
+
+
+test('runtime module declarations reject library kinds and mismatched capability dependencies', async () => {
+  const {verifyRuntimeDescriptor}=await import('./workspace.mjs');
+  const definition={id:'catalog',api:1,required:['platform'],optional:['identity'],capabilities:['catalog.read'],capability_requires:{'catalog.read':['identity']}};
+  const manifest={id:'catalog',kind:'module',api:1,requires:[{id:'platform',api:1}],optional:[{id:'identity',api:1}],capabilities:['catalog.read'],capability_requires:{'catalog.read':[{id:'identity',api:1}]}};
+  verifyRuntimeDescriptor(definition,manifest);
+  assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,kind:'library'}),/runtime module/);
+  assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,requires:[]}),/Required dependencies/);
+  assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,capability_requires:{}}),/Capability dependencies/);
 });

@@ -1,12 +1,12 @@
 ---
 type: adr
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-11
 ---
 
 # 0005：使用 Mani 管理开发工作区
 
-## 背景与决定因素
+## 背景与设计条件
 
 StuHelper 的模块分别维护代码、接口、版本和 GitHub PR。当前需要统一检出、查看状态和执行仓库自身的检查。生产组合由私有 ops 仓库固定版本，不要求所有模块绑定为同一个源码发行版本。
 
@@ -14,11 +14,11 @@ StuHelper 的模块分别维护代码、接口、版本和 GitHub PR。当前需
 
 使用主机安装的 Mani 统一检出和任务，各仓库独立维护，ops 固定部署组合。仓库保留独立构建和检查入口。
 
-单份 mani.yaml 登记 platform、Web、stuhelper-admin、SSO、认证、学校适配、账务和 ops。公私仓划分决定代码与文档的可见性，GitHub 管理仓库访问权限。
+单份 mani.yaml 登记 platform、Web、stuhelper-admin、SSO、认证、学校适配、账务和 ops。公私仓划分规定代码与文档的可见性，GitHub 管理仓库访问权限。
 
 ## 备选与取舍
 
-Google Repo 提供完整的 revision manifest 和同步流程，适合需要统一维护整套源码版本的项目。West 也能维护多仓库清单，但其 Python 实现和 YAML 配置不足以构成本项目的决定性优势。
+Google Repo 提供完整的 revision manifest 和同步流程，适合需要统一维护整套源码版本的项目。West 也能维护多仓库清单，但其 Python 实现和 YAML 配置不足以构成本项目的选型优势。
 
 Mani 更贴近当前日常操作，但 `mani sync` 主要克隆缺失仓库，不负责把已有工作树切换到声明版本。源码更新显式使用 Git。发布组合和兼容验证需要继续由依赖文件、接口测试与 ops 版本记录负责。
 

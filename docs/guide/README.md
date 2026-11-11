@@ -1,7 +1,7 @@
 ---
 type: guide
 status: Accepted
-updated: 2026-10-25
+updated: 2026-11-11
 ---
 
 # 操作指南
@@ -12,6 +12,7 @@ updated: 2026-10-25
 | [CI 运行与缓存操作](ci-runners.md) | 手动检查、runner 选择、结果判断与缓存清理 |
 | [SSO 候选工具的位置](sso-candidate.md) | 获得官方 release、commit、镜像 digest；不进行部署 |
 | [开发工作区](development-workspace.md) | 统一检出、任务工作树与候选组合重放 |
+| [后端交易与收款资料配置](backend-commerce.md) | 配置私有密钥、交易 relay、运行身份和有界清理 |
 | [工具链与依赖维护](dependency-maintenance.md) | 工具链同步、依赖更新与框架升级 |
 
 新增主题使用[分类模板](TEMPLATE.md)，并同步维护[文档导航](../README.md)。

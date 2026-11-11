@@ -21,12 +21,16 @@ export function validateModules(config) {
     assert(!repositories.has(module.repository), `Duplicate repository owner: ${module.repository}`);
     repositories.add(module.repository);
     assert(['public', 'private'].includes(module.visibility));
-    assert(['not-implemented', 'framework'].includes(module.implementation));
+    assert(['not-implemented', 'in-progress', 'framework', 'library'].includes(module.implementation));
     assert.equal(module.interface_owner, module.id);
-    assert(['design-only', 'framework'].includes(module.contract_status));
-    if (module.implementation === 'framework') {
-      assert.equal(module.contract_status, 'framework');
-      assert(Number.isInteger(module.api) && module.api > 0);
+    assert(['design-only', 'implemented', 'framework', 'library'].includes(module.contract_status));
+    if (module.implementation === 'library') {
+      assert.equal(module.contract_status, 'library');
+      assert(!module.capabilities?.length, 'Libraries do not expose runtime capabilities');
+    }
+    if (['framework','in-progress'].includes(module.implementation)) {
+      assert.equal(module.contract_status, module.implementation === 'framework' ? 'framework' : 'implemented', 'Candidates must declare their implemented contract');
+      assert(Number.isInteger(module.api) && module.api > 0, 'Candidates must declare an API version');
       assert(Array.isArray(module.capabilities));
       assert(module.capability_requires && typeof module.capability_requires === 'object');
     }
@@ -57,6 +61,7 @@ export function validateModules(config) {
   for (const id of ['identity', 'verification', 'campus-adapters', 'billing']) {
     assert.equal(byId.get(id)?.visibility, 'private', `${id} must remain private`);
   }
+  assert.equal(byId.get('storage-bhpan')?.visibility, 'public', 'storage-bhpan must remain public');
   const apps = new Map(config.applications.map(app => [app.id, app]));
   assert.equal(apps.size, config.applications.length, 'Duplicate application ID');
   for (const app of apps.values()) {
