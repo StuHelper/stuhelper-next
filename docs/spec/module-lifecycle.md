@@ -1,7 +1,7 @@
 ---
 type: spec
 status: Accepted
-updated: 2026-11-11
+updated: 2026-11-12
 ---
 
 # 模块生命周期
@@ -75,7 +75,7 @@ platform 使用独立 PostgreSQL schema 和运行身份保存安装事实，管�
 
 | 场景 | 预期结果 |
 | --- | --- |
-| MOD-10 | reviews、resources 或 favorites 从未安装时，注销跳过并记录模块名称；已安装但关闭、历史未知或损坏时等待 |
+| MOD-10 | billing、open-platform、reviews、resources、favorites 或 qq-binding 从未安装时，注销跳过对应模块处理并记录模块名称；已安装但关闭、历史未知或损坏时等待 |
 
 | 场景 | 预期结果 |
 | --- | --- |

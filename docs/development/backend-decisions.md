@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-11
+updated: 2026-11-12
 ---
 
 # 后端候选实施状态
@@ -32,26 +32,26 @@ updated: 2026-11-11
 
 ## 发布版本
 
-各仓库的版本 tag 指向 main 上的合并提交，workspace.lock.json 记录相同提交。首次上线尚未部署，预发布与生产的运行版本由 stuhelper-ops 记录。
+各仓库的版本 tag 指向 main 上的合并提交，workspace.lock.json 记录相同提交。当前组合使用 backend v0.1.4、profiles v0.1.1 和 Web/Admin v0.1.1，包含完整启动回归、module-history 驱动修复，以及按持久安装历史跳过未安装模块的注销处理。该组合用于预发布验收，生产尚未部署。
 
 | 仓库 | 版本 | 提交 |
 | --- | --- | --- |
 | platform | v0.2.0 | 1b232d4 |
-| web | v0.1.0 | ac138e5 |
-| admin | v0.1.0 | 567b073 |
+| web | v0.1.1 | 77ede8d |
+| admin | v0.1.1 | 5a6b2a8 |
 | verification | v0.1.0 | 5a1cd27 |
 | storage | v0.1.0 | 70d0785 |
 | media | v0.1.0 | 63928dd |
 | storage-contribution | v0.1.0 | 2437c26 |
 | billing | v0.1.0 | c40e84c |
-| backend | v0.1.0 | c77cb75 |
+| backend | v0.1.4 | 2c967db |
 | catalog | v0.1.0 | 55ba322 |
 | open-platform | v0.1.0 | 2d82043 |
 | favorites | v0.1.0 | 480ad90 |
 | reviews | v0.1.0 | 995e6d0 |
 | moderation | v0.1.0 | 3a64bf8 |
 | resources | v0.1.0 | 4bc9cc1 |
-| profiles | v0.1.0 | 83999a0 |
+| profiles | v0.1.1 | 272cf90 |
 | qq-binding | v0.1.0 | 20f61b5 |
 | notifications | v0.1.0 | e99fd52 |
 | information-query | v0.1.0 | 97f0030 |
@@ -120,6 +120,10 @@ verification、profiles、reviews、resources、groups、billing 已装配公开
 
 ## 验证与剩余工作
 
+注销修复先复现缺失账务与开放平台时的阻塞，再通过隔离 PostgreSQL 验证安装历史、跳过结果持久化、故障恢复和重复请求。提供方及 backend 完整检查通过，Web 注销申请与撤销覆盖八语言桌面和移动端共 16 个浏览器用例。
+
+backend v0.1.4 正式 tag 制品已使用生产配置模板与空数据库完成本地启动检查。两端完整检查及浏览器 CI 通过。真实账号验收仍待负责人完成。
+
 发布提交由 workspace.lock.json 记录，模块场景与测试函数登记在 architecture/modules.yaml。提供方的数据库验证使用隔离 PostgreSQL 与模块运行身份，正式 backend 依赖由 go.mod 固定。源码检查、客户端接入和真实环境验收分别记录。
 
 groups、search 与 notifications 已登记模块场景。search 使用 DS-01、DS-04 至 DS-07，groups 按 0.4.0 的 module.yaml 登记本人查询、管理接口与事件测试。
@@ -140,7 +144,7 @@ groups、search 与 notifications 已登记模块场景。search 使用 DS-01、
 
 个人日程编辑、真实学校数据、真实 QQ 互联、机器人与支付流程仍待验收。
 
-公开主页限流采用各进程独立计数。源码版本已发布；真实账号、部署与恢复演练未验收。
+公开主页限流采用各进程独立计数。源码版本已发布；真实账号验收、生产部署与恢复演练尚未完成。
 
 ## 合并依赖
 
