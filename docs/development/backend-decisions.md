@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-11
+updated: 2026-11-12
 ---
 
 # 后端候选实施状态
@@ -32,7 +32,7 @@ updated: 2026-11-11
 
 ## 发布版本
 
-各仓库的版本 tag 指向 main 上的合并提交，workspace.lock.json 记录相同提交。首次上线尚未部署，预发布与生产的运行版本由 stuhelper-ops 记录。
+各仓库的版本 tag 指向 main 上的合并提交，workspace.lock.json 记录相同提交。当前组合使用 backend v0.1.3，包含完整启动回归和 module-history 数据库驱动修复。预发布仍运行 backend v0.1.1，待按本组合升级并完成真实账号验收。生产尚未部署。
 
 | 仓库 | 版本 | 提交 |
 | --- | --- | --- |
@@ -44,7 +44,7 @@ updated: 2026-11-11
 | media | v0.1.0 | 63928dd |
 | storage-contribution | v0.1.0 | 2437c26 |
 | billing | v0.1.0 | c40e84c |
-| backend | v0.1.0 | c77cb75 |
+| backend | v0.1.3 | d5354f6 |
 | catalog | v0.1.0 | 55ba322 |
 | open-platform | v0.1.0 | 2d82043 |
 | favorites | v0.1.0 | 480ad90 |
