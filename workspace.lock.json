@@ -142,8 +142,8 @@
     },
     "campus-adapters": {
       "repository": "https://github.com/StuHelper/stuhelper-campus-adapters.git",
-      "tag": "v0.1.3",
-      "revision": "6a54680a9ee6ac1450701d24f7229abac1f813c7",
+      "tag": "v0.1.4",
+      "revision": "fa8cf48665c33c92c42250b54297bb87274aef66",
       "dirty": false
     },
     "storage-bhpan": {
