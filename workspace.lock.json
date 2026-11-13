@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release": "v0.1.5",
+  "release": "v0.1.6",
   "projects": {
     "platform": {
       "repository": "https://github.com/StuHelper/stuhelper-platform.git",
@@ -10,14 +10,14 @@
     },
     "web": {
       "repository": "https://github.com/StuHelper/stuhelper-web.git",
-      "tag": "v0.1.1",
-      "revision": "77ede8d24c409bf84b087b73472d81c6c4e1856b",
+      "tag": "v0.1.2",
+      "revision": "8feaa072033118f76680216901faeba1edb056a5",
       "dirty": false
     },
     "admin": {
       "repository": "https://github.com/StuHelper/stuhelper-admin.git",
-      "tag": "v0.1.1",
-      "revision": "5a6b2a8f5bbe53974d16f62306742619d0ce454c",
+      "tag": "v0.1.2",
+      "revision": "2f75fcb33949b489fad635c6f6bf386a41cb8409",
       "dirty": false
     },
     "verification": {
@@ -52,8 +52,8 @@
     },
     "backend": {
       "repository": "https://github.com/StuHelper/stuhelper-backend.git",
-      "tag": "v0.1.7",
-      "revision": "f5984b7248ba801ff7003fa6309f2dbd259b527d",
+      "tag": "v0.1.8",
+      "revision": "20fb64c6715b3dd87662021644d2306c58c3b0c7",
       "dirty": false
     },
     "catalog": {
@@ -130,20 +130,20 @@
     },
     "tooling": {
       "repository": "https://github.com/StuHelper/stuhelper-tooling.git",
-      "tag": "v0.1.5",
-      "revision": "4cfbe214496e62d5d37a50031b1ddd868d2b209e",
+      "tag": "v0.1.6",
+      "revision": "2fe317ce06eca957c60ac4fe2cbd19b202911db2",
       "dirty": false
     },
     "ops": {
       "repository": "https://github.com/StuHelper/stuhelper-ops.git",
-      "tag": "v0.1.4",
-      "revision": "b7d734d1ca517da4aaf7aad5488179a84b3382be",
+      "tag": "v0.1.6",
+      "revision": "a548d1764c1be4d8c4e519ee3fc77be0f157b71d",
       "dirty": false
     },
     "campus-adapters": {
       "repository": "https://github.com/StuHelper/stuhelper-campus-adapters.git",
-      "tag": "v0.1.5",
-      "revision": "fb1658b7c2f4cd23e37161051e0aabdb5a5884a3",
+      "tag": "v0.1.6",
+      "revision": "89275596fb85afa7530b861d18d8c46ef870c413",
       "dirty": false
     },
     "storage-bhpan": {

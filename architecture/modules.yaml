@@ -945,6 +945,7 @@ applications:
       resources.read:
         - resources
     specifications:
+      - docs/spec/sso-compatibility.md
       - docs/spec/internationalization.md
       - docs/spec/module-lifecycle.md
       - docs/spec/storage-contribution.md
@@ -998,6 +999,7 @@ applications:
       resources.read:
         - resources
     specifications:
+      - docs/spec/sso-compatibility.md
       - docs/spec/internationalization.md
       - docs/spec/module-lifecycle.md
       - docs/spec/admin-operations.md
