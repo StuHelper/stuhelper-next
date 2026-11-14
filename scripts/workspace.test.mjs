@@ -5,7 +5,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { test } from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { goWorkspace, parseCommand, verifyWorkspaceScenarios, verifyScenarios, verifyClientScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
+import { verifyLocalePolicy, goWorkspace, parseCommand, verifyWorkspaceScenarios, verifyScenarios, verifyClientScenarios, verifySource, verifyAcademicSource } from './workspace.mjs';
 
 const digest = text => crypto.createHash('sha256').update(text).digest('hex');
 
@@ -219,4 +219,23 @@ test('runtime module declarations reject library kinds and mismatched capability
   assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,kind:'library'}),/runtime module/);
   assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,requires:[]}),/Required dependencies/);
   assert.throws(()=>verifyRuntimeDescriptor(definition,{...manifest,capability_requires:{}}),/Capability dependencies/);
+});
+
+
+test('locale policies retain shared rules and each consumer exceptions across independent releases', () => {
+  const old = { default: 'zh-CN', default_time_zone: 'Asia/Shanghai', languages: { 'zh-CN': { direction: 'ltr' }, 'ar-EG': { direction: 'rtl' } }, same_text_exceptions: { web: { languages: {} }, admin: { shared: { brand: { value: 'StuHelper', reason: 'brand' } } } } };
+  const current = structuredClone(old);
+  current.same_text_exceptions.web.languages['fr-FR'] = { 'nav.campus': { value: 'Campus', reason: 'French word' } };
+  verifyLocalePolicy(old, current, 'admin');
+  verifyLocalePolicy(current, current, 'web');
+  assert.throws(() => verifyLocalePolicy(old, current, 'web'), /locale exceptions/);
+  for (const field of ['default', 'default_time_zone', 'languages']) {
+    const changed = structuredClone(current);
+    changed[field] = field === 'languages' ? { 'ar-EG': { direction: 'ltr' } } : 'changed';
+    assert.throws(() => verifyLocalePolicy(changed, current, 'web'), /shared locale policy/);
+  }
+  const changed = structuredClone(old);
+  changed.same_text_exceptions.admin.shared.brand.value = 'unexpected';
+  assert.throws(() => verifyLocalePolicy(changed, current, 'admin'), /locale exceptions/);
+  assert.throws(() => verifyLocalePolicy(old, current, 'unknown'), /Unknown locale policy application/);
 });
