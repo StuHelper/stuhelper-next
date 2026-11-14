@@ -136,8 +136,8 @@
     },
     "ops": {
       "repository": "https://github.com/StuHelper/stuhelper-ops.git",
-      "tag": "v0.1.7",
-      "revision": "06ccc88ac79b4be9f0e018d8786d1d20ade69f6f",
+      "tag": "v0.1.8",
+      "revision": "01bbafd134e8f67264dda0abe7562c28156e80a3",
       "dirty": false
     },
     "campus-adapters": {
