@@ -63,6 +63,13 @@ same_text_exceptions:
         demo.notifications:
           value: Notifications
           reason: 法语 Notifications 表示通知，与英语同形。
+        nav.campus:
+          value: Campus
+          reason: 法语 Campus 表示校园，与英语同形。
+      es-ES:
+        nav.campus:
+          value: Campus
+          reason: 西班牙语 Campus 表示校园，与英语同形。
   admin:
     shared:
       authentication.qq:

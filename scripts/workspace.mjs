@@ -31,6 +31,17 @@ export function validate(directory = root) {
   toolchains(directory, false, false);
 }
 
+// A release can update one application's translation exceptions independently.
+// Shared language rules and the consuming application's own exceptions stay strict.
+export function verifyLocalePolicy(actual, expected, application) {
+  assert(['web', 'admin'].includes(application), 'Unknown locale policy application');
+  const { same_text_exceptions: actualExceptions, ...actualShared } = actual;
+  const { same_text_exceptions: expectedExceptions, ...expectedShared } = expected;
+  assert.deepEqual(actualShared, expectedShared, `${application}: shared locale policy`);
+  assert(expectedExceptions?.[application], `${application}: missing central locale exceptions`);
+  assert.deepEqual(actualExceptions?.[application], expectedExceptions[application], `${application}: locale exceptions`);
+}
+
 export function toolchains(directory = root, write = false, includeCheckouts = true) {
   const versions = readYaml(path.join(directory, 'architecture/toolchains.yaml'));
   const directories = [directory, ...(includeCheckouts ? projects(directory).map(project => project.directory).filter(location => fs.existsSync(path.join(location, '.git'))) : [])];
@@ -73,7 +84,8 @@ export function toolchains(directory = root, write = false, includeCheckouts = t
         fs.writeFileSync(policy, source);
         execFileSync('pnpm', ['exec', 'stuhelper-check', 'locale-policy', '--write'], { cwd: location, stdio: 'inherit' });
       }
-      assert(fs.readFileSync(policy).equals(source), `${location}: locale policy`);
+      const application = projects(directory).find(project => project.directory === location)?.name;
+      verifyLocalePolicy(readYaml(policy), YAML.parse(source.toString()), application);
     }
   }
   console.log(`PASS: toolchains agree in ${directories.length} checked-out repositories`);
