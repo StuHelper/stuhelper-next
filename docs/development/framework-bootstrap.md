@@ -1,7 +1,7 @@
 ---
 type: development
 status: Accepted
-updated: 2026-11-11
+updated: 2026-11-14
 ---
 
 # 框架实施状态
@@ -17,6 +17,14 @@ platform 提供公共模块接口、依赖校验、能力降级、Fx 生命周�
 Web 与 stuhelper-admin 提供状态展示、错误恢复和八语言入口。Admin 另有存储运营页面，接口、权限和验收范围见[存储实施状态](storage-module.md)。国际化检查覆盖消息键、占位符、复数、数字、金额、日期、时区、相对时间和 RTL。
 
 共享检查器、GitHub action、reusable workflow 与 Lefthook 预设已迁至 stuhelper-tooling。主仓库保留架构、Mani、工作区工具和应用联调。SSO 官方制品资料归 ops，后端身份实现归 backend。
+
+## v0.1.10 固定组合
+
+组合固定 backend v0.1.13、Web v0.1.4 和 Admin v0.1.3，其他提供方版本保持不变。完整源码提交与 tag 记录于 workspace.lock.json。各应用附件由正式 Release 提供，部署前核对来源与 SHA256SUMS。
+
+Web 主域根路径为多产品主页，校园首页位于 /campus。框架浏览器测试分别验证品牌标题的可访问名称、校园内容、语言切换、错误恢复与布局。八语言桌面及手机共 80 项通过，中文学业流程 44 项通过，完整组合由远端 CI 验证。
+
+生产部署和真实账号验收由私有 ops 记录，公网入口切换由负责人执行。
 
 ## 验证入口
 

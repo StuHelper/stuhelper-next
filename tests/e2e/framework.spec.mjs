@@ -22,10 +22,13 @@ async function layout(page, locale) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 }
 
-test('Web loads translated framework capabilities within the viewport', async ({ page }, testInfo) => {
+test('Web portal and campus load translated content within the viewport', async ({ page }, testInfo) => {
   const { locale, web } = messages(testInfo);
   const errors = collectErrors(page);
   await page.goto(`http://127.0.0.1:18781/?lang=${locale}`);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(web.brand.name);
+  await layout(page, locale);
+  await page.goto(`http://127.0.0.1:18781/campus?lang=${locale}`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(web.home.title);
   // A working connection shows no status; only a failure is announced.
   await expect(page.getByRole('region', { name: web.connection.label })).toHaveCount(0);
@@ -40,7 +43,7 @@ test('Web loads translated framework capabilities within the viewport', async ({
 test('Web recovers from a network failure through a translated retry action', async ({ page }, testInfo) => {
   const { locale, web } = messages(testInfo);
   await page.route('**/api/v1/system/capabilities', route => route.abort());
-  await page.goto(`http://127.0.0.1:18781/?lang=${locale}`);
+  await page.goto(`http://127.0.0.1:18781/campus?lang=${locale}`);
   await expect(page.getByRole('status')).toContainText(web.connection.errors.network);
   await page.unroute('**/api/v1/system/capabilities');
   await page.getByRole('button', { name: web.connection.retry }).click();
@@ -52,7 +55,7 @@ test('Web deep links and language selection retain the chosen language', async (
   await page.goto(`http://127.0.0.1:18781/unimplemented-module?lang=${locale}`);
   await expect(page.getByRole('heading', { name: web.notFound.title })).toBeVisible();
   await page.getByRole('link', { name: web.notFound.home, exact: true }).click();
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText(web.home.title);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveAccessibleName(web.brand.name);
   // The language control is a listbox: open it, then choose a language by its own name.
   // Its accessible name follows the current language.
   const chinese = messages({ project: { metadata: { locale: 'zh-CN' } } }).web;
